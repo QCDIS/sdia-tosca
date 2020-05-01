@@ -1,0 +1,306 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+node_types:
+
+  tosca.nodes.QC.Root:
+    description: root QC node
+    attributes:
+      current_state:
+        type: string
+        required: false
+        description: the current state of the node
+      desired_state:
+        type: string
+        required: false
+        description: the current state of the node
+    
+
+  tosca.nodes.QC.Container.Application.Docker:
+    derived_from:  tosca.nodes.QC.Application
+    description: description of container
+    properties:
+      ports:
+        description: ports to be forwarded
+        type: list
+        required: false      
+      entrypoint:
+        description: command
+        type: string
+        required: false
+      cmd:
+        description: cmd
+        type: string
+        required: false
+      environment:
+        description: environment variables
+        type: map
+        required: false
+      volumes:
+        description: volume
+        type: list
+        required: false
+    requirements:
+      - host:
+          capability: tosca.capabilities.QC.docker.Orchestrator
+          node: tosca.nodes.QC.docker.Orchestrator
+          relationship: tosca.relationships.HostedOn         
+    attributes:
+      service_url:
+        type: string
+        required: false
+        description: url of the service 
+    interfaces:
+        Kubernetes:
+            type: tosca.interfaces.QC.Kubernetes
+            delete:
+                inputs:
+                    repository: https://github.com/skoulouzis/playbooks.git
+                    playbooks: 
+                        - delete_service.yml
+            create:
+                inputs:
+                    repository: https://github.com/skoulouzis/playbooks.git
+                    playbooks: 
+                        - create_service.yml
+            scale:
+                inputs:
+                    repository: https://github.com/skoulouzis/playbooks.git
+                    playbooks: 
+                        - scale_service.yml  
+                    replicas: 1
+            autoscale:
+                inputs:
+                    repository: https://github.com/skoulouzis/playbooks.git                
+                    playbooks: 
+                        - autoscale_service.yml  
+                    horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml  
+            info:
+                inputs:
+                    repository: https://github.com/skoulouzis/playbooks.git   
+                    playbooks: 
+                        - get_info_service.yml
+                
+                    
+                    
+          
+  tosca.nodes.QC.docker.Orchestrator:
+    derived_from: tosca.nodes.QC.Application
+    description: a container orchestrator
+    requirements:
+      - host:
+          capability: tosca.capabilities.QC.VM.topology
+          node: tosca.nodes.QC.VM.topology
+          relationship: tosca.relationships.HostedOn
+    capabilities:
+      orchestrator:
+        type: tosca.capabilities.QC.docker.Orchestrator
+      host:
+        type: tosca.capabilities.Container.Docker
+      container:
+        type: tosca.capabilities.Container        
+    properties:
+        min_masters_num:
+            type: integer
+            required: true
+            default: 1
+            constraints:
+            - greater_or_equal: 1
+        min_workers_num:            
+            type: integer
+            required: true
+            default: 1
+            constraints:
+            - greater_or_equal: 1
+        
+    
+  tosca.nodes.QC.docker.Orchestrator.Kubernetes:
+    derived_from: tosca.nodes.QC.docker.Orchestrator
+    description: Kubernetes orchestrator
+    attributes:
+      tokens:
+        type: list
+        required: false
+        entry_schema:
+            type: tosca.datatypes.Credential
+        description: list of tokens to access the kubernetes dashboard and other kubernetes resources 
+      dashboard_url:
+        type: string
+        required: false
+        description: the dashboard access url
+    interfaces:
+        Standard:
+            type: tosca.interfaces.QC.Standard
+            create:
+                inputs:
+                    repository: https://github.com/skoulouzis/playbooks.git   
+                    playbooks: 
+                        - install_packages.yaml
+                        - mount.yaml
+                        - install_docker.yaml
+                        - install_k8s.yaml
+            configure:
+                inputs:
+                    repository: https://github.com/skoulouzis/playbooks.git   
+                    playbooks: 
+                        - create_k8s_cluster.yaml
+                        - create_k8s_dashboard.yaml
+            delete:
+                inputs:
+                    repository: https://github.com/skoulouzis/playbooks.git   
+                    playbooks: 
+                        - k8s_delete.yaml                     
+                    
+        
+  tosca.nodes.QC.VM.topology:
+    derived_from: tosca.nodes.QC.Infrastructure
+    description: topology of VMs
+    requirements:
+      - vm:
+          capability: tosca.capabilities.QC.VM
+          node: tosca.nodes.QC.Infrastructure
+          relationship: tosca.relationships.DependsOn
+    capabilities:
+      scalable:
+        type: tosca.capabilities.Scalable 
+      topology:
+        type: tosca.capabilities.QC.VM.topology
+    properties:
+      name:
+        type: string
+        required: false
+        description: the name of this topology
+      subnet:
+        type: string
+        required: false
+        description: The subnet of the VMs this topology e.g. 192.168.10.10/24
+      domain:        
+        type: string
+        required: true
+        default: "Frankfurt"
+        description: the domain of this topology e.g. California, UvA (Amsterdam, The Netherlands) XO Rack, Frankfurt, etc           
+      provider:
+        type: string
+        required: true
+        default: "EC2"
+        description: The name of the provider e.g. EC2, ExoGENI etc.    
+      coordinates: 
+        type: tosca.datatypes.QC.coordinates
+        required: false
+        description: The coordinates of the domain 
+    attributes:
+      ssh_keys:
+        type: tosca.datatypes.QC.Credential
+        required: false      
+    artifacts:
+      provisioned_files:
+        type: string
+        required: false
+    interfaces:
+        CloudsStorm:
+            type: tosca.interfaces.QC.CloudsStorm
+            provision:
+                inputs:
+                    code_type: SEQ
+                    object_type: SubTopology
+            delete:
+                inputs:
+                    code_type: SEQ
+                    object_type: SubTopology
+            hscale:
+                inputs:
+                    code_type: SEQ
+                    object_type: SubTopology     
+            stop:
+                inputs:
+                    code_type: SEQ
+                    object_type: SubTopology    
+            start:
+                inputs:
+                    code_type: SEQ
+                    object_type: SubTopology       
+        
+  tosca.nodes.QC.VM.Compute:
+    derived_from: tosca.nodes.QC.Infrastructure
+    description: vm
+    capabilities:
+      compute:
+        type: tosca.capabilities.QC.VM
+    properties:
+      num_cores:
+        type: integer
+        required: true
+        default: 1
+        constraints:
+          - greater_or_equal: 1
+      cpu_frequency:
+        type: scalar-unit.frequency
+        required: false
+        constraints:
+          - greater_or_equal: 0.5 GHz
+      disk_size:
+        type: scalar-unit.size
+        required: true
+        default: 10000 MB
+        constraints:
+          - greater_or_equal: 5000 MB
+      mem_size:
+        type: scalar-unit.size
+        required: true
+        default: 1000 MB
+        constraints:
+          - greater_or_equal: 500 MB
+      os:
+        type: string
+        required: true       
+        default: "Ubuntu 18.04"
+      user_name:
+        type: string
+        required: true
+        default: "vm_user"
+    # outputs for this node
+    attributes:
+      private_ip:
+        type: string
+        required: false
+        description: The private IP of the VM e.g. 192.168.10.10    
+      public_ip:
+        type: string
+        required: false
+        description: The public IP
+      role:
+        type: string
+        required: true       
+        description: the role of the VM in the topology
+        default: "master"
+        constraints:
+            - valid_values: [ "master","worker" ]         
+      node_type:
+        type: string
+        required: false
+        description: the type of VM depending on the provider. e.g. XOSmall, t.medium etc. It has to match the mem_size, num_cores etc.                  
+      host_name:
+        type: string
+        required: true
+        default: "vm"
+      root_key_pair:
+        type: tosca.datatypes.QC.Credential
+        required: false    
+      user_key_pair:
+        type: tosca.datatypes.QC.Credential
+        required: false           
+    interfaces:
+      Standard:
+        create: dumy.yaml        
+        
+  tosca.nodes.QC.Infrastructure:
+    derived_from:  tosca.nodes.QC.Root
+    description: Base infrastructure node
+    capabilities:
+      compute:
+        type: tosca.capabilities.Compute
+      node:
+        type: tosca.capabilities.Node
+        
+  tosca.nodes.QC.Application:
+    derived_from:  tosca.nodes.QC.Root
+    description: Base application node    

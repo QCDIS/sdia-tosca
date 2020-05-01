@@ -1,0 +1,104 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+interface_types:
+
+  tosca.interfaces.QC.CloudsStorm:
+    description: Interface for VM topology management with CloudsStorm. More at https://cloudsstorm.github.io/
+    derived_from: tosca.interfaces.node.lifecycle.Standard
+    inputs:
+      code_type:
+        type: string
+        required: true
+        default: SEQ
+        description: This field indicates the type of this code. Currently, there are only two types, ‘SEQ’ and ‘LOOP’.
+        constraints:
+          - valid_values: ['SEQ' , 'LOOP']
+      object_type:
+        type: string
+        required: true
+        default: SubTopology
+        description: This field indicates the object type of this operation. According to the specific operation, the object can be, 'SubTopology', some entire sub-topologies; VM, some individual VMs; REQ some requests, only used when vscale, hscale or recover.
+        constraints:
+          - valid_values: ['SubTopology' , 'VM' ,'REQ' ] 
+      objects:
+        type: list
+        required: false
+        description: It indicates a set of objects, which this operation impacts. If the ObjectType is SubTopology, the name of the object is the sub-topology name; If the ObjectType is VM, the name of the object is the VM full name, containing sub-topology and VM node name, such as, $SubTopology.$Node; If the ObjectType is REQ, the name of the object is previously generated request name.        
+      command:
+        type: string
+        required: false
+        description: The detailed command, when the operation is execut
+      options:
+        type: map
+        required: false
+        description: Some options defined for this operation. They are key-value pairs. It depends on the specific operation.
+      count:
+        type: integer
+        required: false
+        description: This is defined as a maximum number of iterations for a loop.
+      duration:
+        type: scalar-unit.time
+        default: 1 s
+        required: false
+        description: This is defined as a maximum number of iterations for a loop
+      deadline:
+        type: timestamp
+        required: false
+        description: This is defined as a certain timing to exit this loop.
+    execute:
+      description: Execute some command on the objects. The detailed command is specified in the filed Command below. ObjectType currently can only be VM
+    put:
+      description: Upload some input data or files to the remote resources. ObjectType currently can only be VM.
+    get:
+      description: Download or retrieve output results or files from the remote resources. ObjectType currently can only be VM.
+    v_scale:
+      description: Vertically scale up or down to adapt the computing capability of the infrastructure through directly changing the capacity of some VM. ObjectType can only be VM and REQ.
+    h_scale:
+      description: Horizontally scale out or in to adapt the computing capability of the infrastructure through changing the number of VMs. ObjectType can be SubTopology, VM or REQ.
+    provision:
+      description: provision
+    recover:
+      description: Recover some failed sub-topologies. ObjectType can be SubTopology or REQ.
+    run:
+      description: Provision the defined objects (resources). ObjectType can be SubTopology or VM.
+      
+      
+  tosca.interfaces.QC.Standard:
+    derived_from: tosca.interfaces.node.lifecycle.Standard
+    inputs:
+      inventory_file:
+        type: string
+        required: false
+      playbooks:
+        type: list
+        required: false
+      repository:
+        type: string
+        required: false        
+      
+  tosca.interfaces.QC.Kubernetes:
+    derived_from: tosca.interfaces.QC.Standard
+    inputs:
+      replicas:
+        type: integer
+        required: false
+    scale:
+      description: Set the number of replicas for a Deployment, ReplicaSet, or Replication Controller, or the parallelism attribute of a Job.  
+    autoscale:
+      description: horizontal_pod_autoscaler           
+    info:
+      description: get information on pods,services or deployments
+      
+      
+#tosca.interfaces.node.lifecycle.Standard:
+  #derived_from: tosca.interfaces.Root
+  #create:
+    #description: Standard lifecycle create operation.
+  #configure:
+    #description: Standard lifecycle configure operation.
+  #start:
+    #description: Standard lifecycle start operation.
+  #stop:
+    #description: Standard lifecycle stop operation.
+  #delete:
+    #description: Standard lifecycle delete operation.      
+  

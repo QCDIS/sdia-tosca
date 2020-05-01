@@ -1,0 +1,38 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+capability_types:
+
+  tosca.capabilities.QC.docker.Orchestrator:
+    derived_from: tosca.capabilities.Container
+    properties:
+      some_properties:
+        type: string
+        required: no
+        
+  tosca.capabilities.QC.VM:
+    derived_from: tosca.capabilities.Compute
+    properties:
+      some_properties:
+        type: string
+        required: no
+        
+  tosca.capabilities.QC.VM.topology:
+    derived_from: tosca.capabilities.Compute
+    properties:
+      some_properties:
+        type: string
+        required: no        
+
+  tosca.capabilities.QC.Useless:
+    properties:
+      some_properties:
+        type: string
+        required: no 
+     
+        
+  tosca.capabilities.Compute:
+    derived_from: tosca.capabilities.Container
+    properties:
+      some_properties:
+        type: string
+        required: no      

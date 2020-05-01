@@ -1,0 +1,41 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+
+policy_types:
+  tosca.policies.QC.Performance:
+    derived_from: tosca.policies.Performance
+    description: QoS constraint
+    properties:
+      constraint_name:
+        type: string
+        description: the name of the constraint e.g. users_per_sec
+        required: false
+      min_value:
+        type: integer
+        required: false
+        description: the minimum acceptable value
+      max_value:
+        type: integer
+        required: false
+        description: the maximum acceptable value
+  
+  tosca.policies.QC.Performance.CPU:
+    derived_from: tosca.policies.QC.Performance
+    description: CPU load constraint as percentage  
+
+  tosca.policies.QC.Performance.Mem:
+    derived_from: tosca.policies.Performance
+    description: Memory load constraint as percentage
+    
+  tosca.policies.QC.Performance.Disk:
+    derived_from: tosca.policies.Performance
+    description: Disk size as MB
+
+  tosca.policies.QC.FaultTolerance:
+    derived_from: tosca.policies.Root
+    description: the level of acceptable faults
+    properties:
+      level:
+        type: integer
+        required: false
+        description: the minimum acceptable value

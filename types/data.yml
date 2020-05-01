@@ -1,0 +1,24 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+data_types:    
+                
+                
+    tosca.datatypes.QC.Credential:
+        derived_from: tosca.datatypes.Credential
+        properties:
+            cloud_provider_name:
+                type: string
+                required: true
+
+            
+    tosca.datatypes.QC.coordinates:
+        derived_from: tosca.datatypes.Root
+        properties:
+            longitude: 
+                type: float
+                required: false
+                description: The longitude of the domain 
+            latitude:
+                type: float
+                required: false
+                description: The latitude of the domain         
