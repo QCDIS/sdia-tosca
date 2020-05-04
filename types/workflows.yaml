@@ -111,11 +111,11 @@ topology_template:
              is_master: true
             activities:
             - set_state: creating
-            - call_operation: tosca.interfaces.node.lifecycle.Standard.create
+            - call_operation: tosca.interfaces.QC.Standard.create
             - set_state: created
             - set_state: starting
-            - call_operation: tosca.interfaces.node.lifecycle.Standard.start
-            - set_state: started
+            - call_operation: tosca.interfaces.QC.Standard.configure
+            - set_state: configured
           on-success:
             - compute1_start
 
