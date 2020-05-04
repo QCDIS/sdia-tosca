@@ -29,18 +29,45 @@ topology_template:
           capability: "tosca.capabilities.QC.VM.topology"
           node: "topology"
           relationship: "tosca.relationships.HostedOn"
+      type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
       interfaces:
-        Standard:
-          configure:
-            inputs:
-              playbook: "https://github.com/QCAPI-DRIP/playbooks.gitk8s_dashboard.yaml"
+        Kubernetes:
           create:
             inputs:
-              playbook: "https://github.com/QCAPI-DRIP/playbooks.gitinstall_k8s.yaml"
-          delete:
+              repository: https://github.com/QCAPI-DRIP/playbooks.git
+                resources: 
+                - install_k8s_prerequisites.yaml
+                - install_docker.yaml
+                - create_k8s_cluster.yaml
+          configure:
             inputs:
-              playbook: "https://github.com/QCAPI-DRIP/playbooks.gitk8s_delete.yaml"
-      type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
+              repository: https://github.com/QCAPI-DRIP/playbooks.git
+                resources: 
+                - install_nfs.yaml
+                - create_dynamic_pv.yaml
+                - create_k8s_dashboard.yaml
+          scale:
+            inputs:
+              replicas: { get_input: replicas }   
+              service_name: { get_input: service_name }   
+              repository: https://github.com/QCAPI-DRIP/playbooks.git
+                resources: 
+                - scale_k8s_service.yaml
+          autoscale:
+            inputs:
+              replicas: { get_input: replicas }   
+              service_name: { get_input: service_name }   
+              repository: https://github.com/QCAPI-DRIP/playbooks.git
+                resources: 
+                - autoscale_k8s_service.yaml                 
+          info:
+            inputs:
+              replicas: { get_input: replicas }   
+              service_name: { get_input: service_name }   
+                resources: 
+                - info_k8s_service.yaml                    
+                
+                
     topology:
       properties:
         domain: "Frankfurt"
@@ -54,29 +81,29 @@ topology_template:
           capability: "tosca.capabilities.QC.VM"
           node: "compute_1"
           relationship: "tosca.relationships.DependsOn"
+      type: "tosca.nodes.QC.VM.topology"
       interfaces:
-        CloudsStorm:
-          delete:
+        Standard:
+          create:
             inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          hscale:
+              repository: https://github.com/QCAPI-DRIP/playbooks.git
+                resources: 
+                - provision_open-stack_topology.yml      
+          configure:
             inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          provision:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          start:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
+              repository: https://github.com/QCAPI-DRIP/playbooks.git
+                resources: 
+                - configure_open-stack_topology.yml        
           stop:
             inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-      type: "tosca.nodes.QC.VM.topology"
+              repository: https://github.com/QCAPI-DRIP/playbooks.git
+                resources: 
+                - stop_open-stack_topology.yml        
+          delete:
+            inputs:
+              repository: https://github.com/QCAPI-DRIP/playbooks.git
+                resources: 
+                - stop_open-stack_topology.yml                 
       artifacts:
         provisioned_files:
           required: false
@@ -96,14 +123,15 @@ topology_template:
           file: "alogo53/ws-pema-lifewatch"
           repository: "docker_hub"
           type: "tosca.artifacts.Deployment.Image.Container.Docker"
+          
 
 
   workflows:
     install:
-      description: Workflow to deploy the vm 
+      description: Workflow to deploy the topology 
       steps:
-        compute_start:
-          node: compute 
+        topology_deploy:
+          node: topology 
           preconditions:
             state: initial 
             attributes:
@@ -117,7 +145,42 @@ topology_template:
             - call_operation: tosca.interfaces.QC.Standard.configure
             - set_state: configured
           on-success:
-            - compute1_start
+            - kubernetes_deploy
+        kubernetes_deploy:            
+          node: kubernetes 
+          preconditions:
+            state: initial 
+            attributes:
+             some_attribute: 0.0.0
+             is_master: true
+          requirements:
+            - topology_deployed: true
+            activities:
+            - set_state: creating
+            - call_operation: tosca.interfaces.QC.Standard.create
+            - set_state: created
+            - set_state: starting
+            - call_operation: tosca.interfaces.QC.Standard.configure
+            - set_state: configured            
+          on-success:
+            - deploy_containers
+        deploy_containers:            
+          node: kubernetes
+          preconditions:
+            state: initial 
+            attributes:
+             some_attribute: 0.0.0
+             is_master: true
+          requirements:
+            - k8s_deployed: true
+            activities:
+            - set_state: creating
+            - call_operation: tosca.interfaces.QC.Standard.create
+            - set_state: created
+            - set_state: starting
+            - call_operation: tosca.interfaces.QC.Standard.configure
+            - set_state: configured                  
+            
 
 description: "TOSCA example"
 imports:
