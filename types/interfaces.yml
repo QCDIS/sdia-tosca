@@ -81,6 +81,9 @@ interface_types:
       replicas:
         type: integer
         required: false
+      service_name:
+        type: string
+        required: false        
     scale:
       description: Set the number of replicas for a Deployment, ReplicaSet, or Replication Controller, or the parallelism attribute of a Job.  
     autoscale:
