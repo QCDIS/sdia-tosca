@@ -89,9 +89,6 @@ interface_types:
       description: get information on pods,services or deployments
       
       
-  tosca.interfaces.QC.Standard.OpenStack:
-    derived_from: tosca.interfaces.QC.Standard
-      
      
       
 #tosca.interfaces.node.lifecycle.Standard:
