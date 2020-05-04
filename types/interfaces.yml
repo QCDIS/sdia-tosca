@@ -68,7 +68,7 @@ interface_types:
       inventory_file:
         type: string
         required: false
-      playbooks:
+      resources:
         type: list
         required: false
       repository:
