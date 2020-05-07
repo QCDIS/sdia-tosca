@@ -304,3 +304,36 @@ node_types:
   tosca.nodes.QC.Application:
     derived_from:  tosca.nodes.QC.Root
     description: Base application node    
+    
+    
+    
+    
+  tosca.nodes.QC.ARTICONF.TIC:
+    derived_from:  tosca.nodes.QC.Application
+    description: description of TIC
+    properties:
+      cmd:
+        description: cmd
+        type: string
+        required: false
+    requirements:
+      - host:
+          capability: tosca.capabilities.QC.Docker
+          node: tosca.nodes.QC.Docker
+          relationship: tosca.relationships.DependsOn
+    attributes:
+      service_url:
+        type: string
+        required: false
+        description: url of the service 
+    interfaces:
+        Standard:
+            type: tosca.interfaces.QC.Standard
+            create:
+                inputs:
+                    repository: https://github.com/skoulouzis/playbooks.git   
+                    resources: 
+                        - install_packages.yaml
+                        - mount.yaml
+                        - install_docker.yaml
+                        - install_k8s.yaml   
