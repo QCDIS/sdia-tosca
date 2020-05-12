@@ -51,33 +51,33 @@ node_types:
     interfaces:
       Kubernetes:
         type: tosca.interfaces.QC.Kubernetes
-          delete:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              resources:
-                - delete_service.yml
-          create:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              resources:
-                - create_service.yml
-          scale:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              resources:
-                - scale_service.yml
-              replicas: 1
-          autoscale:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              resources:
-                - autoscale_service.yml
-              horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml
-          info:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              resources:
-                - get_info_service.yml
+        delete:
+          inputs:
+            repository: https://github.com/QCDIS/playbooks.git
+            resources:
+              - delete_service.yml
+        create:
+          inputs:
+            repository: https://github.com/QCDIS/playbooks.git
+            resources:
+              - create_service.yml
+        scale:
+          inputs:
+            repository: https://github.com/QCDIS/playbooks.git
+            resources:
+              - scale_service.yml
+            replicas: 1
+        autoscale:
+          inputs:
+            repository: https://github.com/QCDIS/playbooks.git
+            resources:
+              - autoscale_service.yml
+            horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml
+        info:
+          inputs:
+            repository: https://github.com/QCDIS/playbooks.git
+            resources:
+              - get_info_service.yml
                 
 
   tosca.nodes.QC.docker.Orchestrator:
