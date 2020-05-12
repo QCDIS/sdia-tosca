@@ -333,12 +333,7 @@ node_types:
         required: false
     capabilities:
       storage:
-        type: tosca.capabilities.QC.GlusterFS
-    requirements:
-      - host:
-          capability: tosca.capabilities.QC.VM.topology
-          node: tosca.nodes.QC.VM.topology
-          relationship: tosca.relationships.HostedOn       
+        type: tosca.capabilities.QC.GlusterFS      
     attributes:
       service_url:
         type: string
