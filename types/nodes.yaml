@@ -305,68 +305,26 @@ node_types:
     derived_from:  tosca.nodes.QC.Root
     description: Base application node    
     
-    
-    
-    
-  tosca.nodes.QC.ARTICONF.TIC:
-    derived_from:  tosca.nodes.QC.Application
-    description: description of TIC
-    properties:
-      cmd:
-        description: cmd
-        type: string
-        required: false
-    requirements:
-      - host:
-          capability: tosca.capabilities.QC.GlusterFS
-          node: tosca.nodes.QC.ARTICONF.GlusterFS
-          relationship: tosca.relationships.DependsOn
-    attributes:
-      gluster_cluster_host0:
-        type: string
-        required: false
-        description: the ip address of any one of the machines of your glusterfs cluster
-      gluster_cluster_volume:
-        type: string
-        required: false
-        description: specifies the name of the created glusterfs volume        
-    interfaces:
-        Standard:
-            type: tosca.interfaces.QC.Standard
-            create:
-                inputs:
-                    repository: https://github.com/bityoga/fabric_as_code.git
-                    resources: 
-                        - 011.initialize_hosts.yml
-                        - 012.prepare_docker_images.yml
-                        - install_docker.yaml
-                        - install_k8s.yaml   
-                        
-                        
-  tosca.nodes.QC.ARTICONF.GlusterFS:
+
+  tosca.nodes.QC.Container.Application.GlusterFS:
     derived_from:  tosca.nodes.QC.Application
     description: description of GlusterFS
-    capabilities:
-      storage:
-        type: tosca.capabilities.QC.GlusterFS
-    properties:
-      cmd:
-        description: cmd
-        type: string
-        required: false
     requirements:
       - host:
-          capability: tosca.capabilities.QC.VM.topology
-          node: tosca.nodes.QC.VM.topology
-          relationship: tosca.relationships.HostedOn      
+          capability: tosca.capabilities.QC.docker.Orchestrator
+          node: tosca.nodes.QC.docker.Orchestrator
+          relationship: tosca.relationships.HostedOn         
+    attributes:
+      service_url:
+        type: string
+        required: false
+        description: url of the service 
     interfaces:
         Standard:
             type: tosca.interfaces.QC.Standard
             create:
                 inputs:
-                    repository: https://github.com/bityoga/mysome_glusterfs.git
-                    resources: 
+                    repository: https://github.com/bityoga/mysome_glusterfs.git 
+                    playbooks: 
                         - 002.setup_glusterfs_infra.yml
-                        - 003.setup_glusterfs_cluster.yml
-                        - 004.mount_glusterfs.yml
                         
