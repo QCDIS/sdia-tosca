@@ -19,16 +19,16 @@ topology_template:
   node_templates:        
     ws-pema:
         type: tosca.nodes.QC.Application.GlusterFS     
-        interfaces:
-          Standard:
-            create:
-              inputs:
-                repository: https://github.com/skoulouzis/playbooks.git   
-                playbooks: 
-                  - install_packages.yaml
-                  - mount.yaml
-                  - install_docker.yaml
-                  - install_k8s.yaml                             
+#         interfaces:
+#           Standard:
+#             create:
+#               inputs:
+#                 repository: https://github.com/skoulouzis/playbooks.git   
+#                 playbooks: 
+#                   - install_packages.yaml
+#                   - mount.yaml
+#                   - install_docker.yaml
+#                   - install_k8s.yaml                             
                 
       
     topology:
