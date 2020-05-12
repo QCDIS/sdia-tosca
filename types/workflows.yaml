@@ -184,8 +184,8 @@ topology_template:
 
 description: "TOSCA example"
 imports:
-- nodes: "https://raw.githubusercontent.com/QCAPI-DRIP/qc-tosca/master/types/nodes.yaml"
-- data: "https://raw.githubusercontent.com/skoulouzis/CONF/develop/TOSCA/types/data.yml"
-- capabilities: "https://raw.githubusercontent.com/QCAPI-DRIP/qc-tosca/master/types/capabilities.yaml"
-- policies: "https://raw.githubusercontent.com/QCAPI-DRIP/qc-tosca/master/types/policies.yaml"
-- interfaces: "https://raw.githubusercontent.com/QCAPI-DRIP/qc-tosca/master/types/interfaces.yml"
+- nodes: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/nodes.yaml"
+- data: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/data.yml"
+- capabilities: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/capabilities.yaml"
+- policies: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/policies.yaml"
+- interfaces: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/interfaces.yml"
