@@ -331,9 +331,11 @@ node_types:
         description: volume
         type: list
         required: false
-    capabilities:
-      storage:
-        type: tosca.capabilities.QC.GlusterFS      
+    requirements:
+      - host:
+          capability: tosca.capabilities.QC.docker.Orchestrator
+          node: tosca.nodes.QC.docker.Orchestrator
+          relationship: tosca.relationships.HostedOn              
     attributes:
       service_url:
         type: string
