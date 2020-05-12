@@ -18,28 +18,55 @@ topology_template:
 
   node_templates:        
     ws-pema:
-      type: tosca.nodes.QC.Application.GlusterFS     
-      interfaces:
-        Standard:
-          create:
-            inputs:
-              repository: https://github.com/bityoga/mysome_glusterfs.git
-              resources:
-                - install_packages.yaml
-                - mount.yaml
-                - install_docker.yaml
-                - install_k8s.yaml
+        type: tosca.nodes.QC.Container.Application.Docker
+        properties:
+            ports: 
+            - "30001:8080"   
+        artifacts:
+            image:
+                type: tosca.artifacts.Deployment.Image.Container.Docker
+                file:  alogo53/ws-pema-lifewatch
+                repository: docker_hub                 
+        interfaces:
+            Kubernetes:
+                delete:
+                    inputs:
+                        repository: https://github.com/QCAPI-DRIP/playbooks.git
+                        resources:
+                            - delete_service.yml
+                create:
+                    inputs:
+                        repository: https://github.com/QCAPI-DRIP/playbooks.git
+                        resources:
+                            - create_service.yml
+                scale:
+                    inputs:
+                        repository: https://github.com/QCAPI-DRIP/playbooks.git
+                        resources:
+                            - scale_service.yml  
+                        replicas: 1
+                autoscale:
+                    inputs:
+                        repository: https://github.com/QCAPI-DRIP/playbooks.git                
+                        resources:
+                            - autoscale_service.yml  
+                        horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml  
+                info:
+                    inputs:
+                        repository: https://github.com/QCAPI-DRIP/playbooks.git   
+                        resources:
+                            - get_info_service.yml                
                 
       
     topology:
-      type: tosca.nodes.QC.VM.topology
-      interfaces:
-        CloudsStorm:
-          provision:
-            inputs:
-              code_type: SEQ
-              object_type: SubTopology
-      properties:
-        domain: UvA (Amsterdam, The Netherlands) XO Rack
-        provider: ExoGENI
+        type: tosca.nodes.QC.VM.topology
+        interfaces:
+            CloudsStorm:
+                provision:
+                    inputs:
+                        code_type: SEQ
+                        object_type: SubTopology
+        properties:
+            domain: UvA (Amsterdam, The Netherlands) XO Rack
+            provider: ExoGENI
       
