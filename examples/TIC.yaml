@@ -17,13 +17,20 @@ topology_template:
 
   node_templates:        
     gluster_fs:
-        type: tosca.nodes.QC.Container.Application.GlusterFS  
-    interfaces:
-        Standard:
-            type: tosca.interfaces.QC.Standard
-            create:
-                inputs:
-                    repository: https://github.com/bityoga/mysome_glusterfs.git 
-                    playbooks: 
-                        - 002.setup_glusterfs_infra.yml        
+        type: tosca.nodes.QC.Container.Application.Docker
+        properties:
+            ports: 
+            - "30001:8080"   
+        artifacts:
+            image:
+                type: tosca.artifacts.Deployment.Image.Container.Docker
+                file:  alogo53/ws-pema-lifewatch
+                repository: docker_hub                 
+        interfaces:
+            Kubernetes:
+                delete:
+                    inputs:
+                        repository: https://github.com/QCAPI-DRIP/playbooks.git
+                        playbooks: 
+                            - delete_service.yml     
         
