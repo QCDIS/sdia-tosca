@@ -13,11 +13,12 @@ repositories:
 description: >
   TOSCA example
   
+
 topology_template:
 
   node_templates:        
     ws-pema:
-        type: tosca.nodes.QC.Container.Application.GlusterFS
+        type: tosca.nodes.QC.Container.Application.Docker
         properties:
             ports: 
             - "30001:8080"   
@@ -68,3 +69,4 @@ topology_template:
         properties:
             domain: UvA (Amsterdam, The Netherlands) XO Rack
             provider: ExoGENI
+      
