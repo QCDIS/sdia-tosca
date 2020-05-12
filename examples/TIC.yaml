@@ -17,27 +17,13 @@ topology_template:
 
   node_templates:        
     gluster_fs:
-        type: tosca.nodes.QC.ARTICONF.GlusterFS         
+        type: tosca.nodes.QC.Container.Application.GlusterFS  
     interfaces:
         Standard:
             type: tosca.interfaces.QC.Standard
             create:
                 inputs:
-                    repository: https://github.com/bityoga/mysome_glusterfs.git
-                    resources: 
-                        - 002.setup_glusterfs_infra.yml
-                        - 003.setup_glusterfs_cluster.yml
-                        - 004.mount_glusterfs.yml        
-                
-      
-    topology:
-        type: tosca.nodes.QC.VM.topology
-        interfaces:
-            CloudsStorm:
-                provision:
-                    inputs:
-                        code_type: SEQ
-                        object_type: SubTopology
-        properties:
-            domain: UvA (Amsterdam, The Netherlands) XO Rack
-            provider: ExoGENI
+                    repository: https://github.com/bityoga/mysome_glusterfs.git 
+                    playbooks: 
+                        - 002.setup_glusterfs_infra.yml        
+        
