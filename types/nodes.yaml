@@ -324,3 +324,16 @@ node_types:
             repository: https://github.com/bityoga/mysome_glusterfs.git
             resources: 
               - install_packages.yaml
+    properties:
+        min_masters_num:
+          type: integer
+          required: true
+          default: 1
+          constraints:
+          - greater_or_equal: 1
+        min_workers_num:
+          type: integer
+          required: true
+          default: 1
+          constraints:
+          - greater_or_equal: 1
