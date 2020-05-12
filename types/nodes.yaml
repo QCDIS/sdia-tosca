@@ -307,7 +307,7 @@ node_types:
     
 
 
-  tosca.nodes.QC.Container.Application.GlusterFS:
+tosca.nodes.QC.Container.Application.GlusterFS:
     derived_from:  tosca.nodes.QC.Application
     description: description of container
     properties:
@@ -335,7 +335,7 @@ node_types:
       - host:
           capability: tosca.capabilities.QC.docker.Orchestrator
           node: tosca.nodes.QC.docker.Orchestrator
-          relationship: tosca.relationships.HostedOn              
+          relationship: tosca.relationships.HostedOn         
     attributes:
       service_url:
         type: string
@@ -371,5 +371,4 @@ node_types:
                     repository: https://github.com/skoulouzis/playbooks.git   
                     playbooks: 
                         - get_info_service.yml
-                        
                         
