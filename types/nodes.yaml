@@ -320,15 +320,15 @@ node_types:
         type: string
         required: false
         description: url of the service 
-#     interfaces:
-#       Standard:
-#         type: tosca.interfaces.QC.Standard
-#         create:
-#           inputs:
-#             repository: https://github.com/skoulouzis/playbooks.git   
-#             playbooks: 
-#               - install_packages.yaml
-#               - mount.yaml
-#               - install_docker.yaml
-#               - install_k8s.yaml
+    interfaces:
+      Standard:
+        type: tosca.interfaces.QC.Standard
+        create:
+          inputs:
+            repository: https://github.com/skoulouzis/playbooks.git   
+            playbooks: 
+              - install_packages.yaml
+              - mount.yaml
+              - install_docker.yaml
+              - install_k8s.yaml
                         
