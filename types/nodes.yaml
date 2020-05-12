@@ -308,8 +308,8 @@ node_types:
     description: description of container
     requirements:
       - host:
-          capability: tosca.capabilities.QC.docker.Orchestrator
-          node: tosca.nodes.QC.docker.Orchestrator
+          capability: tosca.capabilities.QC.VM.topology
+          node: tosca.nodes.QC.VM.topology
           relationship: tosca.relationships.HostedOn
     attributes:
       service_url:
@@ -321,6 +321,6 @@ node_types:
         type: tosca.interfaces.QC.Standard
         create:
           inputs:
-            repository: https://github.com/QCDIS/playbooks.git
+            repository: https://github.com/bityoga/mysome_glusterfs.git
             resources: 
               - install_packages.yaml
