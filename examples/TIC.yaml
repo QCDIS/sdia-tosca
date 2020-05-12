@@ -15,7 +15,7 @@ description: >
 
 topology_template:
   node_templates:        
-    ws-pema:
+    gluster_fs:
       type: tosca.nodes.QC.Application.GlusterFS     
       interfaces:
         Standard:
