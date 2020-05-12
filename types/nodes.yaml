@@ -324,6 +324,3 @@ node_types:
             repository: https://github.com/QCDIS/playbooks.git
             resources: 
               - install_packages.yaml
-              - mount.yaml
-              - install_docker.yaml
-              - install_k8s.yaml

@@ -23,7 +23,7 @@ topology_template:
         Standard:
           create:
             inputs:
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/bityoga/mysome_glusterfs.git
               resources:
                 - install_packages.yaml
                 - mount.yaml
