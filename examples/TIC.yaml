@@ -18,7 +18,7 @@ topology_template:
 
   node_templates:        
     ws-pema:
-        type: tosca.nodes.QC.Container.Application.Docker
+        type: tosca.nodes.QC.Application.GlusterFS
         properties:
             ports: 
             - "30001:8080"   
