@@ -54,30 +54,30 @@ node_types:
           delete:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources: 
-                  - delete_service.yml
+              resources:
+                - delete_service.yml
           create:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources: 
-                  - create_service.yml
+              resources:
+                - create_service.yml
           scale:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources: 
-                  - scale_service.yml  
-                replicas: 1
+              resources:
+                - scale_service.yml
+              replicas: 1
           autoscale:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources: 
-                  - autoscale_service.yml  
-                horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml  
+              resources:
+                - autoscale_service.yml
+              horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml
           info:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources: 
-                  - get_info_service.yml
+              resources:
+                - get_info_service.yml
                 
 
   tosca.nodes.QC.docker.Orchestrator:
@@ -129,22 +129,22 @@ node_types:
           create:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources:
-                  - install_packages.yaml
-                  - mount.yaml
-                  - install_docker.yaml
-                  - install_k8s.yaml
+              resources:
+                - install_packages.yaml
+                - mount.yaml
+                - install_docker.yaml
+                - install_k8s.yaml
           configure:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources:
-                  - create_k8s_cluster.yaml
-                  - create_k8s_dashboard.yaml
+              resources:
+                - create_k8s_cluster.yaml
+                - create_k8s_dashboard.yaml
           delete:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources:
-                  - k8s_delete.yaml
+              resources:
+                - k8s_delete.yaml
                     
         
   tosca.nodes.QC.VM.topology:
@@ -269,7 +269,7 @@ node_types:
         description: the role of the VM in the topology
         default: "master"
         constraints:
-            - valid_values: [ "master","worker" ]         
+          - valid_values: [ "master","worker" ]
       node_type:
         type: string
         required: false
