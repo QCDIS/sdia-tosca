@@ -12,10 +12,8 @@ repositories:
 
 description: >
   TOSCA example
-  
 
 topology_template:
-
   node_templates:        
     ws-pema:
       type: tosca.nodes.QC.Application.GlusterFS     
