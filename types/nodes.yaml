@@ -310,27 +310,6 @@ node_types:
   tosca.nodes.QC.Application.GlusterFS:
     derived_from:  tosca.nodes.QC.Application
     description: description of container
-    properties:
-      ports:
-        description: ports to be forwarded
-        type: list
-        required: false      
-      entrypoint:
-        description: command
-        type: string
-        required: false
-      cmd:
-        description: cmd
-        type: string
-        required: false
-      environment:
-        description: environment variables
-        type: map
-        required: false
-      volumes:
-        description: volume
-        type: list
-        required: false
     requirements:
       - host:
           capability: tosca.capabilities.QC.docker.Orchestrator
@@ -342,14 +321,14 @@ node_types:
         required: false
         description: url of the service 
     interfaces:
-        Standard:
-            type: tosca.interfaces.QC.Standard
-            create:
-                inputs:
-                    repository: https://github.com/skoulouzis/playbooks.git   
-                    playbooks: 
-                        - install_packages.yaml
-                        - mount.yaml
-                        - install_docker.yaml
-                        - install_k8s.yaml
+      Standard:
+        type: tosca.interfaces.QC.Standard
+          create:
+            inputs:
+              repository: https://github.com/skoulouzis/playbooks.git   
+              playbooks: 
+                - install_packages.yaml
+                - mount.yaml
+                - install_docker.yaml
+                - install_k8s.yaml
                         
