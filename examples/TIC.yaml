@@ -1,0 +1,33 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+imports:
+  - nodes: https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/nodes.yaml
+  - data: https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/data.yml
+  - capabilities: https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/capabilities.yaml
+  - policies: https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/policies.yaml
+  - interfaces: https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/interfaces.yml
+  
+repositories:
+  docker_hub: https://hub.docker.com/  
+
+description: >
+  TOSCA example
+  
+topology_template:
+
+  node_templates:        
+    gluster_fs:
+        type: tosca.nodes.QC.ARTICONF.GlusterFS                               
+                
+      
+    topology:
+        type: tosca.nodes.QC.VM.topology
+        interfaces:
+            CloudsStorm:
+                provision:
+                    inputs:
+                        code_type: SEQ
+                        object_type: SubTopology
+        properties:
+            domain: UvA (Amsterdam, The Netherlands) XO Rack
+            provider: ExoGENI
