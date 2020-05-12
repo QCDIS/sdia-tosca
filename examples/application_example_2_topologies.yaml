@@ -130,37 +130,37 @@ topology_template:
             delete:
                 inputs:
                     repository: https://github.com/QCAPI-DRIP/playbooks.git
-                    playbooks: 
+                    resources:
                         - delete_service.yml
             create:
                 inputs:
                     repository: https://github.com/QCAPI-DRIP/playbooks.git
-                    playbooks: 
+                    resources:
                         - create_service.yml
             scale:
                 inputs:
                     repository: https://github.com/QCAPI-DRIP/playbooks.git
-                    playbooks: 
+                    resources:
                         - scale_service.yml  
                     replicas: 1
             autoscale:
                 inputs:
                     repository: https://github.com/QCAPI-DRIP/playbooks.git                
-                    playbooks: 
+                    resources:
                         - autoscale_service.yml  
                     horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml  
             info:
                 inputs:
                     repository: https://github.com/QCAPI-DRIP/playbooks.git   
-                    playbooks: 
+                    resources:
                         - get_info_service.yml
                         
              
                         
 description: "TOSCA example"
 imports:
-- nodes: "https://raw.githubusercontent.com/QCAPI-DRIP/qc-tosca/master/types/nodes.yaml"
-- data: "https://raw.githubusercontent.com/skoulouzis/CONF/develop/TOSCA/types/data.yml"
-- capabilities: "https://raw.githubusercontent.com/QCAPI-DRIP/qc-tosca/master/types/capabilities.yaml"
-- policies: "https://raw.githubusercontent.com/QCAPI-DRIP/qc-tosca/master/types/policies.yaml"
-- interfaces: "https://raw.githubusercontent.com/QCAPI-DRIP/qc-tosca/master/types/interfaces.yml"
+- nodes: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/nodes.yaml"
+- data: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/data.yml"
+- capabilities: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/capabilities.yaml"
+- policies: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/policies.yaml"
+- interfaces: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/interfaces.yml"
