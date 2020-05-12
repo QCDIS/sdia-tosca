@@ -16,7 +16,7 @@ description: >
 topology_template:
 
   node_templates:        
-    gluster_fs:
+    ws-pema:
         type: tosca.nodes.QC.Container.Application.Docker
         properties:
             ports: 
@@ -32,5 +32,39 @@ topology_template:
                     inputs:
                         repository: https://github.com/QCAPI-DRIP/playbooks.git
                         playbooks: 
-                            - delete_service.yml     
-        
+                            - delete_service.yml
+                create:
+                    inputs:
+                        repository: https://github.com/QCAPI-DRIP/playbooks.git
+                        playbooks: 
+                            - create_service.yml
+                scale:
+                    inputs:
+                        repository: https://github.com/QCAPI-DRIP/playbooks.git
+                        playbooks: 
+                            - scale_service.yml  
+                        replicas: 1
+                autoscale:
+                    inputs:
+                        repository: https://github.com/QCAPI-DRIP/playbooks.git                
+                        playbooks: 
+                            - autoscale_service.yml  
+                        horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml  
+                info:
+                    inputs:
+                        repository: https://github.com/QCAPI-DRIP/playbooks.git   
+                        playbooks: 
+                            - get_info_service.yml                
+                
+      
+    topology:
+        type: tosca.nodes.QC.VM.topology
+        interfaces:
+            CloudsStorm:
+                provision:
+                    inputs:
+                        code_type: SEQ
+                        object_type: SubTopology
+        properties:
+            domain: UvA (Amsterdam, The Netherlands) XO Rack
+            provider: ExoGENI
