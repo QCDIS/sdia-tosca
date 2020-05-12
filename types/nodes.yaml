@@ -331,6 +331,9 @@ node_types:
         description: volume
         type: list
         required: false
+    capabilities:
+      storage:
+        type: tosca.capabilities.QC.GlusterFS
     requirements:
       - host:
           capability: tosca.capabilities.QC.docker.Orchestrator
