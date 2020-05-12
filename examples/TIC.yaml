@@ -39,7 +39,7 @@ topology_template:
             inputs:
               code_type: SEQ
               object_type: SubTopology
-        properties:
-          domain: UvA (Amsterdam, The Netherlands) XO Rack
-          provider: ExoGENI
+      properties:
+        domain: UvA (Amsterdam, The Netherlands) XO Rack
+        provider: ExoGENI
       
