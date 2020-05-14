@@ -307,8 +307,8 @@ node_types:
     derived_from:  tosca.nodes.QC.Application
     description: description of container
     capabilities:
-      storage:
-        type: tosca.capabilities.QC.GlusterFS
+      orchestrator:
+        type: tosca.capabilities.QC.docker.Orchestrator
     requirements:
       - host:
           capability: tosca.capabilities.QC.VM.topology
