@@ -308,7 +308,7 @@ node_types:
     description: description of container
     capabilities:
       orchestrator:
-        type: tosca.capabilities.QC.docker.Orchestrator
+        type: tosca.capabilities.QC.GlusterFS
     requirements:
       - host:
           capability: tosca.capabilities.QC.VM.topology
