@@ -17,15 +17,20 @@ topology_template:
   node_templates:        
     gluster_fs:
       type: tosca.nodes.QC.Application.GlusterFS     
-      interfaces:
-        Standard:
-          create:
-            inputs:
-              repository: https://github.com/bityoga/mysome_glusterfs.git
-              resources:
-                - 002.setup_glusterfs_infra.yml
-                - 003.setup_glusterfs_cluster.yml
-                - 004.mount_glusterfs.yml
+     interfaces:
+       Standard:
+         create:
+           inputs:
+             repository: https://github.com/QCDIS/playbooks.git
+             resources:
+               - install_glusterfs_prerequisites.yaml
+         configure:
+           inputs:
+             repository: https://github.com/QCDIS/mysome_glusterfs.git
+             resources:
+               - 002.setup_glusterfs_infra.yml    
+               - 003.setup_glusterfs_cluster.yml
+               - 004.mount_glusterfs.yml
                 
       
     topology:

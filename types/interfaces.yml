@@ -73,7 +73,10 @@ interface_types:
         required: false
       repository:
         type: string
-        required: false        
+        required: false     
+      branch:
+        type: string
+        required: false           
       
   tosca.interfaces.QC.Kubernetes:
     derived_from: tosca.interfaces.QC.Standard
