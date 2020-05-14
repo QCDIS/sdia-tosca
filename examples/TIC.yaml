@@ -17,8 +17,8 @@ topology_template:
   node_templates:        
     gluster_fs:
       type: tosca.nodes.QC.Application.GlusterFS     
-     interfaces:
-       Standard:
+      interfaces:
+        Standard:
          create:
            inputs:
              repository: https://github.com/QCDIS/playbooks.git
