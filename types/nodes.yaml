@@ -342,39 +342,39 @@ node_types:
           - greater_or_equal: 1
 
 
-  tosca.nodes.QC.Application.TIC:
-    derived_from:  tosca.nodes.QC.Application
-    description: description of TIC
-    requirements:
-      - host:
-          capability: tosca.capabilities.QC.GlusterFS
-          node: tosca.nodes.QC.Application.GlusterFS
-          relationship: tosca.relationships.DependsOn
-    attributes:
-      service_url:
-        type: string
-        required: false
-        description: url of the service
-    interfaces:
-      Standard:
-        type: tosca.interfaces.QC.Standard
-        create:
-          inputs:
-            repository: https://github.com/bityoga/fabric_as_code.git
-            resources:
-              - 011.initialize_hosts.yml
-              - 012.prepare_docker_images.yml
-              - 013.mount_fs.yml
-              - 014.spawn_swarm.yml
-              - 015.deploy_swarm_visualizer.yml
-              - 016.deploy_portainer.yml
-              - 100.deploy_ca.yml
-              - 101.deploy_orderer.yml
-              - 102.deploy_peers.yml
-              - 103.deploy_cli.yml
-              - 104.deploy_hlf_explorer.yml
-    properties:
-        gluster_cluster_volume:
-          type: string
-          required: true
-          default: gv0
+#   tosca.nodes.QC.Application.TIC:
+#     derived_from:  tosca.nodes.QC.Application
+#     description: description of TIC
+#     requirements:
+#       - host:
+#           capability: tosca.capabilities.QC.GlusterFS
+#           node: tosca.nodes.QC.Application.GlusterFS
+#           relationship: tosca.relationships.DependsOn
+#     attributes:
+#       service_url:
+#         type: string
+#         required: false
+#         description: url of the service
+#     interfaces:
+#       Standard:
+#         type: tosca.interfaces.QC.Standard
+#         create:
+#           inputs:
+#             repository: https://github.com/bityoga/fabric_as_code.git
+#             resources:
+#               - 011.initialize_hosts.yml
+#               - 012.prepare_docker_images.yml
+#               - 013.mount_fs.yml
+#               - 014.spawn_swarm.yml
+#               - 015.deploy_swarm_visualizer.yml
+#               - 016.deploy_portainer.yml
+#               - 100.deploy_ca.yml
+#               - 101.deploy_orderer.yml
+#               - 102.deploy_peers.yml
+#               - 103.deploy_cli.yml
+#               - 104.deploy_hlf_explorer.yml
+#     properties:
+#         gluster_cluster_volume:
+#           type: string
+#           required: true
+#           default: gv0
