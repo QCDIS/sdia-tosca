@@ -308,7 +308,7 @@ node_types:
     description: description of container
     capabilities:
       storage:
-        type: tosca.capabilities.Storage
+        type: tosca.capabilities.Compute
     requirements:
       - host:
           capability: tosca.capabilities.QC.VM.topology
