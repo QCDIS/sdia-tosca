@@ -14,27 +14,26 @@ description: >
   TOSCA example
 
 topology_template:
-  node_templates:        
-  
-    tic_application:
+  node_templates:
+    tic:
       type: tosca.nodes.QC.Application.TIC
       interfaces:
         Standard:
           create:
             inputs:
-             repository: https://github.com/bityoga/fabric_as_code.git
-             resources:
-               - 011.initialize_hosts.yml
-               - 012.prepare_docker_images.yml
-               - 013.mount_fs.yml
-               - 014.spawn_swarm.yml
-               - 015.deploy_swarm_visualizer.yml
-               - 016.deploy_portainer.yml
-               - 100.deploy_ca.yml
-               - 101.deploy_orderer.yml
-               - 102.deploy_peers.yml
-               - 103.deploy_cli.yml
-               - 104.deploy_hlf_explorer.yml
+              repository: https://github.com/bityoga/fabric_as_code.git
+              resources:
+                - 011.initialize_hosts.yml
+                - 012.prepare_docker_images.yml
+                - 013.mount_fs.yml
+                - 014.spawn_swarm.yml
+                - 015.deploy_swarm_visualizer.yml
+                - 016.deploy_portainer.yml
+                - 100.deploy_ca.yml
+                - 101.deploy_orderer.yml
+                - 102.deploy_peers.yml
+                - 103.deploy_cli.yml
+                - 104.deploy_hlf_explorer.yml
                 
       
     topology:
