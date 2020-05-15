@@ -49,4 +49,4 @@ capability_types:
     properties:
       name:
         type: string
-        required: false        
+        required: no        
