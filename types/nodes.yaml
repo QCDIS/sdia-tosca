@@ -347,10 +347,10 @@ node_types:
     derived_from:  tosca.nodes.QC.Application
     description: description of TIC
     requirements:
-      - host:
-          capability: tosca.capabilities.QC.VM.topology
-          node: tosca.nodes.QC.VM.topology
-          relationship: tosca.relationships.HostedOn
+      - storage:
+          capability: tosca.capabilities.QC.GlusterFS
+          node: tosca.nodes.QC.Application.GlusterFS
+          relationship: tosca.relationships.DependsOn
     attributes:
       service_url:
         type: string
