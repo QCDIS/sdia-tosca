@@ -308,7 +308,7 @@ node_types:
     description: description of container
     capabilities:
       storage:
-        type: tosca.capabilities.QC.GlusterFS
+        type: tosca.capabilities.Storage
     requirements:
       - host:
           capability: tosca.capabilities.QC.VM.topology
