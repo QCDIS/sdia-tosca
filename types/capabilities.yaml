@@ -43,3 +43,10 @@ capability_types:
       some_properties:
         type: string
         required: no      
+        
+  tosca.capabilities.Storage:
+    derived_from: tosca.capabilities.Root
+    properties:
+      name:
+        type: string
+        required: false        
