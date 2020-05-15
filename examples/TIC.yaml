@@ -16,7 +16,7 @@ description: >
 topology_template:
   node_templates:        
   
-    tic:
+    tic_application:
       type: tosca.nodes.QC.Application.TIC
       interfaces:
         Standard:
