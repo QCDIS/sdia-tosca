@@ -36,15 +36,15 @@ topology_template:
                 - 104.deploy_hlf_explorer.yml
                 
       
-    topology:
-      type: tosca.nodes.QC.VM.topology
-      interfaces:
-        CloudsStorm:
-          provision:
-            inputs:
-              code_type: SEQ
-              object_type: SubTopology
-      properties:
-        domain: UvA (Amsterdam, The Netherlands) XO Rack
-        provider: ExoGENI
+#    topology:
+#      type: tosca.nodes.QC.VM.topology
+#      interfaces:
+#        CloudsStorm:
+#          provision:
+#            inputs:
+#              code_type: SEQ
+#              object_type: SubTopology
+#      properties:
+#        domain: UvA (Amsterdam, The Netherlands) XO Rack
+#        provider: ExoGENI
       
