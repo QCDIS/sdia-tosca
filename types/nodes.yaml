@@ -225,7 +225,7 @@ node_types:
       num_cores:
         type: integer
         required: true
-        default: 1
+        default: 2
         constraints:
           - greater_or_equal: 1
       cpu_frequency:
@@ -236,13 +236,13 @@ node_types:
       disk_size:
         type: scalar-unit.size
         required: true
-        default: 10000 MB
+        default: 50000 MB
         constraints:
           - greater_or_equal: 5000 MB
       mem_size:
         type: scalar-unit.size
         required: true
-        default: 1000 MB
+        default: 4000 MB
         constraints:
           - greater_or_equal: 500 MB
       os:
@@ -326,6 +326,7 @@ node_types:
           inputs:
             repository: https://github.com/QCDIS/playbooks.git
             resources:
+              - ec2_mount.yaml
               - install_glusterfs_prerequisites.yaml
         configure:
           inputs:
