@@ -225,7 +225,7 @@ node_types:
       num_cores:
         type: integer
         required: true
-        default: 2
+        default: 1
         constraints:
           - greater_or_equal: 1
       cpu_frequency:
@@ -236,13 +236,13 @@ node_types:
       disk_size:
         type: scalar-unit.size
         required: true
-        default: 80000 MB
+        default: 20000 MB
         constraints:
           - greater_or_equal: 5000 MB
       mem_size:
         type: scalar-unit.size
         required: true
-        default: 4000 MB
+        default: 1000 MB
         constraints:
           - greater_or_equal: 500 MB
       os:
