@@ -33,29 +33,29 @@ topology_template:
                     inputs:
                         repository: https://github.com/QCAPI-DRIP/playbooks.git
                         resources:
-                            - delete_service.yml
+                            - k8s/delete_service.yml
                 create:
                     inputs:
                         repository: https://github.com/QCAPI-DRIP/playbooks.git
                         resources:
-                            - create_service.yml
+                            - k8s/create_service.yml
                 scale:
                     inputs:
                         repository: https://github.com/QCAPI-DRIP/playbooks.git
                         resources:
-                            - scale_service.yml  
+                            - k8s/scale_service.yml  
                         replicas: 1
                 autoscale:
                     inputs:
                         repository: https://github.com/QCAPI-DRIP/playbooks.git                
                         resources:
-                            - autoscale_service.yml  
+                            - k8s/autoscale_service.yml  
                         horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml  
                 info:
                     inputs:
                         repository: https://github.com/QCAPI-DRIP/playbooks.git   
                         resources:
-                            - get_info_service.yml                
+                            - k8s/get_info_service.yml                
                 
       
     topology:

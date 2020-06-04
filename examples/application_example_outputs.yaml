@@ -33,13 +33,13 @@ topology_template:
         Standard:
           configure:
             inputs:
-              playbook: "https://github.com/QCAPI-DRIP/playbooks.gitk8s_dashboard.yaml"
+              playbook: "https://github.com/QCDIS/playbooks.gitk8s_dashboard.yaml"
           create:
             inputs:
-              playbook: "https://github.com/QCAPI-DRIP/playbooks.gitinstall_k8s.yaml"
+              playbook: "https://github.com/QCDIS/playbooks.gitinstall_k8s.yaml"
           delete:
             inputs:
-              playbook: "https://github.com/QCAPI-DRIP/playbooks.gitk8s_delete.yaml"
+              playbook: "https://github.com/QCDIS/playbooks.gitk8s_delete.yaml"
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
     topology:
       properties:
@@ -128,31 +128,31 @@ topology_template:
         Kubernetes:
             delete:
                 inputs:
-                    repository: https://github.com/QCAPI-DRIP/playbooks.git
+                    repository: https://github.com/QCDIS/playbooks.git
                     resources:
-                        - delete_service.yml
+                        - k8s/delete_service.yml
             create:
                 inputs:
-                    repository: https://github.com/QCAPI-DRIP/playbooks.git
+                    repository: https://github.com/QCDIS/playbooks.git
                     resources:
-                        - create_service.yml
+                        - k8s/create_service.yml
             scale:
                 inputs:
-                    repository: https://github.com/QCAPI-DRIP/playbooks.git
+                    repository: https://github.com/QCDIS/playbooks.git
                     resources:
-                        - scale_service.yml  
+                        - k8s/scale_service.yml  
                     replicas: 1
             autoscale:
                 inputs:
-                    repository: https://github.com/QCAPI-DRIP/playbooks.git                
+                    repository: https://github.com/QCDIS/playbooks.git                
                     resources:
-                        - autoscale_service.yml  
+                        - k8s/autoscale_service.yml  
                     horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml  
             info:
                 inputs:
-                    repository: https://github.com/QCAPI-DRIP/playbooks.git   
+                    repository: https://github.com/QCDIS/playbooks.git   
                     resources:
-                        - get_info_service.yml
+                        - k8s/get_info_service.yml
                         
              
   outputs:
