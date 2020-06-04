@@ -55,29 +55,29 @@ node_types:
           inputs:
             repository: https://github.com/QCDIS/playbooks.git
             resources:
-              - delete_service.yml
+              - k8s/delete_service.yml
         create:
           inputs:
             repository: https://github.com/QCDIS/playbooks.git
             resources:
-              - create_service.yml
+              - k8s/create_service.yml
         scale:
           inputs:
             repository: https://github.com/QCDIS/playbooks.git
             resources:
-              - scale_service.yml
+              - k8s/scale_service.yml
             replicas: 1
         autoscale:
           inputs:
             repository: https://github.com/QCDIS/playbooks.git
             resources:
-              - autoscale_service.yml
+              - k8s/autoscale_service.yml
             horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml
         info:
           inputs:
             repository: https://github.com/QCDIS/playbooks.git
             resources:
-              - get_info_service.yml
+              - k8s/get_info_service.yml
                 
 
   tosca.nodes.QC.docker.Orchestrator:
@@ -133,18 +133,18 @@ node_types:
                 - install_packages.yaml
                 - mount.yaml
                 - install_docker.yaml
-                - install_k8s.yaml
+                - k8s/install_k8s.yaml
           configure:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               resources:
-                - create_k8s_cluster.yaml
-                - create_k8s_dashboard.yaml
+                - k8s/create_k8s_cluster.yaml
+                - k8s/create_k8s_dashboard.yaml
           delete:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               resources:
-                - k8s_delete.yaml
+                - k8s/k8s_delete.yaml
                     
         
   tosca.nodes.QC.VM.topology:
@@ -326,7 +326,7 @@ node_types:
           inputs:
             repository: https://github.com/QCDIS/playbooks.git
             resources:
-              - ec2_mount.yaml
+              - ec2/ec2_mount.yaml
               - install_glusterfs_prerequisites.yaml
         configure:
           inputs:

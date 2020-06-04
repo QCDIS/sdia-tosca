@@ -33,13 +33,13 @@ topology_template:
         Standard:
           configure:
             inputs:
-              playbook: "https://github.com/QCAPI-DRIP/playbooks.gitk8s_dashboard.yaml"
+              playbook: "https://github.com/QCDIS/playbooks.gitk8s_dashboard.yaml"
           create:
             inputs:
-              playbook: "https://github.com/QCAPI-DRIP/playbooks.gitinstall_k8s.yaml"
+              playbook: "https://github.com/QCDIS/playbooks.gitinstall_k8s.yaml"
           delete:
             inputs:
-              playbook: "https://github.com/QCAPI-DRIP/playbooks.gitk8s_delete.yaml"
+              playbook: "https://github.com/QCDIS/playbooks.gitk8s_delete.yaml"
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
     topology:
       properties:
