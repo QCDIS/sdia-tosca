@@ -130,16 +130,16 @@ node_types:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               resources:
-                - install_packages.yaml
-                - mount.yaml
-                - install_docker.yaml
+                - ec2/ec2_mount.yaml
+                - docker/install_docker.yaml
+                - k8s/install_k8s_prerequisites.yaml
                 - k8s/install_k8s.yaml
           configure:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               resources:
-                - k8s/create_k8s_cluster.yaml
-                - k8s/create_k8s_dashboard.yaml
+                - k8s/set_master_k8s_cluster.yaml
+                - k8s/join_k8s_cluster.yaml
           delete:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
