@@ -82,7 +82,7 @@ node_types:
           inputs:
             repository: https://github.com/QCDIS/playbooks.git
             resources:
-              - k8s/get_info_service.yml
+              - k8s/get_services.yaml              
                 
 
   tosca.nodes.QC.docker.Orchestrator:
@@ -146,6 +146,7 @@ node_types:
                 - k8s/set_master_k8s_cluster.yaml
                 - k8s/join_k8s_cluster.yaml
                 - k8s/create_k8s_dashboard.yaml
+                - k8s/get_services.yaml              
           delete:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
