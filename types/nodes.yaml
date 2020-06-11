@@ -145,6 +145,7 @@ node_types:
               resources:
                 - k8s/set_master_k8s_cluster.yaml
                 - k8s/join_k8s_cluster.yaml
+                - k8s/create_k8s_dashboard.yaml
           delete:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
