@@ -21,7 +21,11 @@ node_types:
       ports:
         description: ports to be forwarded
         type: list
-        required: false      
+        required: false     
+      container_ports:
+        description: ports used by the container but not exposed
+        type: list
+        required: false            
       entrypoint:
         description: command
         type: string
