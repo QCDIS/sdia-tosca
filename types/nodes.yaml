@@ -388,3 +388,24 @@ node_types:
           type: string
           required: true
           default: gv0         
+          
+          
+          
+  tosca.nodes.QC.cwl.task:
+    derived_from:  tosca.nodes.QC.Application
+    description: description of common workflow language task
+    requirements:
+      - executor:
+          capability: tosca.capabilities.QC.CWLExecutor
+          node: tosca.nodes.QC.Application.CWLRunner
+          relationship: tosca.relationships.DependsOn    
+          
+          
+  tosca.nodes.QC.Application.CWLRunner:
+    derived_from:  tosca.nodes.QC.Application
+    description: the cwl-runner https://github.com/common-workflow-language/cwltool
+    requirements:
+      - host:
+          capability: tosca.capabilities.QC.VM.topology
+          node: tosca.nodes.QC.VM.topology
+          relationship: tosca.relationships.HostedOn             
