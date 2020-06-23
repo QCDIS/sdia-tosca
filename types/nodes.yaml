@@ -250,7 +250,7 @@ node_types:
       compute:
         type: tosca.capabilities.QC.VM
     properties:
-      runnning_time:
+      running_time:
         type: integer
         required: false
         description: "the time units needed for this resource to execute the assigned workflow tasks"    
