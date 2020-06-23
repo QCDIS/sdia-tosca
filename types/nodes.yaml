@@ -233,6 +233,10 @@ node_types:
       compute:
         type: tosca.capabilities.QC.VM
     properties:
+      runnning_time:
+        type: integer
+        required: false
+        description: "the time units needed for this resource to execute the assigned workflow tasks"    
       num_cores:
         type: integer
         required: true
@@ -258,11 +262,11 @@ node_types:
           - greater_or_equal: 500 MB
       os:
         type: string
-        required: true       
+        required: false       
         default: "Ubuntu 18.04"
       user_name:
         type: string
-        required: true
+        required: false
         default: "vm_user"
     # outputs for this node
     attributes:
@@ -276,7 +280,7 @@ node_types:
         description: The public IP
       role:
         type: string
-        required: true       
+        required: false       
         description: the role of the VM in the topology
         default: "master"
         constraints:
@@ -287,7 +291,7 @@ node_types:
         description: the type of VM depending on the provider. e.g. XOSmall, t.medium etc. It has to match the mem_size, num_cores etc.                  
       host_name:
         type: string
-        required: true
+        required: false
         default: "vm"
       root_key_pair:
         type: tosca.datatypes.QC.Credential
