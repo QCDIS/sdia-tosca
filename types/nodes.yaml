@@ -12,6 +12,23 @@ node_types:
         type: string
         required: false
         description: the current state of the node
+        
+  tosca.nodes.CloudProvider:
+    derived_from: tosca.nodes.SoftwareComponent
+    properties:
+      provider:
+        description: "Name of cloud provider"
+        type: string
+        required: true
+        default: "Azure"
+      datacenter:
+        description: "Location of data center"
+        type: string
+        required: true
+        default: "West Europe"
+    capabilities:
+      host:
+        type: tosca.capabilities.Host.Compute         
     
 
   tosca.nodes.QC.Container.Application.Docker:
