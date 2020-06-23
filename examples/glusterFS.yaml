@@ -26,7 +26,7 @@ topology_template:
                - install_glusterfs_prerequisites.yaml
          configure:
            inputs:
-             repository: https://github.com/bityoga/mysome_glusterfs.git
+             repository: https://github.com/QCDIS/mysome_glusterfs.git
              resources:
                - 002.setup_glusterfs_infra.yml    
                - 003.setup_glusterfs_cluster.yml
