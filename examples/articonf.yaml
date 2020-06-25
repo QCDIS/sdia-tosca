@@ -22,6 +22,8 @@ topology_template:
             environment:
               MONGO_INITDB_ROOT_USERNAME: root
               MONGO_INITDB_ROOT_PASSWORD: example 
+            ports:
+              - "27017:27017"              
         artifacts:
             image:
                 type: tosca.artifacts.Deployment.Image.Container.Docker
