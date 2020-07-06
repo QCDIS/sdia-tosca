@@ -1,1 +1,1 @@
-# qc-tosca
+# SDIA (Software Defined Infrastructure Automator) tosca
