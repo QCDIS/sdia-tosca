@@ -68,6 +68,10 @@ topology_template:
               MONGO_INITDB_ROOT_PASSWORD: example         
             ports:
               - "8081:8081"
+      requirements:
+      - host:
+          node: "mongo"
+          relationship: "tosca.relationships.DependsOn"              
         artifacts:
             image:
                 type: tosca.artifacts.Deployment.Image.Container.Docker
