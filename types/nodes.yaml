@@ -355,12 +355,6 @@ node_types:
         type: tosca.interfaces.QC.Standard
         create:
           inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - ec2/ec2_mount.yaml
-              - install_glusterfs_prerequisites.yaml
-        configure:
-          inputs:
             repository: https://github.com/bityoga/fabric_as_code.git
             resources:
               - 000.purge.yml 
