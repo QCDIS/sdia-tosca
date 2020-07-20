@@ -361,11 +361,12 @@ node_types:
               - install_glusterfs_prerequisites.yaml
         configure:
           inputs:
-            repository: https://github.com/QCDIS/mysome_glusterfs.git
+            repository: https://github.com/bityoga/fabric_as_code.git
             resources:
+              - 000.purge.yml 
+              - 001.requirements.yml
               - 002.setup_glusterfs_infra.yml    
               - 003.setup_glusterfs_cluster.yml
-              - 004.mount_glusterfs.yml
     properties:
         min_masters_num:
           type: integer
