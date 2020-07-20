@@ -355,7 +355,7 @@ node_types:
         type: tosca.interfaces.QC.Standard
         create:
           inputs:
-            repository: https://github.com/bityoga/fabric_as_code.git
+            repository: https://github.com/bityoga/mysome_glusterfs.git
             resources:
               - 000.purge.yml 
               - 001.requirements.yml
