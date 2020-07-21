@@ -385,6 +385,10 @@ node_types:
           capability: tosca.capabilities.QC.GlusterFS
           node: tosca.nodes.QC.Application.GlusterFS
           relationship: tosca.relationships.DependsOn
+      - host:
+          capability: tosca.capabilities.QC.VM.topology
+          node: tosca.nodes.QC.VM.topology
+          relationship: tosca.relationships.HostedOn          
     attributes:
       service_url:
         type: string
