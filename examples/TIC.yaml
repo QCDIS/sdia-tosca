@@ -17,11 +17,6 @@ topology_template:
   node_templates:
     tic:
       type: tosca.nodes.QC.Application.TIC
-      requirements:
-      - storage:
-          capability: "tosca.capabilities.QC.GlusterFS"
-          node: "glusterfs"
-          relationship: "tosca.relationships.DependsOn"
       interfaces:
         Standard:
           create:
@@ -40,25 +35,6 @@ topology_template:
                 - 103.deploy_cli.yml
                 - 104.deploy_hlf_explorer.yml
                 
-                
-    glusterfs:
-      type: tosca.nodes.QC.Application.GlusterFS     
-      interfaces:
-        Standard:
-         create:
-           inputs:
-             repository: https://github.com/QCDIS/playbooks.git
-             resources:
-               - install_glusterfs_prerequisites.yaml
-         configure:
-           inputs:
-             repository: https://github.com/bityoga/mysome_glusterfs.git
-             resources:
-               - 000.purge.yml 
-               - 001.requirements.yml
-               - 002.setup_glusterfs_infra.yml    
-               - 003.setup_glusterfs_cluster.yml
-               - 004.mount_glusterfs.yml                
                 
       
 #    topology:
