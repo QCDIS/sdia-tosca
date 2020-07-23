@@ -422,11 +422,19 @@ node_types:
   tosca.nodes.QC.cwl.task:
     derived_from:  tosca.nodes.QC.Application
     description: description of common workflow language task
-    requirements:
-      - executor:
-          capability: tosca.capabilities.QC.CWLExecutor
-          node: tosca.nodes.QC.Application.CWLRunner
-          relationship: tosca.relationships.DependsOn    
+    properties:
+        start_time:
+          type: string
+          required: false           
+        end_time:
+          type: string
+          required: false          
+      
+#     requirements:
+#       - executor:
+#           capability: tosca.capabilities.QC.CWLExecutor
+#           node: tosca.nodes.QC.Application.CWLRunner
+#           relationship: tosca.relationships.DependsOn    
           
           
   tosca.nodes.QC.Application.CWLRunner:
