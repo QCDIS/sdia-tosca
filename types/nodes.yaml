@@ -390,10 +390,11 @@ node_types:
           node: tosca.nodes.QC.VM.topology
           relationship: tosca.relationships.HostedOn          
     attributes:
-      service_url:
-        type: string
+      service_urls:
+        type: list
         required: false
-        description: url of the service 
+        entry_schema:
+          type: string     
     interfaces:
       Standard:
         type: tosca.interfaces.QC.Standard
