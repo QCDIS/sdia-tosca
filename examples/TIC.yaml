@@ -21,7 +21,7 @@ topology_template:
         Standard:
           create:
             inputs:
-              repository: https://github.com/bityoga/fabric_as_code.git
+              repository: https://github.com/QCDIS/mysome_glusterfs.git
               resources:
                 - 011.initialize_hosts.yml
                 - 012.prepare_docker_images.yml
