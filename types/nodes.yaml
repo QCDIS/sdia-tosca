@@ -267,7 +267,7 @@ node_types:
       disk_size:
         type: scalar-unit.size
         required: true
-        default: 30000 MB
+        default: 20000 MB
         constraints:
           - greater_or_equal: 5000 MB
       mem_size:
