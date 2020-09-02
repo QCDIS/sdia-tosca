@@ -199,7 +199,7 @@ node_types:
       domain:        
         type: string
         required: true
-        default: "Frankfurt"
+        default: "Ireland"
         description: the domain of this topology e.g. California, UvA (Amsterdam, The Netherlands) XO Rack, Frankfurt, etc           
       provider:
         type: string
