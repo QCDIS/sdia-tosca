@@ -69,4 +69,12 @@ topology_template:
 #         properties:
 #             domain: UvA (Amsterdam, The Netherlands) XO Rack
 #             provider: ExoGENI
+
+
+  policies:
+    - scalability:
+        type: tosca.policies.QC.Performance.CPU
+        targets: [ ws-pema ]
+        constraint_name: "cpu load"
+        max_value: 80
       
