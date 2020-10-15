@@ -21,11 +21,6 @@ topology_template:
         Standard:
          create:
            inputs:
-             repository: https://github.com/QCDIS/playbooks.git
-             resources:
-               - install_glusterfs_prerequisites.yaml
-         configure:
-           inputs:
              repository: https://github.com/bityoga/mysome_glusterfs.git
              resources:
                - 000.purge.yml 
@@ -34,16 +29,5 @@ topology_template:
                - 003.setup_glusterfs_cluster.yml
                - 004.mount_glusterfs.yml
                 
-      
-#     topology:
-#       type: tosca.nodes.QC.VM.topology
-#       interfaces:
-#         CloudsStorm:
-#           provision:
-#             inputs:
-#               code_type: SEQ
-#               object_type: SubTopology
-#       properties:
-#         domain: UvA (Amsterdam, The Netherlands) XO Rack
-#         provider: ExoGENI
+ 
       
