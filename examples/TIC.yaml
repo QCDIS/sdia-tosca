@@ -34,6 +34,7 @@ topology_template:
                 - 102.deploy_peers.yml
                 - 103.deploy_cli.yml
                 - 104.deploy_hlf_explorer.yml
+                - 105.deploy_bank_app.yml
                 
                 
       
