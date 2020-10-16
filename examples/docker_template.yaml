@@ -14,8 +14,31 @@ description: >
   TOSCA example
   
 topology_template:
-
-  node_templates:        
+  node_templates:      
+      compute:
+      properties:
+        disk_size: "10000 MB"
+        mem_size: "1000 MB"
+        num_cores: 1
+        os: "Ubuntu 18.04"
+        user_name: "vm_user"
+      interfaces:
+        Standard:
+          create: "dumy.yaml"
+      type: "tosca.nodes.QC.VM.Compute"
+    compute_1:
+      properties:
+        disk_size: "10000 MB"
+        mem_size: "1000 MB"
+        num_cores: 1
+        os: "Ubuntu 18.04"
+        user_name: "vm_user"
+      interfaces:
+        Standard:
+          create: "dumy.yaml"
+      type: "tosca.nodes.QC.VM.Compute"
+      
+  
     DOCKER_NAME:
         type: tosca.nodes.QC.Container.Application.Docker
         properties:
