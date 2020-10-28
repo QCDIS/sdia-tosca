@@ -4,7 +4,12 @@ properties:
       ENV_1: VAL
       ENV_2: VAL
     ports:
-      - "30000:8888"              
+      - "30000:8888"             
+requirements:
+  - host:
+    capability: "tosca.capabilities.QC.docker.Orchestrator"
+    node: "kubernetes"
+    relationship: "tosca.relationships.HostedOn"      
 artifacts:
     image:
         type: tosca.artifacts.Deployment.Image.Container.Docker
