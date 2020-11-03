@@ -35,39 +35,37 @@ topology_template:
           create:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources: 
+                resources:
                 - k8s/install_k8s_prerequisites.yaml
                 - install_docker.yaml
                 - k8s/create_k8s_cluster.yaml
           configure:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources: 
-                - install_nfs.yaml
-                - create_dynamic_pv.yaml
+                resources:
                 - k8s/create_k8s_dashboard.yaml
           scale:
             inputs:
-              replicas: { get_input: replicas }   
-              service_name: { get_input: service_name }   
+              replicas: { get_input: replicas }
+              service_name: { get_input: service_name }
               repository: https://github.com/QCDIS/playbooks.git
-                resources: 
+                resources:
                 - k8s/scale_k8s_service.yaml
           autoscale:
             inputs:
-              replicas: { get_input: replicas }   
-              service_name: { get_input: service_name }   
+              replicas: { get_input: replicas }
+              service_name: { get_input: service_name }
               repository: https://github.com/QCDIS/playbooks.git
-                resources: 
-                - k8s/autoscale_k8s_service.yaml                 
+                resources:
+                - k8s/autoscale_k8s_service.yaml
           info:
             inputs:
-              replicas: { get_input: replicas }   
-              service_name: { get_input: service_name }   
-                resources: 
-                - k8s/info_k8s_service.yaml                    
-                
-                
+              replicas: { get_input: replicas }
+              service_name: { get_input: service_name }
+                resources:
+                - k8s/info_k8s_service.yaml
+
+
     topology:
       properties:
         domain: "Frankfurt"
@@ -87,23 +85,23 @@ topology_template:
           create:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources: 
-                - openstack/provision_topology.yml      
+                resources:
+                - openstack/provision_topology.yml
           configure:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources: 
-                - openstack/configure_topology.yml        
+                resources:
+                - openstack/configure_topology.yml
           stop:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources: 
-                - openstack/stop_topology.yml        
+                resources:
+                - openstack/stop_topology.yml
           delete:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-                resources: 
-                - openstack/stop_topology.yml                 
+                resources:
+                - openstack/stop_topology.yml
       artifacts:
         provisioned_files:
           required: false
@@ -123,17 +121,17 @@ topology_template:
           file: "alogo53/ws-pema-lifewatch"
           repository: "docker_hub"
           type: "tosca.artifacts.Deployment.Image.Container.Docker"
-          
+
 
 
   workflows:
     install:
-      description: Workflow to deploy the topology 
+      description: Workflow to deploy the topology
       steps:
         topology_deploy:
-          node: topology 
+          node: topology
           preconditions:
-            state: initial 
+            state: initial
             attributes:
              version: 0.0.0
              is_master: true
@@ -146,10 +144,10 @@ topology_template:
             - set_state: configured
           on-success:
             - kubernetes_deploy
-        kubernetes_deploy:            
-          node: kubernetes 
+        kubernetes_deploy:
+          node: kubernetes
           preconditions:
-            state: initial 
+            state: initial
             attributes:
              some_attribute: 0.0.0
              is_master: true
@@ -161,13 +159,13 @@ topology_template:
             - set_state: created
             - set_state: starting
             - call_operation: tosca.interfaces.QC.Standard.configure
-            - set_state: configured            
+            - set_state: configured
           on-success:
             - deploy_containers
-        deploy_containers:            
+        deploy_containers:
           node: kubernetes
           preconditions:
-            state: initial 
+            state: initial
             attributes:
              some_attribute: 0.0.0
              is_master: true
@@ -179,8 +177,8 @@ topology_template:
             - set_state: created
             - set_state: starting
             - call_operation: tosca.interfaces.QC.Standard.configure
-            - set_state: configured                  
-            
+            - set_state: configured
+
 
 description: "TOSCA example"
 imports:
