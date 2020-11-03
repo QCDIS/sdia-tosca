@@ -1,5 +1,20 @@
 tosca_definitions_version: "tosca_simple_yaml_1_0"
 topology_template:
+  workflows:
+    install:
+      description: Workflow to deploy the topology
+      steps:
+        Compute_install:
+          node: topology # defined in a node template elsewhere
+         preconditions:
+           state: initial
+          activities:
+            - delegate: install
+          on-success:
+            serial:
+              - Mysql_initial
+              - Tomcat_initial
+              
   node_templates:
     compute:
       properties:
@@ -97,21 +112,6 @@ topology_template:
           repository: "docker_hub"
           type: "tosca.artifacts.Deployment.Image.Container.Docker"
 
-
-  workflows:
-    install:
-      description: Workflow to deploy the topology
-      steps:
-        Compute_install:
-          node: topology # defined in a node template elsewhere
-         preconditions:
-           state: initial
-          activities:
-            - delegate: install
-          on-success:
-            serial:
-              - Mysql_initial
-              - Tomcat_initial
 
 description: "TOSCA example"
 imports:
