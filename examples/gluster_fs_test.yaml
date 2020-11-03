@@ -38,6 +38,7 @@ topology_template:
               - "001.requirements.yml"
               - "002.setup_glusterfs_infra.yml"
               - "003.setup_glusterfs_cluster.yml"
+              - "004.mount_glusterfs.yml"
       type: "tosca.nodes.QC.Application.GlusterFS"
     topology:
       properties:
@@ -47,6 +48,10 @@ topology_template:
       - vm:
           capability: "tosca.capabilities.QC.VM"
           node: "compute"
+          relationship: "tosca.relationships.DependsOn"
+      - vm:
+          capability: "tosca.capabilities.QC.VM"
+          node: "compute_1"
           relationship: "tosca.relationships.DependsOn"
       - vm:
           capability: "tosca.capabilities.QC.VM"
