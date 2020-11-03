@@ -1,19 +1,17 @@
 tosca_definitions_version: "tosca_simple_yaml_1_0"
 topology_template:
   workflows:
-    install:
-      description: Workflow to deploy the topology
+    provision:
       steps:
-        Compute_install:
-          node: topology # defined in a node template elsewhere
-         preconditions:
-           state: initial
+        create_vms:
+          target: topology:
           activities:
-            - delegate: install
-          on-success:
-            serial:
-              - Mysql_initial
-              - Tomcat_initial
+            - set_state: creating
+            - call_operation: tosca.interfaces.QC.CloudsStorm.create
+            - set_state: created
+            - set_state: configuring
+            - call_operation: tosca.interfaces.QC.CloudsStorm.configure
+            - set_state: configured
               
   node_templates:
     compute:
