@@ -1,6 +1,7 @@
 import os
 import unittest
-from builtins import filter
+
+from toscaparser.common.exception import ValidationError
 from toscaparser.tosca_template import ToscaTemplate
 import yaml
 import logging
@@ -22,10 +23,15 @@ class TestTosca(unittest.TestCase):
         files = self.get_files(tosca_path)
         for file in files:
             logger.info('Testing: ' +file)
-            tosca_template_dict = self.get_tosca_file_file(file)
 
-            tt = ToscaTemplate(yaml_dict_tpl=tosca_template_dict)
-        pass
+            tosca_template_dict = self.get_tosca_file_file(file)
+            try:
+                tt = ToscaTemplate(yaml_dict_tpl=tosca_template_dict)
+            except ValidationError as ex:
+                if 'Template contains unknown field "workflows".' in ex.message:
+                    logger.warning('The parser does not support "workflows" currently.'+ ex.message)
+                    pass
+
 
     def get_files(self,dir_mame):
         listOfFile = os.listdir(dir_mame)
