@@ -28,6 +28,3 @@ topology_template:
                - 002.setup_glusterfs_infra.yml    
                - 003.setup_glusterfs_cluster.yml
 #               - 004.mount_glusterfs.yml
-                
- 
-      
