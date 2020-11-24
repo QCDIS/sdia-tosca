@@ -219,7 +219,7 @@ node_types:
         type: string
         required: false
     interfaces:
-        CloudsStorm:
+      CloudsStorm:
           type: tosca.interfaces.QC.CloudsStorm
           provision:
             inputs:
@@ -241,13 +241,13 @@ node_types:
             inputs:
               code_type: SEQ
               object_type: SubTopology
-        Openstack:
+      tosca.interfaces.QC.Openstack:
           inputs:
-            os_auth_url: "https://stack-server.ct.infn.it:35357/v3"
-            os_project_id: "745695ccd17042fabf96d2410a4278d9"
-            os_auth_type: "v3oidcaccesstoken"
-            os_identity_provider: "egi.eu"
-            os_protocol: "openid"
+            os_auth_url: ""
+            os_project_id: ""
+            os_auth_type: ""
+            os_identity_provider: ""
+            os_protocol: ""
           create:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
