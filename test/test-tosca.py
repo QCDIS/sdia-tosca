@@ -27,6 +27,7 @@ class TestTosca(unittest.TestCase):
             tosca_template_dict = self.get_tosca_file_file(file)
             try:
                 tt = ToscaTemplate(yaml_dict_tpl=tosca_template_dict)
+                tt = ToscaTemplate(file)
             except ValidationError as ex:
                 if 'Template contains unknown field "workflows".' in ex.message:
                     logger.warning('The parser does not support "workflows" currently.'+ ex.message)

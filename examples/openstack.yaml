@@ -13,6 +13,7 @@ topology_template:
           create: "dumy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
     topology:
+      type: tosca.nodes.QC.VM.topology
       properties:
         domain: "Spain"
         provider: "CESGA"
@@ -45,6 +46,7 @@ topology_template:
               resources:
               - create_user.yaml
               - create_user_key_pair
+
 description: "TOSCA example"
 imports:
 - nodes: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/nodes.yaml"
