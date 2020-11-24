@@ -94,7 +94,31 @@ interface_types:
     info:
       description: get information on pods,services or deployments
       
-      
+
+
+
+  tosca.interfaces.QC.Openstack:
+    inputs:
+      os_access_token:
+        type: string
+        required: false
+      os_auth_url:
+        type: string
+        required: true
+      os_project_id:
+        type: string
+        required: true
+      os_auth_type:
+        type: string
+        required: true
+      os_identity_provider:
+        type: string
+        required: true
+      os_protocol:
+        type: string
+        required: true
+    info:
+      description: get information on pods,services or deployments
      
       
 #tosca.interfaces.node.lifecycle.Standard:
