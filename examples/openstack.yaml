@@ -23,7 +23,7 @@ topology_template:
           node: "compute"
           relationship: "tosca.relationships.DependsOn"
       interfaces:
-        Openstack:
+        tosca.interfaces.QC.Openstack:
           inputs:
             os_auth_url: "https://stack-server.ct.infn.it:35357/v3"
             os_project_id: "745695ccd17042fabf96d2410a4278d9"
