@@ -117,7 +117,6 @@ interface_types:
       os_protocol:
         type: string
         required: true
-
     info:
       description: get information
      
@@ -133,9 +132,4 @@ interface_types:
   #stop:
     #description: Standard lifecycle stop operation.
   #delete:
-    #description: Standard lifecycle delete operation.      
-
-tosca:
-  interfaces:
-    QC:
-      Openstack:
+    #description: Standard lifecycle delete operation.
