@@ -241,6 +241,29 @@ node_types:
             inputs:
               code_type: SEQ
               object_type: SubTopology
+        Openstack:
+          inputs:
+            os_auth_url: "https://stack-server.ct.infn.it:35357/v3"
+            os_project_id: "745695ccd17042fabf96d2410a4278d9"
+            os_auth_type: "v3oidcaccesstoken"
+            os_identity_provider: "egi.eu"
+            os_protocol: "openid"
+          create:
+            inputs:
+              repository: https://github.com/QCDIS/playbooks.git
+              resources:
+                - openstack/install_requirements.yaml
+                - openstack/info/get_images.yaml
+                - openstack/info/get_inst_flavors.yaml
+                - openstack/info/get_networks.yaml
+                - openstack/key/create_key.yaml
+                - openstack/server/create_vm.yaml
+          configure:
+            inputs:
+              repository: "https://github.com/QCDIS/playbooks.git"
+              resources:
+              - create_user.yaml
+              - create_user_key_pair
         
   tosca.nodes.QC.VM.Compute:
     derived_from: tosca.nodes.QC.Infrastructure
