@@ -23,7 +23,8 @@ topology_template:
           node: "compute"
           relationship: "tosca.relationships.DependsOn"
       interfaces:
-        tosca.interfaces.QC.Openstack:
+        Openstack:
+          type: tosca.interfaces.QC.Openstack
           inputs:
             os_auth_url: "https://stack-server.ct.infn.it:35357/v3"
             os_project_id: "745695ccd17042fabf96d2410a4278d9"
@@ -44,8 +45,8 @@ topology_template:
             inputs:
               repository: "https://github.com/QCDIS/playbooks.git"
               resources:
-              - create_user.yaml
-              - create_user_key_pair
+                - create_user.yaml
+                - create_user_key_pair
 
 description: "TOSCA example"
 imports:

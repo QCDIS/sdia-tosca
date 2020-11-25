@@ -100,7 +100,7 @@ interface_types:
     derived_from: tosca.interfaces.QC.Standard
     inputs:
       os_access_token:
-        type: string
+        type: tosca.datatypes.QC.Credential
         required: false
       os_auth_url:
         type: string
