@@ -241,27 +241,28 @@ node_types:
             inputs:
               code_type: SEQ
               object_type: SubTopology
-      tosca.interfaces.QC.Openstack:
+      Openstack:
+        type: tosca.interfaces.QC.Openstack
+#        inputs:
+#          os_auth_url: ""
+#          os_project_id: ""
+#          os_auth_type: ""
+#          os_identity_provider: ""
+#          os_protocol: ""
+        create:
           inputs:
-            os_auth_url: ""
-            os_project_id: ""
-            os_auth_type: ""
-            os_identity_provider: ""
-            os_protocol: ""
-          create:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              resources:
-                - openstack/install_requirements.yaml
-                - openstack/info/get_images.yaml
-                - openstack/info/get_inst_flavors.yaml
-                - openstack/info/get_networks.yaml
-                - openstack/key/create_key.yaml
-                - openstack/server/create_vm.yaml
-          configure:
-            inputs:
-              repository: "https://github.com/QCDIS/playbooks.git"
-              resources:
+            repository: https://github.com/QCDIS/playbooks.git
+            resources:
+              - openstack/install_requirements.yaml
+              - openstack/info/get_images.yaml
+              - openstack/info/get_inst_flavors.yaml
+              - openstack/info/get_networks.yaml
+              - openstack/key/create_key.yaml
+              - openstack/server/create_vm.yaml
+        configure:
+          inputs:
+            repository: "https://github.com/QCDIS/playbooks.git"
+            resources:
               - create_user.yaml
               - create_user_key_pair
         
