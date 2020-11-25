@@ -23,15 +23,26 @@ class TestTosca(unittest.TestCase):
         files = self.get_files(tosca_path)
         for file in files:
             logger.info('Testing: ' +file)
-
-            tosca_template_dict = self.get_tosca_file_file(file)
+            tosca_template_dict = self.get_tosca_file(file)
             try:
                 tt = ToscaTemplate(yaml_dict_tpl=tosca_template_dict)
-                tt = ToscaTemplate(file)
             except ValidationError as ex:
                 if 'Template contains unknown field "workflows".' in ex.message:
                     logger.warning('The parser does not support "workflows" currently.'+ ex.message)
                     pass
+
+
+    def test_open_stack(self):
+        cur_dir = os.path.dirname(os.path.realpath(__file__))
+
+        tosca_path =  os.path.join(cur_dir, '../examples/openstack.yaml')
+        tosca_template_dict = self.get_tosca_file(tosca_path)
+        try:
+            tt = ToscaTemplate(yaml_dict_tpl=tosca_template_dict)
+        except ValidationError as ex:
+            if 'Template contains unknown field "workflows".' in ex.message:
+                logger.warning('The parser does not support "workflows" currently.' + ex.message)
+                pass
 
 
     def get_files(self,dir_mame):
@@ -47,7 +58,7 @@ class TestTosca(unittest.TestCase):
         return completeFileList
 
 
-    def get_tosca_file_file(self, path):
+    def get_tosca_file(self, path):
         input_tosca_file_path = path
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.assertEqual(True, os.path.exists(input_tosca_file_path),
