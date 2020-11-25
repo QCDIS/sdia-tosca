@@ -243,12 +243,6 @@ node_types:
               object_type: SubTopology
       Openstack:
         type: tosca.interfaces.QC.Openstack
-#        inputs:
-#          os_auth_url: ""
-#          os_project_id: ""
-#          os_auth_type: ""
-#          os_identity_provider: ""
-#          os_protocol: ""
         create:
           inputs:
             repository: https://github.com/QCDIS/playbooks.git
