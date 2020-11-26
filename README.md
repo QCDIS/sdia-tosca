@@ -1,4 +1,4 @@
-![Python package](https://github.com/qcdis-sdia/sdia-tosca/workflows/Python%20package/badge.svg)
+![validate with tosca-parser](https://github.com/qcdis-sdia/sdia-tosca/workflows/validate%20with%20tosca-parser/badge.svg)
 # SDIA (Software Defined Infrastructure Automator) tosca
 
 
