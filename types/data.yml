@@ -16,22 +16,22 @@ data_types:
         properties:
             os_auth_url:
                 type: string
-                description: the Keystone url. example https://stack-server.ct.infn.it:35357/v3
+                description: 'the Keystone url. example https://stack-server.ct.infn.it:35357/v3'
                 required: true
             os_project_id:
                 type: string
-                description: the project example 745695ccd17042fabf96d2410a4278d9
+                description: 'the project example 745695ccd17042fabf96d2410a4278d9'
                 required: true
             os_auth_type:
                 type: string
-                description: example v3oidcaccesstoken
+                description: 'example v3oidcaccesstoken'
                 required: true
             os_identity_provider:
                 type: string
-                description: example egi.eu
+                description: 'example egi.eu'
             os_protocol:
                 type: string
-                 description: example  openid
+                 description: 'example openid'
                 required: true
 
             
