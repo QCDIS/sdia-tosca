@@ -31,8 +31,7 @@ data_types:
                 description: 'example egi.eu'
             os_protocol:
                 type: string
-                 description: 'example openid'
-                required: true
+                description: 'example openid'
 
             
     tosca.datatypes.QC.coordinates:
