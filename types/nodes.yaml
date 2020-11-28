@@ -258,7 +258,7 @@ node_types:
             repository: "https://github.com/QCDIS/playbooks.git"
             resources:
               - create_user.yaml
-              - create_user_key_pair
+              - create_user_key_pair.yaml
         
   tosca.nodes.QC.VM.Compute:
     derived_from: tosca.nodes.QC.Infrastructure

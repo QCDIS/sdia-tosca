@@ -117,8 +117,43 @@ interface_types:
       os_protocol:
         type: string
         required: true
+      repository:
+        type: string
+        required: true
+      os:
+        type: string
+        required: false
+      disk_size:
+        type: string
+        required: false
+      mem_size:
+        type: string
+        required: false
+      num_cores:
+        type: integer
+        required: false
+      user_name:
+        type: string
+        required: false
     info:
       description: get information
+    install_requirements:
+      description: installs openstacksdk
+    select_image:
+      description: selects image to satisfy the OS
+    select_instance_type:
+      description: selects image to satisfy the OS
+    select_network:
+      description: selects network
+    create_key:
+      description: creates key
+    create_user:
+      description: creates user
+    create_user_key_pair:
+      description: creates key pair
+
+
+
      
       
 #tosca.interfaces.node.lifecycle.Standard:
