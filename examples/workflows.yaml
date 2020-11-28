@@ -1,5 +1,48 @@
-tosca_definitions_version: "tosca_simple_yaml_1_0"
+tosca_definitions_version: "tosca_simple_yaml_1_2"
 topology_template:
+  workflows:
+    provision:
+      description: Workflow to deploy the topology
+      steps:
+        create_vms:
+          target: topology
+          activities:
+            - set_state: creating
+            - call_operation: install_requirements
+              on_success:
+                - select_image
+                - select_instance_type
+                - select_network
+        select_image:
+          target: topology
+          activities:
+            - call_operation: select_image
+              on_success: create_key
+        select_instance_type:
+          target: topology
+          activities:
+            - call_operation: select_instance_type
+              on_success: create_key
+        select_network:
+          target: topology
+          activities:
+            - call_operation: select_network
+              on_success: create_key
+        create_key:
+          target: topology
+          activities:
+            - call_operation: create_key
+              on_success: create
+        create_user:
+          target: topology
+          activities:
+            - call_operation: create_user
+              on_success: create_user_key_pair
+        create_user_key_pair:
+          target: topology
+          activities:
+            - call_operation: create_user_key_pair
+            - set_state: created
 
   node_templates:
     compute:
@@ -27,8 +70,8 @@ topology_template:
 
     topology:
       properties:
-        domain: "Frankfurt"
-        provider: "EC2"
+        domain: "Spain"
+        provider: "CESGA"
       requirements:
       - vm:
           capability: "tosca.capabilities.QC.VM"
@@ -39,42 +82,36 @@ topology_template:
           node: "compute_1"
           relationship: "tosca.relationships.DependsOn"
       interfaces:
-        CloudsStorm:
-          delete:
+        Openstack:
+          install_requirements:
             inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          hscale:
+              repository: https://github.com/QCDIS/playbooks.git
+            implementation: openstack/install_requirements.yaml
+          select_image:
+              inputs:
+                os: "Ubuntu 18.04"
+              implementation: openstack/info/get_images.yaml
+          select_instance_type:
+              inputs:
+                disk_size: "10000 MB"
+                mem_size: "1000 MB"
+                num_cores: 1
+              implementation: openstack/info/get_inst_flavors.yaml
+          select_network:
+              implementation: openstack/info/get_networks.yaml
+          create_key:
+              implementation: openstack/info/create_key.yaml
+          create:
+              implementation: openstack/server/create_vm.yaml
+          create_user:
             inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          provision:
+              implementation: create_user.yaml
+          create_user_key_pair:
             inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          start:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          stop:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
+              implementation: create_user_key_pair.yaml
       type: "tosca.nodes.QC.VM.topology"
 
-  workflows:
-    provision:
-      description: Workflow to deploy the topology
-      steps:
-        create_vms:
-          target: topology
-          activities:
-            - set_state: creating
-            - call_operation: tosca.interfaces.QC.CloudsStorm.create
-            - set_state: created
-            - set_state: configuring
-            - call_operation: tosca.interfaces.QC.CloudsStorm.configure
-            - set_state: configured
+
 
 
 description: "TOSCA example"
