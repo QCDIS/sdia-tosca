@@ -30,6 +30,8 @@ class TestTosca(unittest.TestCase):
                 if 'Template contains unknown field "workflows".' in ex.message:
                     logger.warning('The parser does not support "workflows" currently.'+ ex.message)
                     pass
+                else:
+                    raise ex
 
 
     def test_open_stack(self):
