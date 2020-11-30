@@ -8,7 +8,7 @@ topology_template:
           target: topology
           activities:
             - set_state: creating
-            - call_operation: install_requirements
+            - call_operation: tosca.interfaces.QC.Openstack.install_requirements
               on_success:
                 - select_image
                 - select_instance_type
@@ -16,32 +16,32 @@ topology_template:
         select_image:
           target: topology
           activities:
-            - call_operation: select_image
+            - call_operation: tosca.interfaces.QC.Openstack.select_image
               on_success: create_key
         select_instance_type:
           target: topology
           activities:
-            - call_operation: select_instance_type
+            - call_operation: tosca.interfaces.QC.Openstack.select_instance_type
               on_success: create_key
         select_network:
           target: topology
           activities:
-            - call_operation: select_network
+            - call_operation: tosca.interfaces.QC.Openstack.select_network
               on_success: create_key
         create_key:
           target: topology
           activities:
-            - call_operation: create_key
+            - call_operation: tosca.interfaces.QC.Openstack.create_key
               on_success: create
         create_user:
           target: topology
           activities:
-            - call_operation: create_user
+            - call_operation: tosca.interfaces.QC.Openstack.create_user
               on_success: create_user_key_pair
         create_user_key_pair:
           target: topology
           activities:
-            - call_operation: create_user_key_pair
+            - call_operation: tosca.interfaces.QC.Openstack.create_user_key_pair
             - set_state: created
 
   node_templates:
@@ -89,26 +89,36 @@ topology_template:
             implementation: openstack/install_requirements.yaml
           select_image:
               inputs:
+                repository: https://github.com/QCDIS/playbooks.git
                 os: "Ubuntu 18.04"
               implementation: openstack/info/get_images.yaml
           select_instance_type:
               inputs:
+                repository: https://github.com/QCDIS/playbooks.git
                 disk_size: "10000 MB"
                 mem_size: "1000 MB"
                 num_cores: 1
               implementation: openstack/info/get_inst_flavors.yaml
           select_network:
-              implementation: openstack/info/get_networks.yaml
+            inputs:
+              repository: https://github.com/QCDIS/playbooks.git
+            implementation: openstack/info/get_networks.yaml
           create_key:
-              implementation: openstack/info/create_key.yaml
+            inputs:
+              repository: https://github.com/QCDIS/playbooks.git
+            implementation: openstack/info/create_key.yaml
           create:
-              implementation: openstack/server/create_vm.yaml
+            inputs:
+              repository: https://github.com/QCDIS/playbooks.git
+            implementation: openstack/server/create_vm.yaml
           create_user:
             inputs:
-              implementation: create_user.yaml
+              repository: https://github.com/QCDIS/playbooks.git
+            implementation: create_user.yaml
           create_user_key_pair:
             inputs:
-              implementation: create_user_key_pair.yaml
+              repository: https://github.com/QCDIS/playbooks.git
+            implementation: create_user_key_pair.yaml
       type: "tosca.nodes.QC.VM.topology"
 
 
