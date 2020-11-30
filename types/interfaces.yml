@@ -97,7 +97,7 @@ interface_types:
 
 
   tosca.interfaces.QC.Openstack:
-    derived_from: tosca.interfaces.QC.Standard
+#    derived_from: tosca.interfaces.QC.Standard
     inputs:
       os_access_token:
         type: tosca.datatypes.QC.Credential
