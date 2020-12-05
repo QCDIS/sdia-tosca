@@ -65,7 +65,7 @@ interface_types:
   tosca.interfaces.QC.Standard:
     derived_from: tosca.interfaces.node.lifecycle.Standard
     inputs:
-      inventory_hosts:
+      inventory:
         type: list
         required: false
       resources:
@@ -81,6 +81,9 @@ interface_types:
   tosca.interfaces.QC.Kubernetes:
     derived_from: tosca.interfaces.QC.Standard
     inputs:
+      inventory:
+        type: list
+        required: false
       replicas:
         type: integer
         required: false
@@ -99,6 +102,9 @@ interface_types:
   tosca.interfaces.QC.Openstack:
 #    derived_from: tosca.interfaces.QC.Standard
     inputs:
+      inventory:
+        type: list
+        required: false
       os_access_token:
         type: tosca.datatypes.QC.Credential
         required: false
@@ -135,6 +141,7 @@ interface_types:
       user_name:
         type: string
         required: false
+      inve
     info:
       description: get information
     install_requirements:
