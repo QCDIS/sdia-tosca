@@ -8,31 +8,28 @@ data_types:
             cloud_provider_name:
                 type: string
                 required: true
-
-
-    tosca.datatypes.QC.Credential.OS:
-        derived_from: tosca.datatypes.QC.Credential
-        properties:
-            os_auth_url:
+            auth_url:
                 type: string
                 description: 'the Keystone url. example https://stack-server.ct.infn.it:35357/v3'
-                required: true
-            os_project_id:
+                required: false
+            project_id:
                 type: string
                 description: 'the project example 745695ccd17042fabf96d2410a4278d9'
-                required: true
-            os_auth_type:
+                required: false
+            auth_type:
                 type: string
                 description: 'example v3oidcaccesstoken'
                 required: true
-            os_identity_provider:
+            identity_provider:
                 type: string
                 description: 'example egi.eu'
-            os_protocol:
+                required: false
+            protocol:
                 type: string
                 description: 'example openid'
+                required: false
 
-            
+
     tosca.datatypes.QC.coordinates:
         derived_from: tosca.datatypes.Root
         properties:
