@@ -158,16 +158,23 @@ topology_template:
           configure:
             implementation: "k8s/k8s_dashboard.yaml"
             inputs:
-#              inventory:
-#                - "{{ compute1.attributes.public_ip }}"
+              inventory:
+                - { get_attribute: [ compute, public_ip ] }
+                - { get_attribute: [ compute_1, public_ip ] }
               repository: https://github.com/QCDIS/playbooks.git
           create:
             implementation: "k8s/install_k8s.yaml"
             inputs:
+              inventory:
+                - { get_attribute: [ compute, public_ip ] }
+                - { get_attribute: [ compute_1, public_ip ] }
               repository: https://github.com/QCDIS/playbooks.git
           delete:
             implementation: "k8s/k8s_delete.yaml"
             inputs:
+              inventory:
+                - { get_attribute: [ compute, public_ip ] }
+                - { get_attribute: [ compute_1, public_ip ] }
               repository: https://github.com/QCDIS/playbooks.git
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
 
