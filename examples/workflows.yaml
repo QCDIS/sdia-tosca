@@ -158,6 +158,8 @@ topology_template:
           configure:
             implementation: "k8s/k8s_dashboard.yaml"
             inputs:
+#              inventory:
+#                - "{{ compute1.attributes.public_ip }}"
               repository: https://github.com/QCDIS/playbooks.git
           create:
             implementation: "k8s/install_k8s.yaml"
