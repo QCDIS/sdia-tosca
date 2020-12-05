@@ -141,7 +141,6 @@ interface_types:
       user_name:
         type: string
         required: false
-      inve
     info:
       description: get information
     install_requirements:
