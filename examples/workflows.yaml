@@ -37,6 +37,13 @@ topology_template:
           activities:
             - call_operation: Openstack.select_network
               on_success: create_key
+        create_vm:
+          target: topology
+          activities:
+            - call_operation: Openstack.create
+              on_success:
+                - create_user
+                - set_vm_attributes
         create_key:
           target: topology
           activities:
@@ -49,6 +56,11 @@ topology_template:
               on_success: create_user_key_pair
         create_user_key_pair:
           target: topology
+          activities:
+            - call_operation: Openstack.create_user_key_pair
+            - set_state: created
+        set_vm_attributes:
+          target: [ compute, compute_1 ]
           activities:
             - call_operation: Openstack.create_user_key_pair
             - set_state: created
@@ -159,8 +171,20 @@ topology_template:
             implementation: "k8s/k8s_dashboard.yaml"
             inputs:
               inventory:
-                - { get_attribute: [ compute, public_ip ] }
-                - { get_attribute: [ compute_1, public_ip ] }
+                - all:
+                    children:
+                      master:
+                        hosts:
+                          ansible_host: { get_attribute: [ compute, public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute, user_name ] }
+                      workers:
+                        hosts:
+                          ansible_host: { get_attribute: [ compute, public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute, user_name ] }
               repository: https://github.com/QCDIS/playbooks.git
           create:
             implementation: "k8s/install_k8s.yaml"
@@ -173,8 +197,20 @@ topology_template:
             implementation: "k8s/k8s_delete.yaml"
             inputs:
               inventory:
-                - { get_attribute: [ compute, public_ip ] }
-                - { get_attribute: [ compute_1, public_ip ] }
+                - all:
+                    children:
+                      master:
+                        hosts:
+                          ansible_host: { get_attribute: [ compute, public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute, user_name ] }
+                      workers:
+                        hosts:
+                          ansible_host: { get_attribute: [ compute, public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute, user_name ] }
               repository: https://github.com/QCDIS/playbooks.git
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
 
