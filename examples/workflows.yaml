@@ -110,7 +110,7 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                    ansible_host: localhosts
+                    localhost:
             implementation: openstack/install_requirements.yaml
           select_image:
             inputs:
@@ -119,7 +119,7 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                    ansible_host: localhosts
+                    localhost:
             implementation: openstack/info/get_images.yaml
           select_instance_type:
             inputs:
@@ -130,7 +130,7 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                    ansible_host: localhosts
+                    localhost:
             implementation: openstack/info/get_inst_flavors.yaml
           select_network:
             inputs:
@@ -138,7 +138,7 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                    ansible_host: localhosts
+                    localhost:
             implementation: openstack/info/get_networks.yaml
           create_key:
             inputs:
@@ -146,7 +146,7 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                    ansible_host: localhosts
+                    localhost:
             implementation: openstack/info/create_key.yaml
           create:
             inputs:
@@ -154,7 +154,7 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                    ansible_host: localhosts
+                    localhost:
             implementation: openstack/server/create_vm.yaml
           create_user:
             inputs:
@@ -162,7 +162,7 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                    ansible_host: localhosts
+                    localhost:
             implementation: create_user.yaml
           create_user_key_pair:
             inputs:
@@ -170,7 +170,7 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                    ansible_host: localhosts
+                    localhost:
             implementation: create_user_key_pair.yaml
       type: "tosca.nodes.QC.VM.topology"
 
@@ -191,13 +191,13 @@ topology_template:
                   children:
                     master:
                       hosts:
-                          ansible_host: { get_attribute: [ compute, public_ip ] }
+                        "{ get_attribute: [ compute, public_ip ] }":
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute, user_name ] }
                     workers:
                       hosts:
-                          ansible_host: { get_attribute: [ compute_1, public_ip ] }
+                        "{ get_attribute: [ compute_1, public_ip ] }":
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute, user_name ] }
@@ -210,13 +210,13 @@ topology_template:
                   children:
                     master:
                       hosts:
-                          ansible_host: { get_attribute: [ compute, public_ip ] }
+                        "{ get_attribute: [ compute, public_ip ] }":
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute, user_name ] }
                     workers:
                       hosts:
-                          ansible_host: { get_attribute: [ compute_1, public_ip ] }
+                        "{ get_attribute: [ compute_1, public_ip ] }":
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute, user_name ] }
@@ -229,13 +229,13 @@ topology_template:
                   children:
                     master:
                       hosts:
-                          ansible_host: { get_attribute: [ compute, public_ip ] }
+                        "{ get_attribute: [ compute, public_ip ] }":
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute, user_name ] }
                     workers:
                       hosts:
-                          ansible_host: { get_attribute: [ compute_1, public_ip ] }
+                        "{ get_attribute: [ compute_1, public_ip ] }":
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute, user_name ] }
