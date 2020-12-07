@@ -111,6 +111,7 @@ topology_template:
                 all:
                   hosts:
                     localhost:
+                      ansible_connection: local
             implementation: openstack/install_requirements.yaml
           select_image:
             inputs:
@@ -120,6 +121,7 @@ topology_template:
                 all:
                   hosts:
                     localhost:
+                      ansible_connection: local
             implementation: openstack/info/get_images.yaml
           select_instance_type:
             inputs:
@@ -131,6 +133,7 @@ topology_template:
                 all:
                   hosts:
                     localhost:
+                      ansible_connection: local
             implementation: openstack/info/get_inst_flavors.yaml
           select_network:
             inputs:
@@ -139,6 +142,7 @@ topology_template:
                 all:
                   hosts:
                     localhost:
+                      ansible_connection: local
             implementation: openstack/info/get_networks.yaml
           create_key:
             inputs:
@@ -147,7 +151,8 @@ topology_template:
                 all:
                   hosts:
                     localhost:
-            implementation: openstack/info/create_key.yaml
+                      ansible_connection: local
+            implementation: openstack/key/create_key.yaml
           create:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
@@ -155,6 +160,7 @@ topology_template:
                 all:
                   hosts:
                     localhost:
+                      ansible_connection: local
             implementation: openstack/server/create_vm.yaml
           create_user:
             inputs:
@@ -171,6 +177,7 @@ topology_template:
                 all:
                   hosts:
                     localhost:
+                      ansible_connection: local
             implementation: create_user_key_pair.yaml
       type: "tosca.nodes.QC.VM.topology"
 
