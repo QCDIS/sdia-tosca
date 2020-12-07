@@ -108,14 +108,18 @@ topology_template:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               inventory:
-                - localhost
+                all:
+                  hosts:
+                    ansible_host: localhosts
             implementation: openstack/install_requirements.yaml
           select_image:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               os: "Ubuntu 18.04"
               inventory:
-                - localhost
+                all:
+                  hosts:
+                    ansible_host: localhosts
             implementation: openstack/info/get_images.yaml
           select_instance_type:
             inputs:
@@ -124,37 +128,49 @@ topology_template:
               mem_size: "1000 MB"
               num_cores: 1
               inventory:
-                - localhost
+                all:
+                  hosts:
+                    ansible_host: localhosts
             implementation: openstack/info/get_inst_flavors.yaml
           select_network:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               inventory:
-                - localhost
+                all:
+                  hosts:
+                    ansible_host: localhosts
             implementation: openstack/info/get_networks.yaml
           create_key:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               inventory:
-                - localhost
+                all:
+                  hosts:
+                    ansible_host: localhosts
             implementation: openstack/info/create_key.yaml
           create:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               inventory:
-                - localhost
+                all:
+                  hosts:
+                    ansible_host: localhosts
             implementation: openstack/server/create_vm.yaml
           create_user:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               inventory:
-                - localhost
+                all:
+                  hosts:
+                    ansible_host: localhosts
             implementation: create_user.yaml
           create_user_key_pair:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               inventory:
-                - localhost
+                all:
+                  hosts:
+                    ansible_host: localhosts
             implementation: create_user_key_pair.yaml
       type: "tosca.nodes.QC.VM.topology"
 
@@ -171,17 +187,17 @@ topology_template:
             implementation: "k8s/k8s_dashboard.yaml"
             inputs:
               inventory:
-                - all:
-                    children:
-                      master:
-                        hosts:
+                all:
+                  children:
+                    master:
+                      hosts:
                           ansible_host: { get_attribute: [ compute, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute, user_name ] }
-                      workers:
-                        hosts:
-                          ansible_host: { get_attribute: [ compute, public_ip ] }
+                    workers:
+                      hosts:
+                          ansible_host: { get_attribute: [ compute_1, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute, user_name ] }
@@ -190,24 +206,36 @@ topology_template:
             implementation: "k8s/install_k8s.yaml"
             inputs:
               inventory:
-                - { get_attribute: [ compute, public_ip ] }
-                - { get_attribute: [ compute_1, public_ip ] }
+                all:
+                  children:
+                    master:
+                      hosts:
+                          ansible_host: { get_attribute: [ compute, public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute, user_name ] }
+                    workers:
+                      hosts:
+                          ansible_host: { get_attribute: [ compute_1, public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute, user_name ] }
               repository: https://github.com/QCDIS/playbooks.git
           delete:
             implementation: "k8s/k8s_delete.yaml"
             inputs:
               inventory:
-                - all:
-                    children:
-                      master:
-                        hosts:
+                all:
+                  children:
+                    master:
+                      hosts:
                           ansible_host: { get_attribute: [ compute, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute, user_name ] }
-                      workers:
-                        hosts:
-                          ansible_host: { get_attribute: [ compute, public_ip ] }
+                    workers:
+                      hosts:
+                          ansible_host: { get_attribute: [ compute_1, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute, user_name ] }
