@@ -17,7 +17,6 @@ topology_template:
           activities:
             - set_state: creating
             - call_operation: Openstack.install_requirements
-            - call_operation: Openstack.install_requirements
               on_success:
                 - select_image
                 - select_instance_type
@@ -162,20 +161,22 @@ topology_template:
       interfaces:
         Standard:
           configure:
-            implementation: "k8s/k8s_dashboard.yaml"
+            implementation: "k8s/create_k8s_dashboard.yaml"
             inputs:
               inventory:
                 all:
                   children:
                     master:
                       hosts:
-                        "{ get_attribute: [ compute, public_ip ] }":
+                        compute:
+                          host: { get_attribute: [ compute, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: "{ get_property: [ compute, user_name ] }"
                     workers:
                       hosts:
-                        "{ get_attribute: [ compute_1, public_ip ] }":
+                        compute_1:
+                          host: { get_attribute: [ compute_1, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: "{ get_property: [ compute, user_name ] }"
@@ -188,13 +189,15 @@ topology_template:
                   children:
                     master:
                       hosts:
-                        "{ get_attribute: [ compute, public_ip ] }":
+                        compute:
+                          host: { get_attribute: [ compute, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: "{ get_property: [ compute, user_name ] }"
                     workers:
                       hosts:
-                        "{ get_attribute: [ compute_1, public_ip ] }":
+                        compute_1:
+                          host: { get_attribute: [ compute_1, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: "{ get_property: [ compute, user_name ] }"
@@ -207,13 +210,15 @@ topology_template:
                   children:
                     master:
                       hosts:
-                        "{ get_attribute: [ compute, public_ip ] }":
+                        compute:
+                          host: { get_attribute: [ compute, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: "{ get_property: [ compute, user_name ] }"
                     workers:
                       hosts:
-                        "{ get_attribute: [ compute_1, public_ip ] }":
+                        compute_1:
+                          host: { get_attribute: [ compute_1, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: "{ get_property: [ compute, user_name ] }"
