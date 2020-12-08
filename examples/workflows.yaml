@@ -42,27 +42,15 @@ topology_template:
           activities:
             - call_operation: Openstack.create
               on_success:
-                - create_user
                 - set_vm_attributes
         create_key:
           target: topology
           activities:
             - call_operation: Openstack.create_key
               on_success: create
-        create_user:
-          target: topology
-          activities:
-            - call_operation: Openstack.create_user
-              on_success: create_user_key_pair
-        create_user_key_pair:
-          target: topology
-          activities:
-            - call_operation: Openstack.create_user_key_pair
-            - set_state: created
         set_vm_attributes:
           target: [ compute, compute_1 ]
           activities:
-            - call_operation: Openstack.create_user_key_pair
             - set_state: created
 
   node_templates:
@@ -116,24 +104,24 @@ topology_template:
           select_image:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-              os: "Ubuntu 18.04"
               inventory:
                 all:
                   hosts:
                     localhost:
                       ansible_connection: local
+                      os: "{ get_propperty: [ compute, os ] }"
             implementation: openstack/info/get_images.yaml
           select_instance_type:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
-              disk_size: "10000 MB"
-              mem_size: "1000 MB"
-              num_cores: 1
               inventory:
                 all:
                   hosts:
                     localhost:
                       ansible_connection: local
+                      disk_size: "{ get_propperty: [ compute, disk_size ] }"
+                      mem_size: "{ get_propperty: [ compute, mem_size ] }"
+                      num_cores: "{ get_propperty: [ compute, num_cores ] }"
             implementation: openstack/info/get_inst_flavors.yaml
           select_network:
             inputs:
@@ -162,23 +150,6 @@ topology_template:
                     localhost:
                       ansible_connection: local
             implementation: openstack/server/create_vm.yaml
-          create_user:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              inventory:
-                all:
-                  hosts:
-                    localhost:
-            implementation: create_user.yaml
-          create_user_key_pair:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              inventory:
-                all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
-            implementation: create_user_key_pair.yaml
       type: "tosca.nodes.QC.VM.topology"
 
 
