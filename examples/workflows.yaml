@@ -8,6 +8,7 @@ imports:
 - interfaces: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/interfaces.yml"
 topology_template:
 
+
   workflows:
     provision:
       description: Workflow to deploy the topology
@@ -80,6 +81,15 @@ topology_template:
       properties:
         domain: "Spain"
         provider: "CESGA"
+      attributes:
+        credential:
+          auth_url: "https://the_open_id_server:35357/v3"
+          cloud_provider_name: "CESGA"
+          identity_provider: "egi.eu"
+          project_id: "the_project_id"
+          protocol: "openid"
+          token: "the_token"
+          token_type: "v3oidcaccesstoken"
       requirements:
       - vm:
           capability: "tosca.capabilities.QC.VM"
@@ -108,7 +118,8 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      os: "{ get_propperty: [ compute, os ] }"
+                      os: { get_property: [ compute, os ] }
+                      auth: { get_attribute: [ topology, credential ] }
             implementation: openstack/info/get_images.yaml
           select_instance_type:
             inputs:
@@ -118,9 +129,10 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      disk_size: "{ get_propperty: [ compute, disk_size ] }"
-                      mem_size: "{ get_propperty: [ compute, mem_size ] }"
-                      num_cores: "{ get_propperty: [ compute, num_cores ] }"
+                      disk_size: { get_property: [ compute, disk_size ] }
+                      mem_size: { get_property: [ compute, mem_size ] }
+                      num_cores: { get_property: [ compute, num_cores ] }
+                      auth: { get_attribute: [ topology, credential ] }
             implementation: openstack/info/get_inst_flavors.yaml
           select_network:
             inputs:
@@ -130,6 +142,7 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
+                      auth: { get_attribute: [ topology, credential ] }
             implementation: openstack/info/get_networks.yaml
           create_key:
             inputs:
@@ -139,6 +152,7 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
+                      auth: { get_attribute: [ topology, credential ] }
             implementation: openstack/key/create_key.yaml
           create:
             inputs:
@@ -148,10 +162,9 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
+                      auth: { get_attribute: [ topology, credential ] }
             implementation: openstack/server/create_vm.yaml
       type: "tosca.nodes.QC.VM.topology"
-
-
     kubernetes:
       requirements:
       - host:
@@ -169,17 +182,17 @@ topology_template:
                     master:
                       hosts:
                         compute:
-                          host: { get_attribute: [ compute, public_ip ] }
+                          ansible_host: { get_attribute: [ compute, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                          ansible_ssh_user: "{ get_property: [ compute, user_name ] }"
+                          ansible_ssh_user: { get_property: [ compute, user_name ] }
                     workers:
                       hosts:
                         compute_1:
-                          host: { get_attribute: [ compute_1, public_ip ] }
+                          ansible_host: { get_attribute: [ compute_1, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                          ansible_ssh_user: "{ get_property: [ compute, user_name ] }"
+                          ansible_ssh_user: { get_property: [ compute, user_name ] }
               repository: https://github.com/QCDIS/playbooks.git
           create:
             implementation: "k8s/install_k8s.yaml"
@@ -190,17 +203,17 @@ topology_template:
                     master:
                       hosts:
                         compute:
-                          host: { get_attribute: [ compute, public_ip ] }
+                          ansible_host: { get_attribute: [ compute, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                          ansible_ssh_user: "{ get_property: [ compute, user_name ] }"
+                          ansible_ssh_user: { get_property: [ compute, user_name ] }
                     workers:
                       hosts:
                         compute_1:
-                          host: { get_attribute: [ compute_1, public_ip ] }
+                          ansible_host: { get_attribute: [ compute_1, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                          ansible_ssh_user: "{ get_property: [ compute, user_name ] }"
+                          ansible_ssh_user: { get_property: [ compute, user_name ] }
               repository: https://github.com/QCDIS/playbooks.git
           delete:
             implementation: "k8s/k8s_delete.yaml"
@@ -211,17 +224,17 @@ topology_template:
                     master:
                       hosts:
                         compute:
-                          host: { get_attribute: [ compute, public_ip ] }
+                          ansible_host: { get_attribute: [ compute, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                          ansible_ssh_user: "{ get_property: [ compute, user_name ] }"
+                          ansible_ssh_user: { get_property: [ compute, user_name ] }
                     workers:
                       hosts:
                         compute_1:
-                          host: { get_attribute: [ compute_1, public_ip ] }
+                          ansible_host: { get_attribute: [ compute_1, public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                          ansible_ssh_user: "{ get_property: [ compute, user_name ] }"
+                          ansible_ssh_user: { get_property: [ compute, user_name ] }
               repository: https://github.com/QCDIS/playbooks.git
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
 
