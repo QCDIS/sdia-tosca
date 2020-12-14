@@ -92,6 +92,8 @@ topology_template:
           project_id: the_project_id
           protocol: the_auth_protocol
           token_type: the_token_type
+          auth_type: the_auth_type
+          token: fake
       attributes:
         credential:
           auth_url: "https://the_open_id_server/oidc/token"
@@ -133,7 +135,7 @@ topology_template:
                       ansible_connection: local
                       os: { get_property: [ compute, os ] }
                       auth: { get_attribute: [ topology, credential ] }
-            implementation: openstack/authentication/get_access_token.yaml
+            implementation: openstack/authentication/create_access_token.yaml
           select_image:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
