@@ -86,11 +86,14 @@ topology_template:
         domain: "CESGA"
         provider: "EGI"
         auth:
+          cloud_provider_name: "CESGA"
           auth_url: 'https://key_stone:35357/v3'
           identity_provider: egi.eu
           project_id: the_project_id
           protocol: the_auth_protocol
           token_type: the_token_type
+          auth_type: the_auth_type
+          token: fake
       attributes:
         credential:
           auth_url: "https://the_open_id_server/oidc/token"
@@ -122,7 +125,7 @@ topology_template:
                     localhost:
                       ansible_connection: local
             implementation: openstack/install_requirements.yaml
-          select_image:
+          create_access_token:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               inventory:
@@ -132,7 +135,7 @@ topology_template:
                       ansible_connection: local
                       os: { get_property: [ compute, os ] }
                       auth: { get_attribute: [ topology, credential ] }
-            implementation: openstack/authentication/get_access_token.yaml
+            implementation: openstack/authentication/create_access_token.yaml
           select_image:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git

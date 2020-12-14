@@ -157,7 +157,8 @@ interface_types:
       description: creates user
     create_user_key_pair:
       description: creates key pair
-
+    create_access_token:
+      description: creates access token
 
 
      
