@@ -205,15 +205,18 @@ node_types:
         type: string
         required: true
         default: "EC2"
-        description: The name of the provider e.g. EC2, ExoGENI etc.    
+        description: The name of the provider e.g. EC2, ExoGENI etc.
       coordinates: 
         type: tosca.datatypes.QC.coordinates
         required: false
-        description: The coordinates of the domain 
+        description: The coordinates of the domain
+      auth:
+        type: tosca.datatypes.QC.Credential
+        required: false
     attributes:
       ssh_keys:
         type: tosca.datatypes.QC.Credential
-        required: false      
+        required: false
     artifacts:
       provisioned_files:
         type: string
