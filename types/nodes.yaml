@@ -247,21 +247,7 @@ node_types:
       Openstack:
         type: tosca.interfaces.QC.Openstack
         create:
-          inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - openstack/install_requirements.yaml
-              - openstack/info/get_images.yaml
-              - openstack/info/get_inst_flavors.yaml
-              - openstack/info/get_networks.yaml
-              - openstack/key/create_key.yaml
-              - openstack/server/create_vm.yaml
         configure:
-          inputs:
-            repository: "https://github.com/QCDIS/playbooks.git"
-            resources:
-              - create_user.yaml
-              - create_user_key_pair.yaml
         
   tosca.nodes.QC.VM.Compute:
     derived_from: tosca.nodes.QC.Infrastructure

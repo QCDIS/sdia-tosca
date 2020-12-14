@@ -6,7 +6,7 @@ data_types:
         properties:
             cloud_provider_name:
                 type: string
-                required: true
+                required: false
             auth_url:
                 type: string
                 description: 'the Keystone url. example https://stack-server.ct.infn.it:35357/v3'
