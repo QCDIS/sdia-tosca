@@ -7,8 +7,6 @@ imports:
 - policies: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/policies.yaml"
 - interfaces: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/interfaces.yml"
 topology_template:
-
-
   workflows:
     provision:
       description: Workflow to deploy the topology
@@ -56,10 +54,10 @@ topology_template:
   node_templates:
     compute:
       properties:
-        disk_size: "10000 MB"
-        mem_size: "1000 MB"
+        disk_size: "10 GB"
+        mem_size: "2048 MB"
         num_cores: 1
-        os: "Ubuntu 18.04"
+        os:  Ubuntu 18.04
         user_name: "vm_user"
       interfaces:
         Standard:
@@ -68,9 +66,9 @@ topology_template:
     compute_1:
       properties:
         disk_size: "10000 MB"
-        mem_size: "1000 MB"
+        mem_size: "1024 MB"
         num_cores: 1
-        os: "Ubuntu 18.04"
+        os:  Ubuntu 18.04
         user_name: "vm_user"
       interfaces:
         Standard:
@@ -79,17 +77,19 @@ topology_template:
 
     topology:
       properties:
-        domain: "Spain"
-        provider: "CESGA"
+        domain: "CESGA"
+        provider: "EGI"
       attributes:
         credential:
-          auth_url: "https://the_open_id_server:35357/v3"
-          cloud_provider_name: "CESGA"
+          auth_url: "https://the_open_id_server/oidc/token"
+          cloud_provider_name: "EGI"
           identity_provider: "egi.eu"
-          project_id: "the_project_id"
+          user: the_client_id
+          keys:
+            refresh_token: the_refresh_token
           protocol: "openid"
-          token: "the_token"
-          token_type: "v3oidcaccesstoken"
+          token: "the_client_secret"
+          token_type: "refresh_token"
       requirements:
       - vm:
           capability: "tosca.capabilities.QC.VM"
@@ -163,6 +163,7 @@ topology_template:
                     localhost:
                       ansible_connection: local
                       auth: { get_attribute: [ topology, credential ] }
+                      image_name: sdia-vm
             implementation: openstack/server/create_vm.yaml
       type: "tosca.nodes.QC.VM.topology"
     kubernetes:
