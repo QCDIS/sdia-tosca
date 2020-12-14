@@ -86,6 +86,7 @@ topology_template:
         domain: "CESGA"
         provider: "EGI"
         auth:
+          cloud_provider_name: "CESGA"
           auth_url: 'https://key_stone:35357/v3'
           identity_provider: egi.eu
           project_id: the_project_id
