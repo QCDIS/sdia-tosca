@@ -15,8 +15,8 @@ topology_template:
     topology:
       type: tosca.nodes.QC.VM.topology
       properties:
-        domain: "Spain"
-        provider: "CESGA"
+        domain: "CESGA"
+        provider: "EGI"
       requirements:
       - vm:
           capability: "tosca.capabilities.QC.VM"
