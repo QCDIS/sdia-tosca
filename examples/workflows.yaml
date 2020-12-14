@@ -17,9 +17,15 @@ topology_template:
             - set_state: creating
             - call_operation: Openstack.install_requirements
               on_success:
+                - create_access_token
                 - select_image
                 - select_instance_type
                 - select_network
+        create_access_token:
+          target: topology
+          activities:
+            - call_operation: Openstack.create_access_token
+              on_success: create_key
         select_image:
           target: topology
           activities:
@@ -79,6 +85,12 @@ topology_template:
       properties:
         domain: "CESGA"
         provider: "EGI"
+        auth:
+          auth_url: 'https://key_stone:35357/v3'
+          identity_provider: egi.eu
+          project_id: the_project_id
+          protocol: the_auth_protocol
+          token_type: the_token_type
       attributes:
         credential:
           auth_url: "https://the_open_id_server/oidc/token"
@@ -120,6 +132,17 @@ topology_template:
                       ansible_connection: local
                       os: { get_property: [ compute, os ] }
                       auth: { get_attribute: [ topology, credential ] }
+            implementation: openstack/authentication/get_access_token.yaml
+          select_image:
+            inputs:
+              repository: https://github.com/QCDIS/playbooks.git
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+                      os: { get_property: [ compute, os ] }
+                      auth: { get_property: [ topology, auth ] }
             implementation: openstack/info/get_images.yaml
           select_instance_type:
             inputs:
@@ -132,7 +155,7 @@ topology_template:
                       disk_size: { get_property: [ compute, disk_size ] }
                       mem_size: { get_property: [ compute, mem_size ] }
                       num_cores: { get_property: [ compute, num_cores ] }
-                      auth: { get_attribute: [ topology, credential ] }
+                      auth: { get_property: [ topology, auth ] }
             implementation: openstack/info/get_inst_flavors.yaml
           select_network:
             inputs:
@@ -142,7 +165,7 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_attribute: [ topology, credential ] }
+                      auth: { get_property: [ topology, auth ] }
             implementation: openstack/info/get_networks.yaml
           create_key:
             inputs:
@@ -152,7 +175,7 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_attribute: [ topology, credential ] }
+                      auth: { get_property: [ topology, auth ] }
             implementation: openstack/key/create_key.yaml
           create:
             inputs:
@@ -162,7 +185,7 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_attribute: [ topology, credential ] }
+                      auth: { get_property: [ topology, auth ] }
                       image_name: sdia-vm
             implementation: openstack/server/create_vm.yaml
       type: "tosca.nodes.QC.VM.topology"
