@@ -121,7 +121,7 @@ topology_template:
                       ansible_connection: local
                       auth: { get_property: [ topology, auth ] }
             implementation: openstack/info/get_networks.yaml
-          create_key:
+          create_ssh_key:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               inventory:
