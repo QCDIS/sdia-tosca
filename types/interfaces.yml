@@ -144,18 +144,20 @@ interface_types:
     info:
       description: get information
     install_requirements:
-      description: installs openstacksdk
+      description: installs openstacksdk and
     select_image:
-      description: selects image to satisfy the OS
+      description: selects image to satisfy mem cpu  etc
     select_instance_type:
       description: selects image to satisfy the OS
     select_network:
       description: selects network
-    create_key:
-      description: creates key
+    create_ssh_key:
+      description: creates ssh key
+    delete_ssh_key:
+      description: creates ssh key
     create_user:
       description: creates user
-    create_user_key_pair:
+    create_user_ssh_key:
       description: creates key pair
     create_access_token:
       description: creates access token

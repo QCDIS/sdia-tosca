@@ -18,44 +18,51 @@ topology_template:
             - call_operation: Openstack.install_requirements
               on_success:
                 - create_access_token
-                - select_image
-                - select_instance_type
-                - select_network
         create_access_token:
           target: topology
           activities:
             - call_operation: Openstack.create_access_token
-              on_success: create_key
+              on_success:
+                - select_image
+                - select_instance_type
+                - select_network
         select_image:
           target: topology
           activities:
             - call_operation: Openstack.select_image
-              on_success: create_key
+              on_success: create_ssh_key
         select_instance_type:
           target: topology
           activities:
             - call_operation: Openstack.select_instance_type
-              on_success: create_key
+              on_success: create_vm_key
         select_network:
           target: topology
           activities:
             - call_operation: Openstack.select_network
-              on_success: create_key
+              on_success: create_ssh_key
         create_vm:
           target: topology
           activities:
             - call_operation: Openstack.create
               on_success:
                 - set_vm_attributes
-        create_key:
+              on_success:
+                - delete_ssh_key
+        create_ssh_key:
           target: topology
           activities:
-            - call_operation: Openstack.create_key
-              on_success: create
+            - call_operation: Openstack.create_ssh_key
+              on_success: create_vm
         set_vm_attributes:
           target: [ compute, compute_1 ]
           activities:
             - set_state: created
+        delete_ssh_key:
+          target: topology
+          activities:
+            - call_operation: Openstack.delete_ssh_key
+            - set_state: failed
 
   node_templates:
     compute:
@@ -63,7 +70,7 @@ topology_template:
         disk_size: "10 GB"
         mem_size: "2048 MB"
         num_cores: 1
-        os:  Ubuntu 18.04
+        os:  CentOS 7
         user_name: "vm_user"
       interfaces:
         Standard:
@@ -74,7 +81,7 @@ topology_template:
         disk_size: "10000 MB"
         mem_size: "1024 MB"
         num_cores: 1
-        os:  Ubuntu 18.04
+        os:  CentOS 7
         user_name: "vm_user"
       interfaces:
         Standard:
@@ -133,7 +140,6 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      os: { get_property: [ compute, os ] }
                       auth: { get_attribute: [ topology, credential ] }
             implementation: openstack/authentication/create_access_token.yaml
           select_image:
@@ -144,7 +150,11 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      os: { get_property: [ compute, os ] }
+                      instances:
+                        compute:
+                          os: { get_property: [ compute, os ] }
+                        compute_1:
+                          os: { get_property: [ compute_1, os ] }
                       auth: { get_property: [ topology, auth ] }
             implementation: openstack/info/get_images.yaml
           select_instance_type:
@@ -155,9 +165,15 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      disk_size: { get_property: [ compute, disk_size ] }
-                      mem_size: { get_property: [ compute, mem_size ] }
-                      num_cores: { get_property: [ compute, num_cores ] }
+                      instances:
+                        compute:
+                          disk_size: { get_property: [ compute, disk_size ] }
+                          mem_size: { get_property: [ compute, mem_size ] }
+                          num_cores: { get_property: [ compute, num_cores ] }
+                        compute_1:
+                          disk_size: { get_property: [ compute_1, disk_size ] }
+                          mem_size: { get_property: [ compute_1, mem_size ] }
+                          num_cores: { get_property: [ compute_1, num_cores ] }
                       auth: { get_property: [ topology, auth ] }
             implementation: openstack/info/get_inst_flavors.yaml
           select_network:
@@ -179,7 +195,16 @@ topology_template:
                     localhost:
                       ansible_connection: local
                       auth: { get_property: [ topology, auth ] }
-            implementation: openstack/key/create_key.yaml
+          delete_ssh_key:
+            inputs:
+              repository: https://github.com/QCDIS/playbooks.git
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+                      auth: { get_property: [ topology, auth ] }
+            implementation: openstack/key/delete_key.yaml
           create:
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
@@ -189,7 +214,9 @@ topology_template:
                     localhost:
                       ansible_connection: local
                       auth: { get_property: [ topology, auth ] }
-                      image_name: sdia-vm
+                      instances:
+                        compute:
+                        compute_1:
             implementation: openstack/server/create_vm.yaml
       type: "tosca.nodes.QC.VM.topology"
     kubernetes:
