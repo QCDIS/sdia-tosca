@@ -35,7 +35,7 @@ topology_template:
           target: topology
           activities:
             - call_operation: Openstack.select_instance_type
-              on_success: create_vm_key
+              on_success: create_ssh_key
         select_network:
           target: topology
           activities:
@@ -47,7 +47,7 @@ topology_template:
             - call_operation: Openstack.create
               on_success:
                 - set_vm_attributes
-              on_success:
+              on_failure:
                 - delete_ssh_key
         create_ssh_key:
           target: topology
@@ -187,6 +187,7 @@ topology_template:
                       auth: { get_property: [ topology, auth ] }
             implementation: openstack/info/get_networks.yaml
           create_ssh_key:
+            implementation: openstack/key/create_key.yaml
             inputs:
               repository: https://github.com/QCDIS/playbooks.git
               inventory:
