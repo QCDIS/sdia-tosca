@@ -92,26 +92,19 @@ topology_template:
       properties:
         domain: "CESGA"
         provider: "EGI"
-        auth:
-          cloud_provider_name: "CESGA"
-          auth_url: 'https://key_stone:35357/v3'
-          identity_provider: egi.eu
-          project_id: the_project_id
-          protocol: the_auth_protocol
-          token_type: the_token_type
-          auth_type: the_auth_type
-          token: fake
+        project_id: "c1c9c25774fe418599bced1d45862c60"
       attributes:
-        credential:
-          auth_url: "https://the_open_id_server/oidc/token"
-          cloud_provider_name: "EGI"
-          identity_provider: "egi.eu"
-          user: the_client_id
-          keys:
-            refresh_token: the_refresh_token
-          protocol: "openid"
-          token: "the_client_secret"
-          token_type: "refresh_token"
+        credentials:
+          refresh_token:
+            auth_url: "https://the_open_id_server/oidc/token"
+            cloud_provider_name: "EGI"
+            identity_provider: "egi.eu"
+            user: the_client_id
+            keys:
+              refresh_token: the_refresh_token
+            protocol: "openid"
+            token: "the_client_secret"
+            token_type: "refresh_token"
       requirements:
       - vm:
           capability: "tosca.capabilities.QC.VM"
@@ -140,7 +133,6 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_attribute: [ topology, credential ] }
             implementation: openstack/authentication/create_access_token.yaml
           select_image:
             inputs:

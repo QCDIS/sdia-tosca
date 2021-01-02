@@ -210,9 +210,12 @@ node_types:
         type: tosca.datatypes.QC.coordinates
         required: false
         description: The coordinates of the domain
-      auth:
-        type: tosca.datatypes.QC.Credential
+      credentials:
+        type: list
         required: false
+        entry_schema:
+          type: tosca.datatypes.Credential
+        description: list of credentials
     attributes:
       ssh_keys:
         type: tosca.datatypes.QC.Credential
