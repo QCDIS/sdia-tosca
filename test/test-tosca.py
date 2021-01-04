@@ -32,7 +32,7 @@ class TestTosca(unittest.TestCase):
     def test_open_stack(self):
         cur_dir = os.path.dirname(os.path.realpath(__file__))
 
-        tosca_path =  os.path.join(cur_dir, '../examples/openstack.yaml')
+        tosca_path =  os.path.join(cur_dir, '../examples/workflows.yaml')
         tosca_template_dict = self.get_tosca_file(tosca_path)
         try:
             tt = ToscaTemplate(yaml_dict_tpl=tosca_template_dict)
