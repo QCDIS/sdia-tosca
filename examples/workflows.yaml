@@ -208,7 +208,7 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_property: [ topology, auth ]
+                      auth: { get_property: [ topology, auth ] }
               repository: https://github.com/QCDIS/playbooks.git
 
   workflows:
