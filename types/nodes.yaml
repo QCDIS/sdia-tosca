@@ -298,10 +298,14 @@ node_types:
         default: 4000 MB
         constraints:
           - greater_or_equal: 500 MB
-      os:
+      os_distro:
         type: string
         required: true       
-        default: "Ubuntu 18.04"
+        default: "Ubuntu"
+      os_version:
+        type: string
+        required: true
+        default: "18.04"
       user_name:
         type: string
         required: true
@@ -466,4 +470,4 @@ node_types:
       - host:
           capability: tosca.capabilities.QC.VM.topology
           node: tosca.nodes.QC.VM.topology
-          relationship: tosca.relationships.HostedOn             
+          relationship: tosca.relationships.HostedOn
