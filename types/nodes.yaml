@@ -206,17 +206,32 @@ node_types:
         required: true
         default: "EC2"
         description: The name of the provider e.g. EC2, ExoGENI etc.
+      auth_url:
+        type: string
+        required: false
+        description:  e.g. https://stack-server.ct.infn.it:35357/v3.
+      project_id:
+        type: string
+        required: false
+        description: e.g. 745695ccd17042fabf96d2410a4278d9
+      identity_provider:
+        type: string
+        required: false
+        description: e.g. egi.eu
       coordinates: 
         type: tosca.datatypes.QC.coordinates
         required: false
         description: The coordinates of the domain
-      auth:
-        type: tosca.datatypes.QC.Credential
-        required: false
     attributes:
-      ssh_keys:
-        type: tosca.datatypes.QC.Credential
+      credentials:
+        type: list
         required: false
+        entry_schema:
+          type: tosca.datatypes.Credential
+        description: list of credentials
+#      ssh_keys:
+#        type: tosca.datatypes.QC.Credential
+#        required: false
     artifacts:
       provisioned_files:
         type: string
