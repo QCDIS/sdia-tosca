@@ -106,6 +106,9 @@ topology_template:
       properties:
         domain: CESGA
         provider: EGI
+        auth_url: https://fedcloud-osservices.egi.cesga.es:5000/v3/
+        project_id: c1c9c25774fe418599bced1d45862c60
+        identity_provider: egi.eu
       requirements:
       - vm:
           capability: tosca.capabilities.QC.VM
@@ -126,7 +129,9 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_attribute: [ topology, auth] }
+                      auth_url: { get_property: [ topology, auth_url ]}
+                      project_id: { get_property: [ topology, project_id ]}
+                      identity_provider: { get_property: [ topology, identity_provider ]}
               repository: https://github.com/QCDIS/playbooks.git
           create_access_token:
             implementation: openstack/authentication/create_access_token.yaml
@@ -136,6 +141,7 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
+                      credentials: { get_attribute: [ topology, credentials ] }
               repository: https://github.com/QCDIS/playbooks.git
           create_ssh_key:
             implementation: openstack/key/create_key.yaml
@@ -145,7 +151,9 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_attribute: [ topology, auth ] }
+                      auth_url: { get_property: [ topology, auth_url ] }
+                      project_id: { get_property: [ topology, project_id ] }
+                      identity_provider: { get_property: [ topology, identity_provider ] }
               repository: https://github.com/QCDIS/playbooks.git
           delete_ssh_key:
             implementation: openstack/key/delete_key.yaml
@@ -155,7 +163,9 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_attribute: [ topology, auth ] }
+                      auth_url: { get_property: [ topology, auth_url ] }
+                      project_id: { get_property: [ topology, project_id ] }
+                      identity_provider: { get_property: [ topology, identity_provider ] }
               repository: https://github.com/QCDIS/playbooks.git
           install_requirements:
             implementation: openstack/install_requirements.yaml
@@ -174,7 +184,9 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_attribute: [ topology, auth ] }
+                      auth_url: { get_property: [ topology, auth_url ] }
+                      project_id: { get_property: [ topology, project_id ] }
+                      identity_provider: { get_property: [ topology, identity_provider ] }
                       instances:
                         compute:
                           os: { get_property: [ compute, os ]}
@@ -189,7 +201,9 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_property: [ topology, auth ] }
+                      auth_url: { get_property: [ topology, auth_url ] }
+                      project_id: { get_property: [ topology, project_id ] }
+                      identity_provider: { get_property: [ topology, identity_provider ] }
                       instances:
                         compute:
                           disk_size: { get_property: [ compute, disk_size ] }
@@ -208,7 +222,9 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_property: [ topology, auth ] }
+                      auth_url: { get_property: [ topology, auth_url ] }
+                      project_id: { get_property: [ topology, project_id ] }
+                      identity_provider: { get_property: [ topology, identity_provider ] }
               repository: https://github.com/QCDIS/playbooks.git
 
   workflows:
