@@ -113,7 +113,7 @@ topology_template:
                       disk_size: { get_property: [ compute, disk_size ] }
                       mem_size: { get_property: [ compute, mem_size ] }
                       num_cores: { get_property: [ compute, num_cores ] }
-                      auth: { get_property: [ topology, auth ] }
+                      auth_url: { get_property: [ topology, auth_url ]}
             implementation: openstack/info/get_inst_flavors.yaml
           select_network:
             inputs:
