@@ -6,7 +6,8 @@ topology_template:
         disk_size: "40000 MB"
         mem_size: "1000 MB"
         num_cores: 1
-        os: "Ubuntu 18.04"
+        os_distro: Ubuntu
+        os_version: 18.04
         user_name: "vm_user"
       interfaces:
         Standard:
@@ -17,7 +18,8 @@ topology_template:
         disk_size: "40000 MB"
         mem_size: "1000 MB"
         num_cores: 1
-        os: "Ubuntu 18.04"
+        os_distro: Ubuntu
+        os_version: 18.04
         user_name: "vm_user"
       interfaces:
         Standard:
