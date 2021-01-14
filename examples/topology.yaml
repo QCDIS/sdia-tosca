@@ -38,15 +38,6 @@ topology_template:
       properties:
         domain: "CESGA"
         provider: "EGI"
-        auth:
-          cloud_provider_name: "CESGA"
-          auth_url: 'https://key_stone:35357/v3'
-          identity_provider: egi.eu
-          project_id: the_project_id
-          protocol: the_auth_protocol
-          token_type: the_token_type
-          auth_type: the_auth_type
-          token: fake
       attributes:
         credential:
           auth_url: "https://the_open_id_server/oidc/token"
@@ -88,7 +79,7 @@ topology_template:
                       ansible_connection: local
                       os_distro: { get_property: [ compute, os_distro ] }
                       os_version: { get_property: [ compute, os_version ] }
-                      auth: { get_attribute: [ topology, credential ] }
+                      auth_url: { get_property: [ topology, auth_url ]}
             implementation: openstack/authentication/create_access_token.yaml
           select_image:
             inputs:
@@ -100,7 +91,7 @@ topology_template:
                       ansible_connection: local
                       os_distro: { get_property: [ compute, os_distro ] }
                       os_version: { get_property: [ compute, os_version ] }
-                      auth: { get_property: [ topology, auth ] }
+                      auth_url: { get_property: [ topology, auth_url ]}
             implementation: openstack/info/get_images.yaml
           select_instance_type:
             inputs:
@@ -133,7 +124,7 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_property: [ topology, auth ] }
+                      auth_url: { get_property: [ topology, auth_url ]}
             implementation: openstack/key/create_key.yaml
           create:
             inputs:
@@ -143,7 +134,7 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_property: [ topology, auth ] }
+                      auth_url: { get_property: [ topology, auth_url ]}
                       image_name: sdia-vm
             implementation: openstack/server/create_vm.yaml
       type: "tosca.nodes.QC.VM.topology"
