@@ -14,7 +14,8 @@ topology_template:
         disk_size: "10 GB"
         mem_size: "2048 MB"
         num_cores: 1
-        os:  Ubuntu 18.04
+        os_distro: Ubuntu
+        os_version: 18.04
         user_name: "vm_user"
       interfaces:
         Standard:
@@ -25,7 +26,8 @@ topology_template:
         disk_size: "10000 MB"
         mem_size: "1024 MB"
         num_cores: 1
-        os:  Ubuntu 18.04
+        os_distro: Ubuntu
+        os_version: 18.04
         user_name: "vm_user"
       interfaces:
         Standard:
@@ -84,7 +86,8 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      os: { get_property: [ compute, os ] }
+                      os_distro: { get_property: [ compute, os_distro ] }
+                      os_version: { get_property: [ compute, os_version ] }
                       auth: { get_attribute: [ topology, credential ] }
             implementation: openstack/authentication/create_access_token.yaml
           select_image:
@@ -95,7 +98,8 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      os: { get_property: [ compute, os ] }
+                      os_distro: { get_property: [ compute, os_distro ] }
+                      os_version: { get_property: [ compute, os_version ] }
                       auth: { get_property: [ topology, auth ] }
             implementation: openstack/info/get_images.yaml
           select_instance_type:
@@ -119,7 +123,7 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth: { get_property: [ topology, auth ] }
+                      auth_url: { get_property: [ topology, auth_url ]}
             implementation: openstack/info/get_networks.yaml
           create_ssh_key:
             inputs:
