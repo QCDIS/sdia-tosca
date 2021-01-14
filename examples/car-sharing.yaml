@@ -10,7 +10,7 @@ imports:
 repositories:
   articonf_registry:
     description: articonf registry
-    url: registry.articonf.eu:4432
+    url: https://registry.articonf.eu:4432
     credential:
         token: "REGISTRY_PASSWORD"
         user: "REGISTRY_USERNAME"

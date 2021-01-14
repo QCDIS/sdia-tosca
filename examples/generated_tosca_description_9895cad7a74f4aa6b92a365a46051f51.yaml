@@ -7,7 +7,8 @@ topology_template:
         disk_size: "120 GB"
         mem_size: "7 GB"
         num_cores: 4
-        os: Ubuntu 18.04
+        os_distro: Ubuntu
+        os_version: 18.04
         user_name: vm_user
       interfaces:
         Standard:
