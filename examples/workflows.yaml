@@ -105,10 +105,10 @@ topology_template:
       type: tosca.nodes.QC.docker.Orchestrator.Kubernetes
     topology:
       properties:
-        domain: CESGA
+        domain: INFN
         provider: EGI
-        auth_url: https://fedcloud-osservices.egi.cesga.es:5000/v3/
-        project_id: c1c9c25774fe418599bced1d45862c60
+        auth_url: https://stack-server.ct.infn.it:35357/v3
+        project_id: 745695ccd17042fabf96d2410a4278d9
         identity_provider: egi.eu
       requirements:
       - vm:

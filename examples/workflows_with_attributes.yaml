@@ -15,9 +15,9 @@ topology_template:
       properties:
         disk_size: 10 GB
         mem_size: 2048 MB
-        num_cores: 1
-        os_distro: CentOS
-        os_version: 7
+        num_cores: 2
+        os_distro: Ubuntu
+        os_version: 18.04
         user_name: vm_user
       type: tosca.nodes.QC.VM.Compute
     compute_1:
@@ -25,11 +25,11 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
-        disk_size: 10000 MB
+        disk_size: 10 GB
         mem_size: 1024 MB
         num_cores: 1
-        os_distro: CentOS
-        os_version: 7
+        os_distro: Ubuntu
+        os_version: 18.04
         user_name: vm_user
       type: tosca.nodes.QC.VM.Compute
     kubernetes:
@@ -105,10 +105,10 @@ topology_template:
       type: tosca.nodes.QC.docker.Orchestrator.Kubernetes
     topology:
       properties:
-        domain: CESGA
+        domain: INFN
         provider: EGI
-        auth_url: https://fedcloud-osservices.egi.cesga.es:5000/v3/
-        project_id: c1c9c25774fe418599bced1d45862c60
+        auth_url: https://stack-server.ct.infn.it:35357/v3
+        project_id: 745695ccd17042fabf96d2410a4278d9
         identity_provider: egi.eu
       attributes:
         credentials:
@@ -154,7 +154,7 @@ topology_template:
                       credentials: { get_attribute: [ topology, credentials ] }
               repository: https://github.com/QCDIS/playbooks.git
           create_ssh_key:
-            implementation: openstack/key/create_key.yaml
+            implementation: openstack/key/create_keys.yaml
             inputs:
               inventory:
                 all:
@@ -164,6 +164,9 @@ topology_template:
                       auth_url: { get_property: [ topology, auth_url ] }
                       project_id: { get_property: [ topology, project_id ] }
                       identity_provider: { get_property: [ topology, identity_provider ] }
+                      instances:
+                        compute:
+                        compute_1:
               repository: https://github.com/QCDIS/playbooks.git
           delete_ssh_key:
             implementation: openstack/key/delete_key.yaml
@@ -237,6 +240,9 @@ topology_template:
                       auth_url: { get_property: [ topology, auth_url ] }
                       project_id: { get_property: [ topology, project_id ] }
                       identity_provider: { get_property: [ topology, identity_provider ] }
+                      instances:
+                        compute:
+                        compute_1:
               repository: https://github.com/QCDIS/playbooks.git
 
   workflows:
