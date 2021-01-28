@@ -25,10 +25,7 @@ topology_template:
         Standard:
           create: "dumy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
-    glusterfs:
-      properties:
-        min_masters_num: 1
-        min_workers_num: 1
+    kubernetes:
       requirements:
       - host:
           capability: "tosca.capabilities.QC.VM.topology"
@@ -36,44 +33,27 @@ topology_template:
           relationship: "tosca.relationships.HostedOn"
       interfaces:
         Standard:
+          configure:
+            inputs:
+              repository: "https://github.com/QCDIS/playbooks.git"
+              resources:
+              - "k8s/set_master_k8s_cluster.yaml"
+              - "k8s/join_k8s_cluster.yaml"
+              - "k8s/create_k8s_dashboard.yaml"
           create:
             inputs:
-              repository: "https://github.com/bityoga/mysome_glusterfs.git"
+              repository: "https://github.com/QCDIS/playbooks.git"
               resources:
-              - "000.purge.yml"
-              - "001.requirements.yml"
-              - "002.setup_glusterfs_infra.yml"
-              - "003.setup_glusterfs_cluster.yml"
-      type: "tosca.nodes.QC.Application.GlusterFS"
-    tic:
-      requirements:
-      - storage:
-          capability: "tosca.capabilities.QC.GlusterFS"
-          node: "glusterfs"
-          relationship: "tosca.relationships.DependsOn"
-      - host:
-          capability: "tosca.capabilities.QC.VM.topology"
-          node: "topology"
-          relationship: "tosca.relationships.HostedOn"
-      interfaces:
-        Standard:
-          create:
+              - "ec2/ec2_mount.yaml"
+              - "docker/install_docker.yaml"
+              - "k8s/install_k8s_prerequisites.yaml"
+              - "k8s/install_k8s.yaml"
+          delete:
             inputs:
-              repository: "https://github.com/bityoga/fabric_as_code.git"
+              repository: "https://github.com/QCDIS/playbooks.git"
               resources:
-              - "011.initialize_hosts.yml"
-              - "012.prepare_docker_images.yml"
-              - "013.mount_fs.yml"
-              - "014.spawn_swarm.yml"
-              - "015.deploy_swarm_visualizer.yml"
-              - "016.deploy_portainer.yml"
-              - "100.deploy_ca.yml"
-              - "101.deploy_orderer.yml"
-              - "102.deploy_peers.yml"
-              - "103.deploy_cli.yml"
-              - "104.deploy_hlf_explorer.yml"
-              - "105.deploy_bank_app.yml"
-      type: "tosca.nodes.QC.Application.TIC"
+              - "k8s/k8s_delete.yaml"
+      type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
     topology:
       properties:
         domain: "Ireland"
@@ -111,14 +91,12 @@ topology_template:
               object_type: "SubTopology"
         Openstack: {}
       type: "tosca.nodes.QC.VM.topology"
-      artifacts:
-        provisioned_files:
-          required: false
-          type: "string"
-description: "TOSCA example"
+
+
+description: "MOG use case. v.1.0.2"
 imports:
-- nodes: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/nodes.yaml"
-- data: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/data.yml"
-- capabilities: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/capabilities.yaml"
-- policies: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/policies.yaml"
-- interfaces: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/interfaces.yml"
+- nodes: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/1.0.2/types/nodes.yaml"
+- data: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/1.0.2/types/data.yml"
+- capabilities: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/1.0.2/types/capabilities.yaml"
+- policies: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/1.0.2/types/policies.yaml"
+- interfaces: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/1.0.2/types/interfaces.yml"
