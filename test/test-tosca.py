@@ -29,18 +29,6 @@ class TestTosca(unittest.TestCase):
             tt = ToscaTemplate(yaml_dict_tpl=tosca_template_dict)
 
 
-    def test_open_stack(self):
-        cur_dir = os.path.dirname(os.path.realpath(__file__))
-
-        tosca_path =  os.path.join(cur_dir, '../examples/workflows.yaml')
-        tosca_template_dict = self.get_tosca_file(tosca_path)
-        try:
-            tt = ToscaTemplate(yaml_dict_tpl=tosca_template_dict)
-        except ValidationError as ex:
-            if 'Template contains unknown field "workflows".' in ex.message:
-                logger.warning('The parser does not support "workflows" currently.' + ex.message)
-                pass
-
 
     def get_files(self,dir_mame):
         listOfFile = os.listdir(dir_mame)
