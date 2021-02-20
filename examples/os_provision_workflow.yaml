@@ -15,9 +15,9 @@ topology_template:
       properties:
         disk_size: 10 GB
         mem_size: 2048 MB
-        num_cores: 1
-        os_distro: CentOS
-        os_version: 7
+        num_cores: 2
+        os_distro: Ubuntu
+        os_version: 18.04
         user_name: vm_user
       type: tosca.nodes.QC.VM.Compute
     compute_1:
@@ -25,11 +25,11 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
-        disk_size: 10000 MB
+        disk_size: 10 GB
         mem_size: 1024 MB
         num_cores: 1
-        os_distro: CentOS
-        os_version: 7
+        os_distro: Ubuntu
+        os_version: 18.04
         user_name: vm_user
       type: tosca.nodes.QC.VM.Compute
     kubernetes:
@@ -145,7 +145,7 @@ topology_template:
                       credentials: { get_attribute: [ topology, credentials ] }
               repository: https://github.com/QCDIS/playbooks.git
           create_ssh_key:
-            implementation: openstack/key/create_key.yaml
+            implementation: openstack/key/create_keys.yaml
             inputs:
               inventory:
                 all:
@@ -155,6 +155,11 @@ topology_template:
                       auth_url: { get_property: [ topology, auth_url ] }
                       project_id: { get_property: [ topology, project_id ] }
                       identity_provider: { get_property: [ topology, identity_provider ] }
+                      instances:
+                        compute:
+                          os_distro : { get_property: [ compute, os_distro ]}
+                        compute_1:
+                          os_distro : { get_property: [ compute, os_distro ]}
               repository: https://github.com/QCDIS/playbooks.git
           delete_ssh_key:
             implementation: openstack/key/delete_key.yaml
@@ -193,8 +198,8 @@ topology_template:
                           os_distro : { get_property: [ compute, os_distro ]}
                           os_version : { get_property: [ compute, os_version ]}
                         compute_1:
-                          os_distro : { get_property: [ compute, os_distro ]}
-                          os_version : { get_property: [ compute, os_version ]}
+                          os_distro: { get_property: [ compute_1, os_distro ] }
+                          os_version: { get_property: [ compute_1, os_version ] }
               repository: https://github.com/QCDIS/playbooks.git
           select_instance_type:
             implementation: openstack/info/get_inst_flavors.yaml
@@ -228,8 +233,21 @@ topology_template:
                       auth_url: { get_property: [ topology, auth_url ] }
                       project_id: { get_property: [ topology, project_id ] }
                       identity_provider: { get_property: [ topology, identity_provider ] }
+                      instances:
+                        compute:
+                          os_distro : { get_property: [ compute, os_distro ]}
+                        compute_1:
+                          os_distro : { get_property: [ compute, os_distro ]}
               repository: https://github.com/QCDIS/playbooks.git
-
+          set_vm_attributes:
+            implementation: openstack/concat_attributes.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+              repository: https://github.com/QCDIS/playbooks.git
   workflows:
     provision:
       description: Workflow to deploy the topology
@@ -284,7 +302,6 @@ topology_template:
           target: topology
         set_vm_attributes:
           activities:
+          - call_operation: Openstack.set_vm_attributes
           - set_state: created
-          target:
-          - compute
-          - compute_1
+          target: topology
