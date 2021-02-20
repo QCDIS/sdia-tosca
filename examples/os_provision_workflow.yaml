@@ -239,7 +239,15 @@ topology_template:
                         compute_1:
                           os_distro : { get_property: [ compute, os_distro ]}
               repository: https://github.com/QCDIS/playbooks.git
-
+          set_vm_attributes:
+            implementation: openstack/concat_attributes.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+              repository: https://github.com/QCDIS/playbooks.git
   workflows:
     provision:
       description: Workflow to deploy the topology
@@ -294,7 +302,6 @@ topology_template:
           target: topology
         set_vm_attributes:
           activities:
+          - call_operation: Openstack.set_vm_attributes
           - set_state: created
-          target:
-          - compute
-          - compute_1
+          target: topology
