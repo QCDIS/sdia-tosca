@@ -162,7 +162,7 @@ topology_template:
                           os_distro : { get_property: [ compute, os_distro ]}
               repository: https://github.com/QCDIS/playbooks.git
           delete_ssh_key:
-            implementation: openstack/key/delete_key.yaml
+            implementation: openstack/key/delete_keys.yaml
             inputs:
               inventory:
                 all:
