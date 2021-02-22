@@ -96,7 +96,14 @@ interface_types:
       description: horizontal_pod_autoscaler           
     info:
       description: get information on pods,services or deployments
-      
+    install_requirements:
+      description: installs
+    join_k8s_cluster:
+      description: add workers
+    create_k8s_dashboard:
+      description: install dashboard
+    set_attributes:
+      description: get keys etc.
 
 
   tosca.interfaces.QC.Openstack:
