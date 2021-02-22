@@ -34,49 +34,7 @@ topology_template:
       type: "tosca.nodes.QC.VM.Compute"
     kubernetes:
       interfaces:
-        ec2_mount:
-          implementation: ec2/ec2_mount.yaml
-          inputs:
-            inventory:
-              all:
-                children:
-                  master:
-                    hosts:
-                      compute:
-                        ansible_host:  { get_attribute: [  compute, public_ip] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                        ansible_ssh_user: { get_property: [compute, user_name] }
-                  workers:
-                    hosts:
-                      compute_1:
-                        ansible_host:  { get_attribute: [  compute_1, public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                        ansible_ssh_user: { get_property: [ compute_1, user_name ] }
-            repository: https://github.com/QCDIS/playbooks.git
-        install_docker:
-          implementation: docker/install_docker.yaml
-          inputs:
-            inventory:
-              all:
-                children:
-                  master:
-                    hosts:
-                      compute:
-                        ansible_host:  { get_attribute: [  compute, public_ip] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                        ansible_ssh_user: { get_property: [compute, user_name] }
-                  workers:
-                    hosts:
-                      compute_1:
-                        ansible_host:  { get_attribute: [  compute_1, public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                        ansible_ssh_user: { get_property: [ compute_1, user_name ] }
-            repository: https://github.com/QCDIS/playbooks.git
-        install_k8s_prerequisites:
+        install_requirements:
           implementation: k8s/install_k8s_prerequisites.yaml
           inputs:
             inventory:
@@ -97,7 +55,7 @@ topology_template:
                         ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                         ansible_ssh_user: { get_property: [ compute_1, user_name ] }
             repository: https://github.com/QCDIS/playbooks.git
-        install_k8s:
+        create:
           implementation: k8s/install_k8s.yaml
           inputs:
             inventory:
@@ -118,7 +76,7 @@ topology_template:
                         ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                         ansible_ssh_user: { get_property: [ compute_1, user_name ] }
             repository: https://github.com/QCDIS/playbooks.git
-        set_master_k8s_cluster:
+        configure:
           implementation: k8s/set_master_k8s_cluster.yaml
           repository: https://github.com/QCDIS/playbooks.git
           inputs:
@@ -167,7 +125,7 @@ topology_template:
                         ansible_python_interpreter: /usr/bin/python3
                         ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                         ansible_ssh_user: { get_property: [compute, user_name] }
-        get_config:
+        set_attributes:
           implementation: k8s/get_config.yaml
           repository: https://github.com/QCDIS/playbooks.git
           inputs:
@@ -226,55 +184,42 @@ topology_template:
         Openstack: {}
       type: "tosca.nodes.QC.VM.topology"
 
-  workflows:
-    provision:
-      description: Workflow to deploy the k8s
-      steps:
-        ec2_mount:
-          activities:
-          - call_operation: kubernetes.ec2_mount
-            on_success:
-            - install_docker
-          target: kubernetes
-        install_docker:
-          activities:
-          - call_operation: kubernetes.install_docker
-            on_success: create_vm
-          target: kubernetes
-        install_k8s_prerequisites:
-          activities:
-          - call_operation: kubernetes.install_k8s_prerequisites
-            on_success:
-            - install_k8s
-          target: kubernetes
-        install_k8s:
-          activities:
-          - call_operation: kubernetes.install_k8s
-          target: kubernetes
-        set_master_k8s_cluster:
-          activities:
-          - set_state: creating
-          - call_operation: kubernetes.set_master_k8s_cluster
-            on_success:
-            - join_k8s_cluster
-            - create_k8s_metrics_server
-            - create_k8s_dashboard
-            - get_config
-          target: kubernetes
-        join_k8s_cluster:
-          activities:
-          - call_operation: kubernetes.join_k8s_cluster
-          target: kubernetes
-        create_k8s_metrics_server:
-          activities:
-          - call_operation: kubernetes.create_k8s_metrics_server
-          target: kubernetes
-        create_k8s_dashboard:
-          activities:
-          - call_operation: kubernetes.create_k8s_dashboard
-          target: kubernetes
-        get_config:
-          activities:
-          - call_operation: kubernetes.get_config
-          - set_state: created
-          target: kubernetes
+#  workflows:
+#    provision:
+#      description: Workflow to deploy the k8s
+#      steps:
+#        ec2_mount:
+#          activities:
+#          - call_operation: kubernetes.ec2_mount
+#          target: kubernetes
+#        install_k8s:
+#          activities:
+#          - call_operation: kubernetes.install_k8s
+#          target: kubernetes
+#        set_master_k8s_cluster:
+#          activities:
+#          - set_state: creating
+#          - call_operation: kubernetes.set_master_k8s_cluster
+#            on_success:
+#            - join_k8s_cluster
+#            - create_k8s_metrics_server
+#            - create_k8s_dashboard
+#            - get_config
+#          target: kubernetes
+#        join_k8s_cluster:
+#          activities:
+#          - call_operation: kubernetes.join_k8s_cluster
+#          target: kubernetes
+#        create_k8s_metrics_server:
+#          activities:
+#          - call_operation: kubernetes.create_k8s_metrics_server
+#          target: kubernetes
+#        create_k8s_dashboard:
+#          activities:
+#          - call_operation: kubernetes.create_k8s_dashboard
+#          target: kubernetes
+#        get_config:
+#          activities:
+#          - call_operation: kubernetes.get_config
+#          - set_state: created
+#          target: kubernetes
