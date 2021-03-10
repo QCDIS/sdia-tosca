@@ -27,6 +27,12 @@ data_types:
                 type: string
                 description: 'example openid'
                 required: false
+            extra_properties:
+                type: map
+                description: The optional list of extra properties
+                required: false
+                entry_schema:
+                  type: string
 
 
     tosca.datatypes.QC.coordinates:
