@@ -73,6 +73,7 @@ topology_template:
               - "103.deploy_cli.yml"
               - "104.deploy_hlf_explorer.yml"
               - "105.deploy_bank_app.yml"
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
       type: "tosca.nodes.QC.Application.TIC"
     topology:
       properties:
