@@ -54,7 +54,7 @@ topology_template:
           capability: "tosca.capabilities.QC.VM"
           node: "compute_1"
           relationship: "tosca.relationships.DependsOn"
-
+      type: "tosca.nodes.QC.VM.topology"
     kubernetes:
       requirements:
         - host:
