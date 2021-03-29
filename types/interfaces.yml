@@ -109,29 +109,11 @@ interface_types:
 
 
   tosca.interfaces.QC.Openstack:
-#    derived_from: tosca.interfaces.QC.Standard
+    derived_from: tosca.interfaces.QC.Ansible
     inputs:
-      inventory:
-        type: list
-        required: false
       os_access_token:
         type: tosca.datatypes.QC.Credential
         required: false
-      os_auth_url:
-        type: string
-        required: true
-      os_project_id:
-        type: string
-        required: true
-      os_auth_type:
-        type: string
-        required: true
-      os_identity_provider:
-        type: string
-        required: true
-      os_protocol:
-        type: string
-        required: true
       repository:
         type: string
         required: true
@@ -190,8 +172,6 @@ interface_types:
         type: string
         required: false
 
-
-
   tosca.interfaces.QC.TIC:
     derived_from: tosca.interfaces.QC.Ansible
     initialize_hosts:
@@ -218,6 +198,20 @@ interface_types:
       description: deploy_hlf_explorer
     deploy_bank_app:
       description: deploy_bank_app
+
+
+  tosca.interfaces.QC.Glusterfs:
+    derived_from: tosca.interfaces.QC.Ansible
+    purge:
+      description: purge
+    requirements:
+      description: requirements
+    setup_glusterfs_infra:
+      description: setup_glusterfs_infra
+    setup_glusterfs_cluster:
+      description: setup_glusterfs_cluster
+    mount:
+      description: mount
       
 #tosca.interfaces.node.lifecycle.Standard:
   #derived_from: tosca.interfaces.Root
