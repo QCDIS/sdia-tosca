@@ -18,13 +18,30 @@ topology_template:
     gluster_fs:
       type: tosca.nodes.QC.Application.GlusterFS     
       interfaces:
-        Standard:
-         create:
-           inputs:
-             repository: https://github.com/bityoga/mysome_glusterfs.git
-             resources:
-               - 000.purge.yml 
-               - 001.requirements.yml
-               - 002.setup_glusterfs_infra.yml    
-               - 003.setup_glusterfs_cluster.yml
-#               - 004.mount_glusterfs.yml
+        Glusterfs:
+          purge:
+            inputs:
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
+              implementation: 000.purge.yml
+          requirements:
+            inputs:
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
+              implementation: 001.requirements.yml
+          setup_glusterfs_infra:
+            inputs:
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
+              implementation: 002.setup_glusterfs_infra.yml
+          setup_glusterfs_cluster:
+            inputs:
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
+              implementation: 003.setup_glusterfs_cluster.yml
+#        Standard:
+#         create:
+#           inputs:
+#             repository: https://github.com/bityoga/mysome_glusterfs.git
+#             resources:
+#               - 000.purge.yml
+#               - 001.requirements.yml
+#               - 002.setup_glusterfs_infra.yml
+#               - 003.setup_glusterfs_cluster.yml
+##               - 004.mount_glusterfs.yml
