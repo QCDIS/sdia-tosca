@@ -60,20 +60,24 @@ topology_template:
           create:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              resources:
-              - "011.initialize_hosts.yml"
-              - "012.prepare_docker_images.yml"
-              - "013.mount_fs.yml"
-              - "014.spawn_swarm.yml"
-              - "015.deploy_swarm_visualizer.yml"
-              - "016.deploy_portainer.yml"
-              - "100.deploy_ca.yml"
-              - "101.deploy_orderer.yml"
-              - "102.deploy_peers.yml"
-              - "103.deploy_cli.yml"
-              - "104.deploy_hlf_explorer.yml"
-              - "105.deploy_bank_app.yml"
+              implementation: 011.initialize_hosts.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+          iwsdjnc:
+            repository: "https://github.com/bityoga/fabric_as_code.git"
+            implementation: 012.prepare_docker_images.yml
+#              resources:
+#              - "011.initialize_hosts.yml"
+#              - "012.prepare_docker_images.yml"
+#              - "013.mount_fs.yml"
+#              - "014.spawn_swarm.yml"
+#              - "015.deploy_swarm_visualizer.yml"
+#              - "016.deploy_portainer.yml"
+#              - "100.deploy_ca.yml"
+#              - "101.deploy_orderer.yml"
+#              - "102.deploy_peers.yml"
+#              - "103.deploy_cli.yml"
+#              - "104.deploy_hlf_explorer.yml"
+#              - "105.deploy_bank_app.yml"
       type: "tosca.nodes.QC.Application.TIC"
     topology:
       properties:
