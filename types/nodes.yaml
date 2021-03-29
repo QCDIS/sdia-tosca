@@ -377,9 +377,8 @@ node_types:
         required: false
         description: url of the service 
     interfaces:
-      interfaces:
-        Glusterfs:
-          type: tosca.interfaces.QC.Glusterfs
+      Glusterfs:
+        type: tosca.interfaces.QC.Glusterfs
     properties:
         min_masters_num:
           type: integer
