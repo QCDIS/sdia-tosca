@@ -173,7 +173,8 @@ interface_types:
     set_vm_attributes:
       description: sets ip addresses and roles
 
-  tosca.interfaces.QC.TIC:
+
+  tosca.interfaces.QC.Ansible:
 #    derived_from: tosca.interfaces.QC.Standard
     inputs:
       inventory:
@@ -188,6 +189,11 @@ interface_types:
       extra_variables:
         type: string
         required: false
+
+
+
+  tosca.interfaces.QC.TIC:
+    derived_from: tosca.interfaces.QC.Ansible
     initialize_hosts:
       description: initialize hosts
     prepare_docker_images:
