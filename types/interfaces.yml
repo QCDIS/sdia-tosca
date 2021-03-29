@@ -97,13 +97,15 @@ interface_types:
     info:
       description: get information on pods,services or deployments
     install_requirements:
-      description: installs
+      description: install
     join_k8s_cluster:
       description: add workers
     create_k8s_dashboard:
       description: install dashboard
     set_attributes:
       description: get keys etc.
+
+
 
 
   tosca.interfaces.QC.Openstack:
@@ -171,7 +173,51 @@ interface_types:
     set_vm_attributes:
       description: sets ip addresses and roles
 
-     
+
+  tosca.interfaces.QC.Ansible:
+#    derived_from: tosca.interfaces.QC.Standard
+    inputs:
+      inventory:
+        type: list
+        required: false
+      credentials:
+        type: tosca.datatypes.QC.Credential
+        required: false
+      repository:
+        type: string
+        required: true
+      extra_variables:
+        type: string
+        required: false
+
+
+
+  tosca.interfaces.QC.TIC:
+    derived_from: tosca.interfaces.QC.Ansible
+    initialize_hosts:
+      description: initialize hosts
+    prepare_docker_images:
+      description: prepare_docker_images
+    mount_fs:
+      description: mount_fs
+    spawn_swarm:
+      description: spawn_swarm
+    deploy_swarm_visualizer:
+      description: deploy_swarm_visualizer
+    deploy_portainer:
+      description: deploy_portainer
+    deploy_ca:
+      description: deploy_ca
+    deploy_orderer:
+      description: deploy_orderer
+    deploy_peers:
+      description: deploy_peers
+    deploy_cli:
+      description: deploy_cli
+    deploy_hlf_explorer:
+      description: deploy_hlf_explorer
+    deploy_bank_app:
+      description: deploy_bank_app
       
 #tosca.interfaces.node.lifecycle.Standard:
   #derived_from: tosca.interfaces.Root
