@@ -190,7 +190,7 @@ topology_template:
           deploy_hlf_explorer:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 103.deploy_hlf_explorer.yml
+              implementation: 105.deploy_hlf_explorer.yml
               inventory:
                 all:
                   hosts:
