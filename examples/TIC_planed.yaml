@@ -172,6 +172,11 @@ topology_template:
               repository: "https://github.com/bityoga/fabric_as_code.git"
               implementation: 103.deploy_cli.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
           deploy_hlf_explorer:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
