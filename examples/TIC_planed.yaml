@@ -81,6 +81,7 @@ topology_template:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
               implementation: 011.initialize_hosts.yml
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
                   hosts:
@@ -90,6 +91,7 @@ topology_template:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
               implementation: 012.prepare_docker_images.yml
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
                   hosts:
@@ -99,6 +101,7 @@ topology_template:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
               implementation: 013.mount_fs.yml
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
                   hosts:
@@ -108,6 +111,7 @@ topology_template:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
               implementation: 014.spawn_swarm.yml
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
                   hosts:
@@ -117,6 +121,7 @@ topology_template:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
               implementation: 015.deploy_swarm_visualizer.yml
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
                   hosts:
@@ -126,6 +131,7 @@ topology_template:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
               implementation: 016.deploy_portainer.yml
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
                   hosts:
@@ -135,6 +141,7 @@ topology_template:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
               implementation: 100.deploy_ca.yml
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
                   hosts:
@@ -144,6 +151,7 @@ topology_template:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
               implementation: 101.deploy_orderer.yml
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
                   hosts:
@@ -153,6 +161,7 @@ topology_template:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
               implementation: 102.deploy_peers.yml
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
                   hosts:
@@ -162,6 +171,12 @@ topology_template:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
               implementation: 103.deploy_cli.yml
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+          deploy_hlf_explorer:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 104.deploy_hlf_explorer.yml
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
                   hosts:
@@ -179,7 +194,7 @@ topology_template:
           deploy_bank_app:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 103.deploy_bank_app.yml
+              implementation: 105.deploy_bank_app.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
