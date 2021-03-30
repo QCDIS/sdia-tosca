@@ -105,9 +105,6 @@ interface_types:
     set_attributes:
       description: get keys etc.
 
-
-
-
   tosca.interfaces.QC.Openstack:
     derived_from: tosca.interfaces.QC.Ansible
     inputs:
