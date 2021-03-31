@@ -13,6 +13,7 @@ topology_template:
         Standard:
           create: "dumy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
+
     topology:
       type: tosca.nodes.QC.VM.topology
       properties:
@@ -23,53 +24,25 @@ topology_template:
           capability: "tosca.capabilities.QC.VM"
           node: "compute"
           relationship: "tosca.relationships.DependsOn"
-      interfaces:
-        Openstack:
-          create:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              resources:
-                - openstack/install_requirements.yaml
-                - openstack/info/get_images.yaml
-                - openstack/info/get_inst_flavors.yaml
-                - openstack/info/get_networks.yaml
-                - openstack/key/create_key.yaml
-                - openstack/server/create_vm.yaml
-          configure:
-            inputs:
-              repository: "https://github.com/QCDIS/playbooks.git"
-              resources:
-                - create_user.yaml
-                - create_user_key_pair
-    kubernetes:
-      requirements:
-      - host:
-          capability: "tosca.capabilities.QC.VM.topology"
-          node: "topology"
-          relationship: "tosca.relationships.HostedOn"
-      interfaces:
-        Standard:
-          configure:
-            inputs:
-              repository: "https://github.com/QCDIS/playbooks.git"
-              resources:
-              - "k8s/set_master_k8s_cluster.yaml"
-              - "k8s/join_k8s_cluster.yaml"
-              - "k8s/create_k8s_dashboard.yaml"
-          create:
-            inputs:
-              repository: "https://github.com/QCDIS/playbooks.git"
-              resources:
-              - "ec2/ec2_mount.yaml"
-              - "docker/install_docker.yaml"
-              - "k8s/install_k8s_prerequisites.yaml"
-              - "k8s/install_k8s.yaml"
-          delete:
-            inputs:
-              repository: "https://github.com/QCDIS/playbooks.git"
-              resources:
-              - "k8s/k8s_delete.yaml"
-      type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
+#      interfaces:
+#        Openstack:
+#          create:
+#            inputs:
+#              repository: https://github.com/QCDIS/playbooks.git
+#              resources:
+#                - openstack/install_requirements.yaml
+#                - openstack/info/get_images.yaml
+#                - openstack/info/get_inst_flavors.yaml
+#                - openstack/info/get_networks.yaml
+#                - openstack/key/create_key.yaml
+#                - openstack/server/create_vm.yaml
+#          configure:
+#            inputs:
+#              repository: "https://github.com/QCDIS/playbooks.git"
+#              resources:
+#                - create_user.yaml
+#                - create_user_key_pair
+
 
 description: "TOSCA example"
 imports:

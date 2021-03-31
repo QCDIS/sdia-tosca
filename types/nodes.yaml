@@ -196,11 +196,11 @@ node_types:
         type: string
         required: false
         description: The subnet of the VMs this topology e.g. 192.168.10.10/24
-      domain:        
+      domain:
         type: string
         required: true
         default: "Ireland"
-        description: the domain of this topology e.g. California, UvA (Amsterdam, The Netherlands) XO Rack, Frankfurt, etc           
+        description: the domain of this topology e.g. California, UvA (Amsterdam, The Netherlands) XO Rack, Frankfurt, etc
       provider:
         type: string
         required: true
@@ -218,7 +218,7 @@ node_types:
         type: string
         required: false
         description: e.g. egi.eu
-      coordinates: 
+      coordinates:
         type: tosca.datatypes.QC.coordinates
         required: false
         description: The coordinates of the domain
@@ -235,27 +235,27 @@ node_types:
         required: false
     interfaces:
       CloudsStorm:
-          type: tosca.interfaces.QC.CloudsStorm
-          provision:
-            inputs:
-              code_type: SEQ
-              object_type: SubTopology
-          delete:
-            inputs:
-              code_type: SEQ
-              object_type: SubTopology
-          hscale:
-            inputs:
-              code_type: SEQ
-              object_type: SubTopology
-          stop:
-            inputs:
-              code_type: SEQ
-              object_type: SubTopology
-          start:
-            inputs:
-              code_type: SEQ
-              object_type: SubTopology
+        type: tosca.interfaces.QC.CloudsStorm
+        provision:
+          inputs:
+            code_type: SEQ
+            object_type: SubTopology
+        delete:
+          inputs:
+            code_type: SEQ
+            object_type: SubTopology
+        hscale:
+          inputs:
+            code_type: SEQ
+            object_type: SubTopology
+        stop:
+          inputs:
+            code_type: SEQ
+            object_type: SubTopology
+        start:
+          inputs:
+            code_type: SEQ
+            object_type: SubTopology
       Openstack:
         type: tosca.interfaces.QC.Openstack
         create:
@@ -365,7 +365,6 @@ node_types:
         description: list of credentials
     
 
-
   tosca.nodes.QC.Application.GlusterFS:
     derived_from:  tosca.nodes.QC.Application
     description: description of container
@@ -399,7 +398,6 @@ node_types:
           constraints:
           - greater_or_equal: 1
 
-          
   tosca.nodes.QC.Application.TIC:
     derived_from:  tosca.nodes.QC.Application
     description: description of TIC
@@ -428,29 +426,3 @@ node_types:
           default: gv0
           
           
-          
-  tosca.nodes.QC.cwl.task:
-    derived_from:  tosca.nodes.QC.Application
-    description: description of common workflow language task
-    requirements:
-      - host:
-          capability: tosca.capabilities.QC.VM.topology
-          node: tosca.nodes.QC.VM.topology
-          relationship: tosca.relationships.HostedOn
-    properties:
-        start_time:
-          type: string
-          required: false           
-        end_time:
-          type: string
-          required: false          
-          
-          
-  tosca.nodes.QC.Application.CWLRunner:
-    derived_from:  tosca.nodes.QC.Application
-    description: the cwl-runner https://github.com/common-workflow-language/cwltool
-    requirements:
-      - host:
-          capability: tosca.capabilities.QC.VM.topology
-          node: tosca.nodes.QC.VM.topology
-          relationship: tosca.relationships.HostedOn
