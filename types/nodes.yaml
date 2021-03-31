@@ -359,11 +359,9 @@ node_types:
     description: Base application node
     properties:
       credentials:
-        type: list
+        type: tosca.datatypes.Credential
         required: false
-        entry_schema:
-          type: tosca.datatypes.Credential
-        description: list of credentials
+        description: credentials
     
 
   tosca.nodes.QC.Application.GlusterFS:

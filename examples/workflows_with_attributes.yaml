@@ -28,8 +28,7 @@ topology_template:
       properties:
         min_masters_num: 1
         min_workers_num: 1
-        credentials:
-        - { get_attribute: [ compute,user_key_pair ] }
+        credential: { get_attribute: [ compute,user_key_pair ] }
       requirements:
       - host:
           capability: "tosca.capabilities.QC.VM.topology"
