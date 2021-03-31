@@ -61,29 +61,11 @@ interface_types:
     run:
       description: Provision the defined objects (resources). ObjectType can be SubTopology or VM.
       
-      
-  tosca.interfaces.QC.Standard:
-    derived_from: tosca.interfaces.node.lifecycle.Standard
-    inputs:
-      inventory:
-        type: list
-        required: false
-      resources:
-        type: list
-        required: false
-      repository:
-        type: string
-        required: false     
-      branch:
-        type: string
-        required: false           
+       
       
   tosca.interfaces.QC.Kubernetes:
-    derived_from: tosca.interfaces.QC.Standard
+    derived_from: tosca.interfaces.QC.Ansible
     inputs:
-      inventory:
-        type: list
-        required: false
       replicas:
         type: integer
         required: false
@@ -104,9 +86,6 @@ interface_types:
       description: install dashboard
     set_attributes:
       description: get keys etc.
-
-
-
 
   tosca.interfaces.QC.Openstack:
     derived_from: tosca.interfaces.QC.Ansible
