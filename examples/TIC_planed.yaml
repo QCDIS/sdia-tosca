@@ -587,8 +587,10 @@ topology_template:
         provisioned_files:
           required: false
           type: "string"
+
+
   workflows:
-    provision:
+    deploy_tic:
       description: Workflow to deploy TIC
       steps:
         purge:
