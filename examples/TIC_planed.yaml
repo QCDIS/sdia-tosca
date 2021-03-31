@@ -601,7 +601,7 @@ topology_template:
         requirements:
           activities:
           - call_operation: Glusterfs.requirements
-            on_success: setup_glusterfs_cluster
+            on_success: setup_glusterfs_infra
           target: glusterfs
         setup_glusterfs_infra:
           activities:
@@ -628,7 +628,17 @@ topology_template:
         mount_fs:
           activities:
           - call_operation: TIC.mount_fs
-            on_success: spawn_swarm
+            on_success: purge_swarm
+          target: tic
+        purge_swarm:
+          activities:
+          - call_operation: TIC.purge_swarm
+            on_success: purge_swarm
+          target: tic
+        spawn_swarm:
+          activities:
+          - call_operation: TIC.spawn_swarm
+            on_success: deploy_swarm_visualizer
           target: tic
         deploy_swarm_visualizer:
           activities:
