@@ -259,6 +259,8 @@ node_types:
           type: tosca.interfaces.QC.CloudsStorm
       Openstack:
         type: tosca.interfaces.QC.Openstack
+        create:
+#        configure:
         
   tosca.nodes.QC.VM.Compute:
     derived_from: tosca.nodes.QC.Infrastructure
