@@ -583,14 +583,14 @@ topology_template:
     deploy_tic:
       description: Workflow to deploy TIC
       steps:
-        purge:
-          activities:
-          - call_operation: Glusterfs.purge
-            on_success: requirements
-          target: glusterfs
         requirements:
           activities:
           - call_operation: Glusterfs.requirements
+            on_success: purge
+          target: glusterfs
+        purge:
+          activities:
+          - call_operation: Glusterfs.purge
             on_success: setup_glusterfs_infra
           target: glusterfs
         setup_glusterfs_infra:
