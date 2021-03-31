@@ -103,8 +103,7 @@ node_types:
           inputs:
             repository: https://github.com/QCDIS/playbooks.git
             resources:
-              - k8s/get_services.yaml              
-                
+              - k8s/get_services.yaml
 
   tosca.nodes.QC.docker.Orchestrator:
     derived_from: tosca.nodes.QC.Application
@@ -174,6 +173,7 @@ node_types:
                 - k8s/k8s_delete.yaml
                     
         
+
   tosca.nodes.QC.VM.topology:
     derived_from: tosca.nodes.QC.Infrastructure
     description: topology of VMs
@@ -229,9 +229,6 @@ node_types:
         entry_schema:
           type: tosca.datatypes.Credential
         description: list of credentials
-#      ssh_keys:
-#        type: tosca.datatypes.QC.Credential
-#        required: false
     artifacts:
       provisioned_files:
         type: string
@@ -345,6 +342,7 @@ node_types:
       Standard:
         create: dumy.yaml        
         
+
   tosca.nodes.QC.Infrastructure:
     derived_from:  tosca.nodes.QC.Root
     description: Base infrastructure node
@@ -354,9 +352,17 @@ node_types:
       node:
         type: tosca.capabilities.Node
         
+
   tosca.nodes.QC.Application:
     derived_from:  tosca.nodes.QC.Root
-    description: Base application node    
+    description: Base application node
+    properties:
+      credentials:
+        type: list
+        required: false
+        entry_schema:
+          type: tosca.datatypes.Credential
+        description: list of credentials
     
 
 
@@ -392,8 +398,7 @@ node_types:
           default: 1
           constraints:
           - greater_or_equal: 1
-          
-          
+
           
   tosca.nodes.QC.Application.TIC:
     derived_from:  tosca.nodes.QC.Application

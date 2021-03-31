@@ -73,8 +73,8 @@ topology_template:
 
 description: "TOSCA example"
 imports:
-- nodes: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/nodes.yaml"
-- data: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/data.yml"
-- capabilities: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/capabilities.yaml"
-- policies: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/policies.yaml"
-- interfaces: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/interfaces.yml"
+- nodes: "file:///home/alogo/workspace/sdia-tosca/types/nodes.yaml"
+- data: "file:///home/alogo/workspace/sdia-tosca/types/data.yml"
+- capabilities: "file:///home/alogo/workspace/sdia-tosca/types/capabilities.yaml"
+- policies: "file:///home/alogo/workspace/sdia-tosca/types/policies.yaml"
+- interfaces: "file:///home/alogo/workspace/sdia-tosca/types/interfaces.yml"
