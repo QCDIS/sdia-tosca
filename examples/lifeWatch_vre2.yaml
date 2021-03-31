@@ -51,30 +51,6 @@ topology_template:
           capability: "tosca.capabilities.QC.VM.topology"
           node: "topology"
           relationship: "tosca.relationships.HostedOn"
-      interfaces:
-        Standard:
-          configure:
-            inputs:
-              repository: "https://github.com/QCDIS/playbooks.git"
-              resources:
-              - "k8s/set_master_k8s_cluster.yaml"
-              - "k8s/join_k8s_cluster.yaml"
-              - "k8s/create_k8s_metrics_server.yaml"
-              - "k8s/create_k8s_dashboard.yaml"
-              - "k8s/get_config.yaml"
-          create:
-            inputs:
-              repository: "https://github.com/QCDIS/playbooks.git"
-              resources:
-              - "ec2/ec2_mount.yaml"
-              - "docker/install_docker.yaml"
-              - "k8s/install_k8s_prerequisites.yaml"
-              - "k8s/install_k8s.yaml"
-          delete:
-            inputs:
-              repository: "https://github.com/QCDIS/playbooks.git"
-              resources:
-              - "k8s/k8s_delete.yaml"
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
     topology:
       properties:
@@ -89,28 +65,6 @@ topology_template:
           capability: "tosca.capabilities.QC.VM"
           node: "compute_1"
           relationship: "tosca.relationships.DependsOn"
-      interfaces:
-        CloudsStorm:
-          delete:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          hscale:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          provision:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          start:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          stop:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
       type: "tosca.nodes.QC.VM.topology"
       attributes:
         credentials:
