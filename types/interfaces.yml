@@ -52,7 +52,7 @@ interface_types:
       description: Download or retrieve output results or files from the remote resources. ObjectType currently can only be VM.
     v_scale:
       description: Vertically scale up or down to adapt the computing capability of the infrastructure through directly changing the capacity of some VM. ObjectType can only be VM and REQ.
-    h_scale:
+    hscale:
       description: Horizontally scale out or in to adapt the computing capability of the infrastructure through changing the number of VMs. ObjectType can be SubTopology, VM or REQ.
     provision:
       description: provision
@@ -64,11 +64,8 @@ interface_types:
        
       
   tosca.interfaces.QC.Kubernetes:
-    derived_from: tosca.interfaces.QC.Standard
+    derived_from: tosca.interfaces.QC.Ansible
     inputs:
-      inventory:
-        type: list
-        required: false
       replicas:
         type: integer
         required: false
