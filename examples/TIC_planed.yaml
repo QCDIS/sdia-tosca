@@ -13,6 +13,7 @@ topology_template:
         Standard:
           create: "dumy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
+
     compute_1:
       properties:
         disk_size: "40000 MB"
@@ -25,6 +26,7 @@ topology_template:
         Standard:
           create: "dumy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
+
     glusterfs:
       type: "tosca.nodes.QC.Application.GlusterFS"
       properties:
@@ -65,21 +67,9 @@ topology_template:
               implementation: 001.requirements.yml
               inventory:
                 all:
-                  children:
-                    gfscluster:
-                      hosts:
-                        gfs1:
-                          ansible_host: { get_attribute: [ compute,public_ip ] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                          ansible_ssh_user: { get_property: [ compute,user_name ] }
-                          gluster_mount_server: { get_attribute: [ compute,public_ip ] }
-                        gfs2:
-                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
-                          gluster_mount_server: { get_attribute: [ compute,public_ip ] }
+                  hosts:
+                    localhost:
+                      ansible_connection: local
           setup_glusterfs_infra:
             inputs:
               repository: "https://github.com/bityoga/mysome_glusterfs.git"
