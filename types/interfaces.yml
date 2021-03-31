@@ -90,9 +90,6 @@ interface_types:
     set_attributes:
       description: get keys etc.
 
-
-
-
   tosca.interfaces.QC.Openstack:
     derived_from: tosca.interfaces.QC.Ansible
     inputs:
@@ -167,6 +164,8 @@ interface_types:
       description: mount_fs
     spawn_swarm:
       description: spawn_swarm
+    purge_swarm:
+      description: purge_swarm
     deploy_swarm_visualizer:
       description: deploy_swarm_visualizer
     deploy_portainer:
