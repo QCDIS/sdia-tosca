@@ -587,6 +587,86 @@ topology_template:
         provisioned_files:
           required: false
           type: "string"
+  workflows:
+    provision:
+      description: Workflow to deploy TIC
+      steps:
+        purge:
+          activities:
+          - call_operation: Glusterfs.purge
+            on_success: requirements
+          target: glusterfs
+        requirements:
+          activities:
+          - call_operation: Glusterfs.requirements
+            on_success: setup_glusterfs_cluster
+          target: glusterfs
+        setup_glusterfs_infra:
+          activities:
+          - call_operation: Glusterfs.setup_glusterfs_infra
+            on_success: setup_glusterfs_cluster
+          target: glusterfs
+        setup_glusterfs_cluster:
+          activities:
+          - call_operation: Glusterfs.setup_glusterfs_cluster
+            on_success: initialize_hosts
+          target: glusterfs
+        initialize_hosts:
+          activities:
+          - set_state: creating
+          - call_operation: TIC.initialize_hosts
+            on_success:
+            - prepare_docker_images
+          target: tic
+        prepare_docker_images:
+          activities:
+          - call_operation: TIC.prepare_docker_images
+            on_success: mount_fs
+          target: tic
+        mount_fs:
+          activities:
+          - call_operation: TIC.mount_fs
+            on_success: spawn_swarm
+          target: tic
+        deploy_swarm_visualizer:
+          activities:
+          - call_operation: TIC.deploy_swarm_visualizer
+            on_success: deploy_portainer
+          target: tic
+        deploy_portainer:
+          activities:
+          - call_operation: TIC.deploy_portainer
+            on_success: deploy_ca
+          target: tic
+        deploy_ca:
+          activities:
+          - call_operation: TIC.deploy_ca
+            on_success: deploy_orderer
+          target: tic
+        deploy_orderer:
+          activities:
+          - call_operation: TIC.deploy_orderer
+            on_success: deploy_peers
+          target: tic
+        deploy_peers:
+          activities:
+          - call_operation: TIC.deploy_peers
+            on_success: deploy_cli
+          target: tic
+        deploy_cli:
+          activities:
+          - call_operation: TIC.deploy_cli
+            on_success: deploy_hlf_explorer
+          target: tic
+        deploy_hlf_explorer:
+          activities:
+          - call_operation: TIC.deploy_hlf_explorer
+            on_success: deploy_bank_app
+          target: tic
+        deploy_bank_app:
+          activities:
+          - set_state: created
+          target: tic
 
 description: "TOSCA example"
 imports:
