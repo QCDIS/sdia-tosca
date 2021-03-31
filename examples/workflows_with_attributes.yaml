@@ -631,7 +631,7 @@ topology_template:
         purge_swarm:
           activities:
           - call_operation: TIC.purge_swarm
-            on_success: purge_swarm
+            on_success: spawn_swarm
           target: tic
         spawn_swarm:
           activities:
