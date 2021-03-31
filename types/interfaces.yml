@@ -64,11 +64,8 @@ interface_types:
        
       
   tosca.interfaces.QC.Kubernetes:
-    derived_from: tosca.interfaces.QC.Standard
+    derived_from: tosca.interfaces.QC.Ansible
     inputs:
-      inventory:
-        type: list
-        required: false
       replicas:
         type: integer
         required: false
