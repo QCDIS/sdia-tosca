@@ -118,8 +118,8 @@ node_types:
         required: false
         description: the dashboard access url
     interfaces:
-        Standard:
-          type: tosca.interfaces.QC.Standard
+        Kubernetes:
+          type: tosca.interfaces.QC.Kubernetes
                     
         
   tosca.nodes.QC.VM.topology:
@@ -177,16 +177,24 @@ node_types:
         entry_schema:
           type: tosca.datatypes.Credential
         description: list of credentials
-#      ssh_keys:
-#        type: tosca.datatypes.QC.Credential
-#        required: false
     artifacts:
       provisioned_files:
         type: string
         required: false
     interfaces:
       CloudsStorm:
-          type: tosca.interfaces.QC.CloudsStorm
+        type: tosca.interfaces.QC.CloudsStorm
+        delete:
+        execute:
+        put:
+        get:
+        v_scale:
+        h_scale:
+        provision:
+        recover:
+        run:
+        start:
+        stop:
       Openstack:
         type: tosca.interfaces.QC.Openstack
         
@@ -345,7 +353,7 @@ node_types:
         type: list
         required: false
         entry_schema:
-          type: string
+          type: string     
     interfaces:
       TIC:
         type: tosca.interfaces.QC.TIC
@@ -353,7 +361,7 @@ node_types:
         gluster_cluster_volume:
           type: string
           required: true
-          default: gv0
+          default: gv0         
           
           
           
