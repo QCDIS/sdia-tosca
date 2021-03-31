@@ -677,6 +677,7 @@ topology_template:
           target: tic
         deploy_bank_app:
           activities:
+          - call_operation: TIC.deploy_bank_app
           - set_state: created
           target: tic
 
