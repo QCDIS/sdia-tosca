@@ -164,6 +164,8 @@ interface_types:
       description: mount_fs
     spawn_swarm:
       description: spawn_swarm
+    purge_swarm:
+      description: purge_swarm
     deploy_swarm_visualizer:
       description: deploy_swarm_visualizer
     deploy_portainer:
