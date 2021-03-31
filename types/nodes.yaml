@@ -239,30 +239,8 @@ node_types:
     interfaces:
       CloudsStorm:
           type: tosca.interfaces.QC.CloudsStorm
-          provision:
-            inputs:
-              code_type: SEQ
-              object_type: SubTopology
-          delete:
-            inputs:
-              code_type: SEQ
-              object_type: SubTopology
-          hscale:
-            inputs:
-              code_type: SEQ
-              object_type: SubTopology
-          stop:
-            inputs:
-              code_type: SEQ
-              object_type: SubTopology
-          start:
-            inputs:
-              code_type: SEQ
-              object_type: SubTopology
       Openstack:
         type: tosca.interfaces.QC.Openstack
-        create:
-        configure:
         
   tosca.nodes.QC.VM.Compute:
     derived_from: tosca.nodes.QC.Infrastructure
@@ -356,7 +334,14 @@ node_types:
         
   tosca.nodes.QC.Application:
     derived_from:  tosca.nodes.QC.Root
-    description: Base application node    
+    description: Base application node
+    properties:
+      credentials:
+        type: list
+        required: false
+        entry_schema:
+          type: tosca.datatypes.Credential
+        description: list of credentials
     
 
 
