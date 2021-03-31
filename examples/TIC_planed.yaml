@@ -26,9 +26,12 @@ topology_template:
           create: "dumy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
     glusterfs:
+      type: "tosca.nodes.QC.Application.GlusterFS"
       properties:
         min_masters_num: 1
         min_workers_num: 1
+        credentials:
+        - { get_attribute: [ compute,user_key_pair ] }
       requirements:
       - host:
           capability: "tosca.capabilities.QC.VM.topology"
@@ -42,38 +45,89 @@ topology_template:
               implementation: 000.purge.yml
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    gfscluster:
+                      hosts:
+                        gfs1:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                          gluster_mount_server: { get_attribute: [ compute,public_ip ] }
+                        gfs2:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+                          gluster_mount_server: { get_attribute: [ compute,public_ip ] }
           requirements:
             inputs:
               repository: "https://github.com/bityoga/mysome_glusterfs.git"
               implementation: 001.requirements.yml
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    gfscluster:
+                      hosts:
+                        gfs1:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                          gluster_mount_server: { get_attribute: [ compute,public_ip ] }
+                        gfs2:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+                          gluster_mount_server: { get_attribute: [ compute,public_ip ] }
           setup_glusterfs_infra:
             inputs:
               repository: "https://github.com/bityoga/mysome_glusterfs.git"
               implementation: 002.setup_glusterfs_infra.yml
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    gfscluster:
+                      hosts:
+                        gfs1:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                          gluster_mount_server: { get_attribute: [ compute,public_ip ] }
+                        gfs2:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+                          gluster_mount_server: { get_attribute: [ compute,public_ip ] }
           setup_glusterfs_cluster:
             inputs:
               repository: "https://github.com/bityoga/mysome_glusterfs.git"
               implementation: 003.setup_glusterfs_cluster.yml
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
-      type: "tosca.nodes.QC.Application.GlusterFS"
+                  children:
+                    gfscluster:
+                      hosts:
+                        gfs1:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                          gluster_mount_server: { get_attribute: [ compute,public_ip ] }
+                        gfs2:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+                          gluster_mount_server: { get_attribute: [ compute,public_ip ] }
+
     tic:
+      properties:
+        credentials:
+        - { get_attribute: [ compute,user_key_pair ] }
       type: "tosca.nodes.QC.Application.TIC"
       interfaces:
         TIC:
@@ -84,9 +138,31 @@ topology_template:
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           prepare_docker_images:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
@@ -94,9 +170,31 @@ topology_template:
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           mount_fs:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
@@ -104,9 +202,63 @@ topology_template:
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          purge_swarm:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 014.purge_swarm.yml
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              inventory:
+                all:
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           spawn_swarm:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
@@ -114,9 +266,31 @@ topology_template:
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_swarm_visualizer:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
@@ -124,9 +298,31 @@ topology_template:
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_portainer:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
@@ -134,9 +330,31 @@ topology_template:
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_ca:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
@@ -144,9 +362,31 @@ topology_template:
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_orderer:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
@@ -154,9 +394,31 @@ topology_template:
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_peers:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
@@ -164,9 +426,31 @@ topology_template:
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_cli:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
@@ -174,9 +458,31 @@ topology_template:
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_hlf_explorer:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
@@ -184,9 +490,31 @@ topology_template:
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_bank_app:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
@@ -194,9 +522,32 @@ topology_template:
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+
     topology:
       properties:
         domain: "Ireland"
@@ -239,92 +590,10 @@ topology_template:
           required: false
           type: "string"
 
-  workflows:
-    provision:
-      description: Workflow to deploy TIC
-      steps:
-        purge:
-          activities:
-          - call_operation: Glusterfs.purge
-            on_success: requirements
-          target: glusterfs
-        requirements:
-          activities:
-          - call_operation: Glusterfs.requirements
-            on_success: setup_glusterfs_cluster
-          target: glusterfs
-        setup_glusterfs_infra:
-          activities:
-          - call_operation: Glusterfs.setup_glusterfs_infra
-            on_success: setup_glusterfs_cluster
-          target: glusterfs
-        setup_glusterfs_cluster:
-          activities:
-          - call_operation: Glusterfs.setup_glusterfs_cluster
-            on_success: initialize_hosts
-          target: glusterfs
-        initialize_hosts:
-          activities:
-          - set_state: creating
-          - call_operation: TIC.initialize_hosts
-            on_success:
-            - prepare_docker_images
-          target: tic
-        prepare_docker_images:
-          activities:
-          - call_operation: TIC.prepare_docker_images
-            on_success: mount_fs
-          target: tic
-        mount_fs:
-          activities:
-          - call_operation: TIC.mount_fs
-            on_success: spawn_swarm
-          target: tic
-        deploy_swarm_visualizer:
-          activities:
-          - call_operation: TIC.deploy_swarm_visualizer
-            on_success: deploy_portainer
-          target: tic
-        deploy_portainer:
-          activities:
-          - call_operation: TIC.deploy_portainer
-            on_success: deploy_ca
-          target: tic
-        deploy_ca:
-          activities:
-          - call_operation: TIC.deploy_ca
-            on_success: deploy_orderer
-          target: tic
-        deploy_orderer:
-          activities:
-          - call_operation: TIC.deploy_orderer
-            on_success: deploy_peers
-          target: tic
-        deploy_peers:
-          activities:
-          - call_operation: TIC.deploy_peers
-            on_success: deploy_cli
-          target: tic
-        deploy_cli:
-          activities:
-          - call_operation: TIC.deploy_cli
-            on_success: deploy_hlf_explorer
-          target: tic
-        deploy_hlf_explorer:
-          activities:
-          - call_operation: TIC.deploy_hlf_explorer
-            on_success: deploy_bank_app
-          target: tic
-        deploy_bank_app:
-          activities:
-          - set_state: created
-          target: tic
-
-
 description: "TOSCA example"
 imports:
-- nodes: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/nodes.yaml"
-- data: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/data.yml"
-- capabilities: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/capabilities.yaml"
-- policies: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/policies.yaml"
-- interfaces: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/interfaces.yml"
+- nodes: "file:///home/alogo/workspace/sdia-tosca/types/nodes.yaml"
+- data: "file:///home/alogo/workspace/sdia-tosca/types/data.yml"
+- capabilities: "file:///home/alogo/workspace/sdia-tosca/types/capabilities.yaml"
+- policies: "file:///home/alogo/workspace/sdia-tosca/types/policies.yaml"
+- interfaces: "file:///home/alogo/workspace/sdia-tosca/types/interfaces.yml"
