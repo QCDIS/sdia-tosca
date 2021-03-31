@@ -72,38 +72,6 @@ node_types:
     interfaces:
       Kubernetes:
         type: tosca.interfaces.QC.Kubernetes
-        delete:
-          inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - k8s/delete_service.yml
-        create:
-          inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - k8s/create_service.yml
-        configure:
-          inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - k8s/get_services.yaml              
-        scale:
-          inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - k8s/scale_service.yml
-            replicas: 1
-        autoscale:
-          inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - k8s/autoscale_service.yml
-            horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml
-        info:
-          inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - k8s/get_services.yaml              
                 
 
   tosca.nodes.QC.docker.Orchestrator:
@@ -152,26 +120,6 @@ node_types:
     interfaces:
         Standard:
           type: tosca.interfaces.QC.Standard
-          create:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              resources:
-                - ec2/ec2_mount.yaml
-                - docker/install_docker.yaml
-                - k8s/install_k8s_prerequisites.yaml
-                - k8s/install_k8s.yaml
-          configure:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              resources:
-                - k8s/set_master_k8s_cluster.yaml
-                - k8s/join_k8s_cluster.yaml
-                - k8s/create_k8s_dashboard.yaml
-          delete:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              resources:
-                - k8s/k8s_delete.yaml
                     
         
   tosca.nodes.QC.VM.topology:

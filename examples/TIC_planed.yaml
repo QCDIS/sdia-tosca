@@ -29,6 +29,8 @@ topology_template:
       properties:
         min_masters_num: 1
         min_workers_num: 1
+        credentials:
+        - { get_attribute: [ compute,user_key_pair ] }
       requirements:
       - host:
           capability: "tosca.capabilities.QC.VM.topology"
@@ -122,6 +124,8 @@ topology_template:
                           gluster_mount_server: { get_attribute: [ compute,public_ip ] }
       type: "tosca.nodes.QC.Application.GlusterFS"
     tic:
+      credentials:
+        - { get_attribute: [ compute,user_key_pair ] }
       type: "tosca.nodes.QC.Application.TIC"
       interfaces:
         TIC:
