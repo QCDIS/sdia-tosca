@@ -71,21 +71,26 @@ interface_types:
         required: false
       service_name:
         type: string
-        required: false        
+        required: false
     scale:
-      description: Set the number of replicas for a Deployment, ReplicaSet, or Replication Controller, or the parallelism attribute of a Job.  
+      description: Set the number of replicas for a Deployment, ReplicaSet, or Replication Controller, or the parallelism attribute of a Job.
     autoscale:
-      description: horizontal_pod_autoscaler           
+      description: horizontal_pod_autoscaler
     info:
       description: get information on pods,services or deployments
     install_requirements:
       description: install
+    install_k8s:
+      description: install
+    set_master:
     join_k8s_cluster:
       description: add workers
     create_k8s_dashboard:
       description: install dashboard
     set_attributes:
       description: get keys etc.
+    create_k8s_metrics_server:
+      description: create_k8s_metrics_server
 
   tosca.interfaces.QC.Openstack:
     derived_from: tosca.interfaces.QC.Ansible
