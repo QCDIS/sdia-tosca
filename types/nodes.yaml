@@ -143,34 +143,10 @@ node_types:
         required: false
         entry_schema:
           type: tosca.datatypes.Credential
-        description: list of tokens to access the kubernetes dashboard and other kubernetes resources 
-      dashboard_url:
-        type: string
-        required: false
-        description: the dashboard access url
+        description: list of tokens to access the kubernetes dashboard and other kubernetes resources
     interfaces:
-        Standard:
-          type: tosca.interfaces.QC.Standard
-          create:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              resources:
-                - ec2/ec2_mount.yaml
-                - docker/install_docker.yaml
-                - k8s/install_k8s_prerequisites.yaml
-                - k8s/install_k8s.yaml
-          configure:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              resources:
-                - k8s/set_master_k8s_cluster.yaml
-                - k8s/join_k8s_cluster.yaml
-                - k8s/create_k8s_dashboard.yaml
-          delete:
-            inputs:
-              repository: https://github.com/QCDIS/playbooks.git
-              resources:
-                - k8s/k8s_delete.yaml
+        Kubernetes:
+          type: tosca.interfaces.QC.Kubernetes
                     
         
 
@@ -262,6 +238,7 @@ node_types:
         create:
 #        configure:
         
+
   tosca.nodes.QC.VM.Compute:
     derived_from: tosca.nodes.QC.Infrastructure
     description: vm
@@ -358,10 +335,16 @@ node_types:
     derived_from:  tosca.nodes.QC.Root
     description: Base application node
     properties:
-      credentials:
+      credential:
         type: tosca.datatypes.Credential
         required: false
         description: credentials
+    attributes:
+      service_urls:
+        type: list
+        required: false
+        entry_schema:
+          type: string
     
 
   tosca.nodes.QC.Application.GlusterFS:
@@ -376,10 +359,10 @@ node_types:
           node: tosca.nodes.QC.VM.topology
           relationship: tosca.relationships.HostedOn
     attributes:
-      service_url:
+      gluster_cluster_volume:
         type: string
         required: false
-        description: url of the service 
+        default: gv0
     interfaces:
       Glusterfs:
         type: tosca.interfaces.QC.Glusterfs
@@ -397,6 +380,7 @@ node_types:
           constraints:
           - greater_or_equal: 1
 
+
   tosca.nodes.QC.Application.TIC:
     derived_from:  tosca.nodes.QC.Application
     description: description of TIC
@@ -408,13 +392,7 @@ node_types:
       - host:
           capability: tosca.capabilities.QC.VM.topology
           node: tosca.nodes.QC.VM.topology
-          relationship: tosca.relationships.HostedOn          
-    attributes:
-      service_urls:
-        type: list
-        required: false
-        entry_schema:
-          type: string
+          relationship: tosca.relationships.HostedOn
     interfaces:
       TIC:
         type: tosca.interfaces.QC.TIC
