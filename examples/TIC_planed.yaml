@@ -44,6 +44,10 @@ topology_template:
             inputs:
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
               implementation: 000.purge.yml
+              extra_variables:
+                devmode: False
+                device_path: "/dev/xvdh"
+                ansible_user: "vm_user"
               inventory:
                 all:
                   children:
@@ -63,6 +67,10 @@ topology_template:
                           gluster_mount_server: { get_attribute: [ compute,public_ip ] }
           requirements:
             inputs:
+              extra_variables:
+                devmode: False
+                device_path: "/dev/xvdh"
+                ansible_user: "vm_user"
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
               implementation: 001.requirements.yml
               inventory:
@@ -74,6 +82,10 @@ topology_template:
             inputs:
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
               implementation: 002.setup_glusterfs_infra.yml
+              extra_variables:
+                devmode: False
+                device_path: "/dev/xvdh"
+                ansible_user: "vm_user"
               inventory:
                 all:
                   children:
@@ -95,6 +107,10 @@ topology_template:
             inputs:
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
               implementation: 003.setup_glusterfs_cluster.yml
+              extra_variables:
+                devmode: False
+                device_path: "/dev/xvdh"
+                ansible_user: "vm_user"
               inventory:
                 all:
                   children:
@@ -247,6 +263,21 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          set_attributes:
+            inputs:
+              repository: "https://github.com/QCDIS/fabric_as_code"
+              implementation: 106.set_attributes.yml
+              inventory:
+                all:
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
           spawn_swarm:
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
@@ -608,12 +639,7 @@ topology_template:
           - set_state: creating
           - call_operation: TIC.initialize_hosts
             on_success:
-            - prepare_docker_images
-          target: tic
-        prepare_docker_images:
-          activities:
-          - call_operation: TIC.prepare_docker_images
-            on_success: mount_fs
+            - mount_fs
           target: tic
         mount_fs:
           activities:
@@ -628,27 +654,32 @@ topology_template:
         spawn_swarm:
           activities:
           - call_operation: TIC.spawn_swarm
-            on_success: deploy_swarm_visualizer
+            on_success: deploy_ca
           target: tic
         deploy_swarm_visualizer:
           activities:
           - call_operation: TIC.deploy_swarm_visualizer
-            on_success: deploy_portainer
+            on_success: deploy_cli
           target: tic
         deploy_portainer:
           activities:
           - call_operation: TIC.deploy_portainer
-            on_success: deploy_ca
+            on_success: deploy_cli
           target: tic
         deploy_ca:
           activities:
           - call_operation: TIC.deploy_ca
-            on_success: deploy_orderer
+            on_success:
+              - deploy_orderer
+              - deploy_peers
+              - deploy_hlf_explorer
+              - deploy_swarm_visualizer
+              - deploy_portainer
           target: tic
         deploy_orderer:
           activities:
           - call_operation: TIC.deploy_orderer
-            on_success: deploy_peers
+            on_success: deploy_cli
           target: tic
         deploy_peers:
           activities:
@@ -658,12 +689,12 @@ topology_template:
         deploy_cli:
           activities:
           - call_operation: TIC.deploy_cli
-            on_success: deploy_hlf_explorer
+            on_success: deploy_bank_app
           target: tic
         deploy_hlf_explorer:
           activities:
           - call_operation: TIC.deploy_hlf_explorer
-            on_success: deploy_bank_app
+            on_success: deploy_cli
           target: tic
         deploy_bank_app:
           activities:
