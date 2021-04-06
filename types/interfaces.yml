@@ -87,8 +87,6 @@ interface_types:
       description: add workers
     create_k8s_dashboard:
       description: install dashboard
-    set_attributes:
-      description: get keys etc.
     create_k8s_metrics_server:
       description: create_k8s_metrics_server
 
@@ -136,8 +134,6 @@ interface_types:
       description: creates key pair
     create_access_token:
       description: creates access token
-    set_vm_attributes:
-      description: sets ip addresses and roles
 
 
   tosca.interfaces.QC.Ansible:
@@ -155,6 +151,8 @@ interface_types:
       extra_variables:
         type: string
         required: false
+    set_attributes:
+      description: get keys, ports, urls.
 
   tosca.interfaces.QC.TIC:
     derived_from: tosca.interfaces.QC.Ansible
