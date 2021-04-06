@@ -239,7 +239,7 @@ topology_template:
                         compute_1:
                           os_distro : { get_property: [ compute, os_distro ]}
               repository: https://github.com/QCDIS/playbooks.git
-          set_vm_attributes:
+          set_attributes:
             implementation: openstack/concat_attributes.yaml
             inputs:
               inventory:
