@@ -182,6 +182,8 @@ interface_types:
       description: deploy_hlf_explorer
     deploy_bank_app:
       description: deploy_bank_app
+    set_attributes:
+      description: get keys, ports, urls.
 
 
   tosca.interfaces.QC.Glusterfs:
