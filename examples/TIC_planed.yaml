@@ -699,8 +699,15 @@ topology_template:
         deploy_bank_app:
           activities:
           - call_operation: TIC.deploy_bank_app
+            on_success: set_attributes
           - set_state: created
           target: tic
+        set_attributes:
+          activities:
+          - call_operation: TIC.set_attributes
+          - set_state: created
+          target: tic
+
 
 description: "TOSCA example"
 imports:
