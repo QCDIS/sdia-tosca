@@ -135,6 +135,7 @@ interface_types:
       description: creates key pair
     create_access_token:
       description: creates access token
+    set_attributes:
 
 
   tosca.interfaces.QC.Ansible:
