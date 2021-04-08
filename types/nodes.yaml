@@ -340,11 +340,13 @@ node_types:
         required: false
         description: credentials
     attributes:
-      service_urls:
-        type: list
-        required: false
-        entry_schema:
-          type: string
+      type: map
+      required: false
+#      service_urls:
+#        type: list
+#        required: false
+#        entry_schema:
+#          type: string
     
 
   tosca.nodes.QC.Application.GlusterFS:
