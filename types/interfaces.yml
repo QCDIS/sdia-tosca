@@ -89,7 +89,9 @@ interface_types:
       description: install dashboard
     create_k8s_metrics_server:
       description: create_k8s_metrics_server
+    reset_k8s_cluster:
     set_attributes:
+
 
   tosca.interfaces.QC.Openstack:
     derived_from: tosca.interfaces.QC.Ansible
