@@ -42,6 +42,8 @@ topology_template:
         Standard:
           create: "dumy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
+
+
     topology:
       properties:
         domain: "Ireland"
