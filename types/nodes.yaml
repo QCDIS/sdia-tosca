@@ -138,6 +138,9 @@ node_types:
     derived_from: tosca.nodes.QC.docker.Orchestrator
     description: Kubernetes orchestrator
     attributes:
+      config:
+        required: false
+         type: map
       tokens:
         type: list
         required: false
