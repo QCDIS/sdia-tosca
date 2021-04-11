@@ -93,6 +93,10 @@ interface_types:
     set_attributes:
 
 
+  tosca.interfaces.QC.Mog:
+    derived_from: tosca.interfaces.QC.Kubernetes
+    deploy:
+
   tosca.interfaces.QC.Openstack:
     derived_from: tosca.interfaces.QC.Ansible
     inputs:

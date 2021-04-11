@@ -150,6 +150,13 @@ node_types:
     interfaces:
         Kubernetes:
           type: tosca.interfaces.QC.Kubernetes
+
+  tosca.nodes.QC.docker.Orchestrator.mog:
+    derived_from: tosca.nodes.QC.docker.Kubernetes
+    description: mog usecase
+    interfaces:
+        Mog:
+          type: tosca.interfaces.QC.Mog
                     
         
 
