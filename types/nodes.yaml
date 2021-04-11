@@ -138,9 +138,6 @@ node_types:
     derived_from: tosca.nodes.QC.docker.Orchestrator
     description: Kubernetes orchestrator
     attributes:
-      config:
-        required: false
-         type: map
       tokens:
         type: list
         required: false
@@ -150,13 +147,6 @@ node_types:
     interfaces:
         Kubernetes:
           type: tosca.interfaces.QC.Kubernetes
-
-  tosca.nodes.QC.docker.Orchestrator.mog:
-    derived_from: tosca.nodes.QC.docker.Kubernetes
-    description: mog usecase
-    interfaces:
-        Mog:
-          type: tosca.interfaces.QC.Mog
                     
         
 
@@ -357,7 +347,7 @@ node_types:
 #        required: false
 #        entry_schema:
 #          type: string
-    
+
 
   tosca.nodes.QC.Application.GlusterFS:
     derived_from:  tosca.nodes.QC.Application
