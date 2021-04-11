@@ -347,7 +347,7 @@ node_types:
 #        required: false
 #        entry_schema:
 #          type: string
-    
+
 
   tosca.nodes.QC.Application.GlusterFS:
     derived_from:  tosca.nodes.QC.Application
