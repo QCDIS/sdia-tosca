@@ -689,7 +689,7 @@ topology_template:
         deploy_cli:
           activities:
           - call_operation: TIC.deploy_cli
-            on_success: set_attributes
+            on_success: set_tic_attributes
           target: tic
         deploy_hlf_explorer:
           activities:
@@ -699,10 +699,10 @@ topology_template:
 #        deploy_bank_app:
 #          activities:
 #          - call_operation: TIC.deploy_bank_app
-#            on_success: set_attributes
+#            on_success: set_tic_attributes
 #          - set_state: created
 #          target: tic
-        set_attributes:
+        set_tic_attributes:
           activities:
           - call_operation: TIC.set_attributes
           - set_state: created
