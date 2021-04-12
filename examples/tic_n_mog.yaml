@@ -580,6 +580,14 @@ topology_template:
           capability: "tosca.capabilities.QC.VM"
           node: "compute_1"
           relationship: "tosca.relationships.DependsOn"
+      - vm:
+          capability: "tosca.capabilities.QC.VM"
+          node: "compute_2"
+          relationship: "tosca.relationships.DependsOn"
+      - vm:
+          capability: "tosca.capabilities.QC.VM"
+          node: "compute_3"
+          relationship: "tosca.relationships.DependsOn"
       interfaces:
         CloudsStorm:
           delete:
@@ -636,54 +644,12 @@ topology_template:
           create: "dumy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
 
-    topology_1:
-      properties:
-        domain: "Ireland"
-        provider: "EC2"
-      requirements:
-      - vm:
-          capability: "tosca.capabilities.QC.VM"
-          node: "compute_2"
-          relationship: "tosca.relationships.DependsOn"
-      - vm:
-          capability: "tosca.capabilities.QC.VM"
-          node: "compute_3"
-          relationship: "tosca.relationships.DependsOn"
-      interfaces:
-        CloudsStorm:
-          delete:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          hscale:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          provision:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          start:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-          stop:
-            inputs:
-              code_type: "SEQ"
-              object_type: "SubTopology"
-        Openstack: {}
-      type: "tosca.nodes.QC.VM.topology"
-      artifacts:
-        provisioned_files:
-          required: false
-          type: "string"
-
     kubernetes:
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
       requirements:
         - host:
             capability: "tosca.capabilities.QC.VM.topology"
-            node: "topology_1"
+            node: "topology"
             relationship: "tosca.relationships.HostedOn"
       properties:
         credential: { get_attribute: [ compute_2,user_key_pair ] }
@@ -784,7 +750,7 @@ topology_template:
 
 
   workflows:
-    deploy_tic:
+    deploy_tic_mog:
       description: Workflow to deploy TIC and MOG
       steps:
         requirements:
@@ -869,12 +835,6 @@ topology_template:
           - call_operation: TIC.deploy_hlf_explorer
             on_success: deploy_cli
           target: tic
-#        deploy_bank_app:
-#          activities:
-#          - call_operation: TIC.deploy_bank_app
-#            on_success: set_attributes
-#          - set_state: created
-#          target: tic
         set_attributes:
           activities:
           - call_operation: TIC.set_attributes
@@ -909,7 +869,7 @@ topology_template:
         create_k8s_metrics_server:
           activities:
           - call_operation: Kubernetes.create_k8s_metrics_server
-            on_success: set_attributes
+            on_success: set_k8s_attributes
           target: kubernetes
         set_k8s_attributes:
           activities:
