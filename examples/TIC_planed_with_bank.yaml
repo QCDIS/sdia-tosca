@@ -13,8 +13,6 @@ topology_template:
         Standard:
           create: "dumy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
-      attributes:
-        role: "master"
 
     compute_1:
       properties:
@@ -28,8 +26,6 @@ topology_template:
         Standard:
           create: "dumy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
-      attributes:
-        role: "worker"
 
     glusterfs:
       type: "tosca.nodes.QC.Application.GlusterFS"
@@ -584,14 +580,6 @@ topology_template:
           capability: "tosca.capabilities.QC.VM"
           node: "compute_1"
           relationship: "tosca.relationships.DependsOn"
-      - vm:
-          capability: "tosca.capabilities.QC.VM"
-          node: "compute_2"
-          relationship: "tosca.relationships.DependsOn"
-      - vm:
-          capability: "tosca.capabilities.QC.VM"
-          node: "compute_3"
-          relationship: "tosca.relationships.DependsOn"
       interfaces:
         CloudsStorm:
           delete:
@@ -622,144 +610,9 @@ topology_template:
           type: "string"
 
 
-    compute_2:
-      properties:
-        disk_size: "40000 MB"
-        mem_size: "4000 MB"
-        num_cores: 2
-        os_distro: "Ubuntu"
-        os_version: "18.04"
-        user_name: "vm_user"
-      interfaces:
-        Standard:
-          create: "dumy.yaml"
-      type: "tosca.nodes.QC.VM.Compute"
-      attributes:
-        role: "master"
-
-    compute_3:
-      properties:
-        disk_size: "40000 MB"
-        mem_size: "4000 MB"
-        num_cores: 2
-        os_distro: "Ubuntu"
-        os_version: "18.04"
-        user_name: "vm_user"
-      interfaces:
-        Standard:
-          create: "dumy.yaml"
-      type: "tosca.nodes.QC.VM.Compute"
-      attributes:
-        role: "worker"
-
-    kubernetes:
-      type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
-      requirements:
-        - host:
-            capability: "tosca.capabilities.QC.VM.topology"
-            node: "topology"
-            relationship: "tosca.relationships.HostedOn"
-      properties:
-        credential: { get_attribute: [ compute_2,user_key_pair ] }
-      interfaces:
-        Kubernetes:
-          install_requirements:
-            inputs:
-              repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: install_prerequisites.yaml
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute_2,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute_2,user_name ] }
-                    worker:
-                      ansible_host: { get_attribute: [ compute_3,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute_3,user_name ] }
-          install_k8s:
-            inputs:
-              repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: install_k8s.yaml
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute_2,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute_2,user_name ] }
-                    worker:
-                      ansible_host: { get_attribute: [ compute_3,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute_3,user_name ] }
-          set_master:
-            inputs:
-              repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: set_master_k8s_cluster.yaml
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute_2,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute_2,user_name ] }
-          join_k8s_cluster:
-            inputs:
-              repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: join_k8s_cluster.yaml
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute_2,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute_2,user_name ] }
-                    worker:
-                      ansible_host: { get_attribute: [ compute_3,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute_3,user_name ] }
-          create_k8s_dashboard:
-            inputs:
-              repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: create_k8s_dashboard.yaml
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute_2,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute_2,user_name ] }
-          create_k8s_metrics_server:
-            inputs:
-              repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: create_k8s_metrics_server.yaml
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute_2,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute_2,user_name ] }
-          scale:
-          autoscale:
-          info:
-          set_attributes:
-            inputs:
-              repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: get_attributes.yaml
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute_2,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute_2,user_name ] }
-
-
   workflows:
-    deploy_tic_mog:
-      description: Workflow to deploy TIC and MOG
+    deploy_tic_with:
+      description: Workflow to deploy TIC
       steps:
         requirements:
           activities:
@@ -779,14 +632,16 @@ topology_template:
         setup_glusterfs_cluster:
           activities:
           - call_operation: Glusterfs.setup_glusterfs_cluster
-            on_success: initialize_hosts
+            on_success:
+            - initialize_hosts
+            - mount_fs
           target: glusterfs
         initialize_hosts:
           activities:
           - set_state: creating
           - call_operation: TIC.initialize_hosts
             on_success:
-            - mount_fs
+            - purge_swarm
           target: tic
         mount_fs:
           activities:
@@ -836,53 +691,24 @@ topology_template:
         deploy_cli:
           activities:
           - call_operation: TIC.deploy_cli
-            on_success: set_tic_attributes
+            on_success: deploy_bank_app
           target: tic
         deploy_hlf_explorer:
           activities:
           - call_operation: TIC.deploy_hlf_explorer
             on_success: deploy_cli
           target: tic
+        deploy_bank_app:
+          activities:
+          - call_operation: TIC.deploy_bank_app
+            on_success: set_tic_attributes
+          - set_state: created
+          target: tic
         set_tic_attributes:
           activities:
           - call_operation: TIC.set_attributes
           - set_state: created
           target: tic
-        install_requirements:
-          activities:
-          - call_operation: Kubernetes.install_requirements
-            on_success: install_k8s
-          target: kubernetes
-        install_k8s:
-          activities:
-          - call_operation: Kubernetes.install_k8s
-            on_success: set_master
-          target: kubernetes
-        set_master:
-          activities:
-          - call_operation: Kubernetes.set_master
-            on_success: join_k8s_cluster
-          target: kubernetes
-        join_k8s_cluster:
-          activities:
-          - call_operation: Kubernetes.join_k8s_cluster
-            on_success:
-              - create_k8s_dashboard
-              - create_k8s_metrics_server
-          target: kubernetes
-        create_k8s_dashboard:
-          activities:
-          - call_operation: Kubernetes.create_k8s_dashboard
-            on_success: set_k8s_attributes
-        create_k8s_metrics_server:
-          activities:
-          - call_operation: Kubernetes.create_k8s_metrics_server
-            on_success: set_k8s_attributes
-          target: kubernetes
-        set_k8s_attributes:
-          activities:
-          - call_operation: Kubernetes.set_attributes
-          target: kubernetes
 
 
 description: "TOSCA example"

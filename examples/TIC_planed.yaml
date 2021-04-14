@@ -611,7 +611,7 @@ topology_template:
 
 
   workflows:
-    deploy_tic:
+    deploy_tic_with:
       description: Workflow to deploy TIC
       steps:
         requirements:
@@ -632,14 +632,16 @@ topology_template:
         setup_glusterfs_cluster:
           activities:
           - call_operation: Glusterfs.setup_glusterfs_cluster
-            on_success: initialize_hosts
+            on_success:
+            - initialize_hosts
+            - mount_fs
           target: glusterfs
         initialize_hosts:
           activities:
           - set_state: creating
           - call_operation: TIC.initialize_hosts
             on_success:
-            - mount_fs
+            - purge_swarm
           target: tic
         mount_fs:
           activities:
