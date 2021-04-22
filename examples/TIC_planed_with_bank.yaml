@@ -67,10 +67,6 @@ topology_template:
                           gluster_mount_server: { get_attribute: [ compute,public_ip ] }
           requirements:
             inputs:
-              extra_variables:
-                devmode: False
-                device_path: "/dev/xvdh"
-                ansible_user: "vm_user"
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
               implementation: 001.requirements.yml
               inventory:
