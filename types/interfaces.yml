@@ -112,7 +112,7 @@ interface_types:
         required: false
     set_attributes:
     add_credential:
-    create_resource_group:
+    create_resoucre_group:
     create:
     create_ssh_key:
     delete_ssh_key:
