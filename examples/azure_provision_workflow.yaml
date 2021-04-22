@@ -48,10 +48,10 @@ topology_template:
       type: tosca.nodes.QC.VM.topology
       interfaces:
         Azure:
-          create_resoucre_group:
-            repository: https://github.com/QCDIS/azure_playbooks.git
+          create_resource_group:
             implementation: resource_group/create_resource_groups.yaml
             inputs:
+              repository: https://github.com/QCDIS/azure_playbooks.git
               extra_variables:
                 region: { get_property: [ topology, domain ] }
               inventory:
