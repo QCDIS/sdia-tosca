@@ -41,9 +41,9 @@ topology_template:
       interfaces:
         Glusterfs:
           purge:
+            implementation: 000.purge.yml
             inputs:
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
-              implementation: 000.purge.yml
               extra_variables:
                 devmode: False
                 device_path: "/dev/xvdh"
@@ -66,22 +66,22 @@ topology_template:
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
                           gluster_mount_server: { get_attribute: [ compute,public_ip ] }
           requirements:
+            implementation: 001.requirements.yml
             inputs:
               extra_variables:
                 devmode: False
                 device_path: "/dev/xvdh"
                 ansible_user: "vm_user"
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
-              implementation: 001.requirements.yml
               inventory:
                 all:
                   hosts:
                     localhost:
                       ansible_connection: local
           setup_glusterfs_infra:
+            implementation: 002.setup_glusterfs_infra.yml
             inputs:
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
-              implementation: 002.setup_glusterfs_infra.yml
               extra_variables:
                 devmode: False
                 device_path: "/dev/xvdh"
@@ -104,9 +104,9 @@ topology_template:
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
                           gluster_mount_server: { get_attribute: [ compute,public_ip ] }
           setup_glusterfs_cluster:
+            implementation: 003.setup_glusterfs_cluster.yml
             inputs:
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
-              implementation: 003.setup_glusterfs_cluster.yml
               extra_variables:
                 devmode: False
                 device_path: "/dev/xvdh"
@@ -136,9 +136,9 @@ topology_template:
       interfaces:
         TIC:
           initialize_hosts:
+            implementation: 011.initialize_hosts.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 011.initialize_hosts.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -168,9 +168,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           prepare_docker_images:
+            implementation: 012.prepare_docker_images.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 012.prepare_docker_images.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -200,9 +200,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           mount_fs:
+            implementation: 013.mount_fs.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 013.mount_fs.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -232,9 +232,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           purge_swarm:
+            implementation: 014.purge_swarm.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 014.purge_swarm.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -264,9 +264,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           set_attributes:
+            implementation: 106.set_attributes.yml
             inputs:
               repository: "https://github.com/QCDIS/fabric_as_code"
-              implementation: 106.set_attributes.yml
               inventory:
                 all:
                   children:
@@ -279,9 +279,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute,user_name ] }
           spawn_swarm:
+            implementation: 014.spawn_swarm.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 014.spawn_swarm.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -311,9 +311,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_swarm_visualizer:
+            implementation: 015.deploy_swarm_visualizer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 015.deploy_swarm_visualizer.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -343,9 +343,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_portainer:
+            implementation: 016.deploy_portainer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 016.deploy_portainer.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -375,9 +375,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_ca:
+            implementation: 100.deploy_ca.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 100.deploy_ca.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -407,9 +407,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_orderer:
+            implementation: 101.deploy_orderer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 101.deploy_orderer.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -439,9 +439,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_peers:
+            implementation: 102.deploy_peers.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 102.deploy_peers.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -471,9 +471,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_cli:
+            implementation: 103.deploy_cli.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 103.deploy_cli.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -503,9 +503,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_hlf_explorer:
+            implementation: 104.deploy_hlf_explorer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 104.deploy_hlf_explorer.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -535,9 +535,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_bank_app:
+            implementation: 105.deploy_bank_app.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 105.deploy_bank_app.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
