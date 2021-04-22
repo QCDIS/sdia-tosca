@@ -237,6 +237,10 @@ node_types:
         type: tosca.interfaces.QC.Openstack
         create:
 #        configure:
+      Azure:
+        type: tosca.interfaces.QC.Azure
+#        create:
+#        configure:
         
 
   tosca.nodes.QC.VM.Compute:
