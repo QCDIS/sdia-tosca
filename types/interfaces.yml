@@ -112,8 +112,14 @@ interface_types:
         required: false
     set_attributes:
     add_credential:
-    create_resoucre_group:
-
+    create_resource_group:
+    create:
+    create_ssh_key:
+    delete_ssh_key:
+    install_requirements:
+    select_image:
+    select_instance_type:
+    select_network:
 
 
   tosca.interfaces.QC.Openstack:
