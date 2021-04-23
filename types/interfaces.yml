@@ -111,7 +111,6 @@ interface_types:
         type: integer
         required: false
     set_attributes:
-    add_credential:
     create_resoucre_group:
     create:
     create_ssh_key:
