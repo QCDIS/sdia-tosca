@@ -70,16 +70,6 @@ topology_template:
                     localhost:
                       ansible_connection: local
               repository: https://github.com/QCDIS/azure_playbooks.git
-          add_credential:
-            implementation: authentication/add_credentials.yaml
-            inputs:
-              inventory:
-                all:
-                  hosts:
-                    localhost:
-                      ansible_connection: local
-                      credentials: { get_attribute: [ topology, credentials ] }
-              repository: https://github.com/QCDIS/azure_playbooks.git
           create_ssh_key:
             implementation: key/create_keys.yaml
             inputs:
@@ -183,13 +173,7 @@ topology_template:
           activities:
           - call_operation: Azure.install_requirements
             on_success:
-            - add_credential
-          target: topology
-        add_credential:
-          activities:
-          - call_operation: Azure.add_credential
-            on_success:
-              - create_resoucre_group
+            - create_resoucre_group
           target: topology
         create_resoucre_group:
           activities:
@@ -212,11 +196,23 @@ topology_template:
             on_success:
             - create
           target: topology
+        select_network:
+          activities:
+          - call_operation: Azure.select_network
+            on_success:
+            - create
+          target: topology
         create_ssh_key:
           activities:
           - call_operation: Azure.create_ssh_key
             on_success:
             - create
+          target: topology
+        create:
+          activities:
+          - call_operation: Azure.create
+#            on_success:
+#            - create
           target: topology
 
 
