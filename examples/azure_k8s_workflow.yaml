@@ -180,6 +180,113 @@ topology_template:
                     localhost:
                       ansible_connection: local
               repository: https://github.com/QCDIS/azure_playbooks.git
+
+    kubernetes:
+      type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
+      requirements:
+        - host:
+            capability: "tosca.capabilities.QC.VM.topology"
+            node: "topology"
+            relationship: "tosca.relationships.HostedOn"
+      properties:
+        credential: { get_attribute: [ compute,user_key_pair ] }
+      interfaces:
+        Kubernetes:
+          install_requirements:
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              implementation: install_prerequisites.yaml
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          install_k8s:
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              implementation: install_k8s.yaml
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          set_master:
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              implementation: set_master_k8s_cluster.yaml
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+          join_k8s_cluster:
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              implementation: join_k8s_cluster.yaml
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          create_k8s_dashboard:
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              implementation: create_k8s_dashboard.yaml
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+          create_k8s_metrics_server:
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              implementation: create_k8s_metrics_server.yaml
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+          scale:
+          autoscale:
+          info:
+          set_attributes:
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              implementation: get_attributes.yaml
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+
+
+
   workflows:
     provision:
       description: Workflow to deploy azure topology
@@ -232,45 +339,7 @@ topology_template:
         set_attributes:
           activities:
           - call_operation: Azure.set_attributes
-            on_success:
-              - install_k8s_requirements
           target: topology
 
-
-        install_k8s_requirements:
-          activities:
-          - call_operation: Kubernetes.install_requirements
-            on_success: install_k8s
-          target: kubernetes
-        install_k8s:
-          activities:
-          - call_operation: Kubernetes.install_k8s
-            on_success: set_master
-          target: kubernetes
-        set_master:
-          activities:
-          - call_operation: Kubernetes.set_master
-            on_success: join_k8s_cluster
-          target: kubernetes
-        join_k8s_cluster:
-          activities:
-          - call_operation: Kubernetes.join_k8s_cluster
-            on_success:
-              - create_k8s_dashboard
-              - create_k8s_metrics_server
-          target: kubernetes
-        create_k8s_dashboard:
-          activities:
-          - call_operation: Kubernetes.create_k8s_dashboard
-            on_success: set_k8s_attributes
-        create_k8s_metrics_server:
-          activities:
-          - call_operation: Kubernetes.create_k8s_metrics_server
-            on_success: set_k8s_attributes
-          target: kubernetes
-        set_k8s_attributes:
-          activities:
-          - call_operation: Kubernetes.set_attributes
-          target: kubernetes
 
 
