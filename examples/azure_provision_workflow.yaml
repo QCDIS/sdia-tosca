@@ -13,7 +13,7 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
-        disk_size: 10 GB
+        disk_size: 10000 MB
         mem_size: 2048 MB
         num_cores: 2
         os_distro: Ubuntu
@@ -25,7 +25,7 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
-        disk_size: 10 GB
+        disk_size: 10000 MB
         mem_size: 2048 MB
         num_cores: 1
         os_distro: Ubuntu
@@ -64,6 +64,24 @@ topology_template:
                           os_distro : { get_property: [ compute, os_distro ]}
                         compute_1:
                           os_distro : { get_property: [ compute, os_distro ]}
+          select_image:
+            implementation: info/get_images.yaml
+            inputs:
+              repository: https://github.com/QCDIS/azure_playbooks.git
+              extra_variables:
+                region: { get_property: [ topology, domain ] }
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+                      instances:
+                        compute:
+                          os_distro : { get_property: [ compute, os_distro ]}
+                          os_version : { get_property: [ compute, os_version ]}
+                        compute_1:
+                          os_distro : { get_property: [ compute, os_distro ]}
+                          os_version : { get_property: [ compute, os_version ]}
           create:
             implementation: vm/create_vms.yaml
             inputs:
@@ -179,6 +197,7 @@ topology_template:
             - select_instance_type
             - select_network
             - create_ssh_key
+            - select_image
           target: topology
         select_instance_type:
           activities:
@@ -198,6 +217,12 @@ topology_template:
             on_success:
             - create
           target: topology
+          select_image:
+            activities:
+              - call_operation: Azure.select_image
+                on_success:
+                  - create
+            target: topology
         create:
           activities:
           - call_operation: Azure.create
