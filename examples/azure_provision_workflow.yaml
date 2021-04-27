@@ -217,12 +217,12 @@ topology_template:
             on_success:
             - create
           target: topology
-          select_image:
-            activities:
-              - call_operation: Azure.select_image
-                on_success:
-                  - create
-            target: topology
+        select_image:
+          activities:
+            - call_operation: Azure.select_image
+              on_success:
+                - create
+          target: topology
         create:
           activities:
           - call_operation: Azure.create
