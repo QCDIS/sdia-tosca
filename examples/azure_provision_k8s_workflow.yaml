@@ -193,9 +193,9 @@ topology_template:
       interfaces:
         Kubernetes:
           install_requirements:
+            implementation: install_prerequisites.yaml
             inputs:
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: install_prerequisites.yaml
               inventory:
                 all:
                   hosts:
@@ -208,9 +208,9 @@ topology_template:
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           install_k8s:
+            implementation: install_k8s.yaml
             inputs:
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: install_k8s.yaml
               inventory:
                 all:
                   hosts:
@@ -223,9 +223,9 @@ topology_template:
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           set_master:
+            implementation: set_master_k8s_cluster.yaml
             inputs:
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: set_master_k8s_cluster.yaml
               inventory:
                 all:
                   hosts:
@@ -234,9 +234,9 @@ topology_template:
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
           join_k8s_cluster:
+            implementation: join_k8s_cluster.yaml
             inputs:
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: join_k8s_cluster.yaml
               inventory:
                 all:
                   hosts:
@@ -249,9 +249,9 @@ topology_template:
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           create_k8s_dashboard:
+            implementation: create_k8s_dashboard.yaml
             inputs:
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: create_k8s_dashboard.yaml
               inventory:
                 all:
                   hosts:
@@ -260,9 +260,9 @@ topology_template:
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
           create_k8s_metrics_server:
+            implementation: create_k8s_metrics_server.yaml
             inputs:
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: create_k8s_metrics_server.yaml
               inventory:
                 all:
                   hosts:
@@ -274,9 +274,9 @@ topology_template:
           autoscale:
           info:
           set_attributes:
+            implementation: get_attributes.yaml
             inputs:
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: get_attributes.yaml
               inventory:
                 all:
                   hosts:
@@ -285,9 +285,60 @@ topology_template:
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
 
+
   workflows:
-    provision_amazone_k8s:
-      description: Workflow to deploy azure topology and k8s
+    deploy_k8s:
+      description: deploy k8s
+      preconditions:
+        - target: topology
+          condition:
+            - assert:
+              - current_state: [{equal: RUNNING }]
+      steps:
+        install_k8s_requirements:
+          activities:
+          - call_operation: Kubernetes.install_requirements
+            on_success: install_k8s
+          target: kubernetes
+        install_k8s:
+          activities:
+          - call_operation: Kubernetes.install_k8s
+            on_success: set_master
+          target: kubernetes
+        set_master:
+          activities:
+          - call_operation: Kubernetes.set_master
+            on_success: join_k8s_cluster
+          target: kubernetes
+        join_k8s_cluster:
+          activities:
+          - call_operation: Kubernetes.join_k8s_cluster
+            on_success:
+              - create_k8s_dashboard
+              - create_k8s_metrics_server
+          target: kubernetes
+        create_k8s_dashboard:
+          activities:
+          - call_operation: Kubernetes.create_k8s_dashboard
+            on_success: set_k8s_attributes
+        create_k8s_metrics_server:
+          activities:
+          - call_operation: Kubernetes.create_k8s_metrics_server
+            on_success: set_k8s_attributes
+          target: kubernetes
+        set_k8s_attributes:
+          activities:
+          - call_operation: Kubernetes.set_attributes
+          target: kubernetes
+
+    provision:
+      description: Workflow to deploy azure topology
+      preconditions:
+        - target: topology
+          condition:
+            - assert:
+              - desired_state: [{equal: RUNNING }]
+              - current_state: [{equal: UNDEFINED }]
       steps:
         install_requirements:
           activities:
@@ -330,52 +381,13 @@ topology_template:
           target: topology
         create:
           activities:
+          - set_state: CREATING
           - call_operation: Azure.create
             on_success:
             - set_attributes
+          - set_state: RUNNING
           target: topology
         set_attributes:
           activities:
           - call_operation: Azure.set_attributes
-            on_success:
-              - install_k8s_requirements
           target: topology
-
-
-        install_k8s_requirements:
-          activities:
-          - call_operation: Kubernetes.install_requirements
-            on_success: install_k8s
-          target: kubernetes
-        install_k8s:
-          activities:
-          - call_operation: Kubernetes.install_k8s
-            on_success: set_master
-          target: kubernetes
-        set_master:
-          activities:
-          - call_operation: Kubernetes.set_master
-            on_success: join_k8s_cluster
-          target: kubernetes
-        join_k8s_cluster:
-          activities:
-          - call_operation: Kubernetes.join_k8s_cluster
-            on_success:
-              - create_k8s_dashboard
-              - create_k8s_metrics_server
-          target: kubernetes
-        create_k8s_dashboard:
-          activities:
-          - call_operation: Kubernetes.create_k8s_dashboard
-            on_success: set_k8s_attributes
-        create_k8s_metrics_server:
-          activities:
-          - call_operation: Kubernetes.create_k8s_metrics_server
-            on_success: set_k8s_attributes
-          target: kubernetes
-        set_k8s_attributes:
-          activities:
-          - call_operation: Kubernetes.set_attributes
-          target: kubernetes
-
-
