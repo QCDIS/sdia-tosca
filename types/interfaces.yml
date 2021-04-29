@@ -111,7 +111,6 @@ interface_types:
         type: integer
         required: false
     set_attributes:
-    add_credential:
     create_resoucre_group:
     create:
     create_ssh_key:
@@ -120,6 +119,7 @@ interface_types:
     select_image:
     select_instance_type:
     select_network:
+    delete:
 
 
   tosca.interfaces.QC.Openstack:
