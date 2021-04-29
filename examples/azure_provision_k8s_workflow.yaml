@@ -48,12 +48,24 @@ topology_template:
       type: tosca.nodes.QC.VM.topology
       interfaces:
         Azure:
+          delete:
+            implementation: resource_group/delete_resource_group.yaml
+            inputs:
+              repository: https://github.com/QCDIS/azure_playbooks.git
+              extra_variables:
+                resource_group_name: { get_attribute: [ topology, resource_group_name ] }
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
           create_resoucre_group:
             implementation: resource_group/create_resource_groups.yaml
             inputs:
               repository: https://github.com/QCDIS/azure_playbooks.git
               extra_variables:
                 region: { get_property: [ topology, domain ] }
+                topology_name: topology
               inventory:
                 all:
                   hosts:
@@ -297,6 +309,7 @@ topology_template:
       steps:
         install_k8s_requirements:
           activities:
+          - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
             on_success: install_k8s
           target: kubernetes
@@ -321,10 +334,12 @@ topology_template:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success: set_k8s_attributes
+          target: kubernetes
         create_k8s_metrics_server:
           activities:
           - call_operation: Kubernetes.create_k8s_metrics_server
             on_success: set_k8s_attributes
+          - set_state: RUNNING
           target: kubernetes
         set_k8s_attributes:
           activities:
@@ -342,6 +357,7 @@ topology_template:
       steps:
         install_requirements:
           activities:
+          - set_state: CREATING
           - call_operation: Azure.install_requirements
             on_success:
             - create_resoucre_group
@@ -360,34 +376,67 @@ topology_template:
           - call_operation: Azure.select_instance_type
             on_success:
             - create
+            on_failure:
+              - delete
           target: topology
         select_network:
           activities:
           - call_operation: Azure.select_network
             on_success:
             - create
+            on_failure:
+              - delete
           target: topology
         create_ssh_key:
           activities:
           - call_operation: Azure.create_ssh_key
             on_success:
             - create
+            on_failure:
+              - delete
           target: topology
         select_image:
           activities:
             - call_operation: Azure.select_image
               on_success:
                 - create
+              on_failure:
+                - delete
           target: topology
         create:
           activities:
-          - set_state: CREATING
           - call_operation: Azure.create
             on_success:
             - set_attributes
           - set_state: RUNNING
+            on_failure:
+              - delete
           target: topology
         set_attributes:
           activities:
           - call_operation: Azure.set_attributes
+          target: topology
+        delete:
+          activities:
+          - call_operation: Azure.delete
+          - set_state: DELETED
+          target: topology
+
+
+    delete_topology:
+      description: delete_topology
+      preconditions:
+        - target: topology
+          condition:
+            - assert:
+              - desired_state: [{equal: DELETED }]
+              - current_state: [{equal: RUNNING }]
+      steps:
+        delete:
+          activities:
+          - set_state: DELETING
+          - call_operation: Azure.delete
+            on_success:
+            - create_resoucre_group
+          - set_state: DELETED
           target: topology
