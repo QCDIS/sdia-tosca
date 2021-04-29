@@ -53,7 +53,7 @@ topology_template:
             inputs:
               repository: https://github.com/QCDIS/azure_playbooks.git
               extra_variables:
-                resource_group_name: { get_attribute: [ topology, resource_group_name ] }
+                resource_group_name: { get_attribute: [ topology, resource_group ] }
               inventory:
                 all:
                   hosts:
@@ -376,32 +376,24 @@ topology_template:
           - call_operation: Azure.select_instance_type
             on_success:
             - create
-            on_failure:
-              - delete
           target: topology
         select_network:
           activities:
           - call_operation: Azure.select_network
             on_success:
             - create
-            on_failure:
-              - delete
           target: topology
         create_ssh_key:
           activities:
           - call_operation: Azure.create_ssh_key
             on_success:
             - create
-            on_failure:
-              - delete
           target: topology
         select_image:
           activities:
             - call_operation: Azure.select_image
               on_success:
                 - create
-              on_failure:
-                - delete
           target: topology
         create:
           activities:
@@ -409,8 +401,7 @@ topology_template:
             on_success:
             - set_attributes
           - set_state: RUNNING
-            on_failure:
-              - delete
+                - create
           target: topology
         set_attributes:
           activities:
