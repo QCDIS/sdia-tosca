@@ -401,16 +401,10 @@ topology_template:
             on_success:
             - set_attributes
           - set_state: RUNNING
-                - create
           target: topology
         set_attributes:
           activities:
           - call_operation: Azure.set_attributes
-          target: topology
-        delete:
-          activities:
-          - call_operation: Azure.delete
-          - set_state: DELETED
           target: topology
 
 
@@ -428,6 +422,10 @@ topology_template:
           - set_state: DELETING
           - call_operation: Azure.delete
             on_success:
-            - create_resoucre_group
+            - set_attributes
           - set_state: DELETED
+          target: topology
+        set_attributes:
+          activities:
+          - call_operation: Azure.set_attributes
           target: topology
