@@ -57,7 +57,7 @@ node_types:
     requirements:
       - host:
           capability: tosca.capabilities.QC.docker.Kubernetes
-          node: tosca.nodes.QC.docker.Kubernetes
+          node: tosca.nodes.QC.docker.Orchestrator.Kubernetes
           relationship: tosca.relationships.HostedOn
     attributes:
       type: map
