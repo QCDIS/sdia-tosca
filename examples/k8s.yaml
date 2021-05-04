@@ -95,6 +95,8 @@ topology_template:
       properties:
         credential: { get_attribute: [ compute,user_key_pair ] }
       interfaces:
+        Helm:
+
         Kubernetes:
           install_requirements:
             implementation: install_prerequisites.yaml
@@ -214,16 +216,16 @@ topology_template:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
               - create_k8s_dashboard
-              - create_k8s_metrics_server
+#              - create_k8s_metrics_server
           target: kubernetes
         create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success: set_k8s_attributes
-        create_k8s_metrics_server:
-          activities:
-          - call_operation: Kubernetes.create_k8s_metrics_server
-            on_success: set_k8s_attributes
+#        create_k8s_metrics_server:
+#          activities:
+#          - call_operation: Kubernetes.create_k8s_metrics_server
+#            on_success: set_k8s_attributes
           target: kubernetes
         set_k8s_attributes:
           activities:
