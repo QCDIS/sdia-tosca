@@ -31,6 +31,42 @@ node_types:
         type: tosca.capabilities.Host.Compute         
     
 
+
+  tosca.nodes.QC.Container.Application.Helm:
+    derived_from:  tosca.nodes.QC.Application
+    description: description of helm applicat
+    properties:
+      name:
+        type: string
+        required: false
+      location:
+        type: string
+        required: false
+      ref:
+        type: string
+        required: true
+      version:
+        type: string
+        required: false
+      namespace:
+        type: string
+        required: false
+      values:
+        type: map
+        required: false
+    requirements:
+      - host:
+          capability: tosca.capabilities.QC.docker.Kubernetes
+          node: tosca.nodes.QC.docker.Kubernetes
+          relationship: tosca.relationships.HostedOn
+    attributes:
+      type: map
+      required: false
+    interfaces:
+      Helm:
+        type: tosca.interfaces.QC.Helm
+
+
   tosca.nodes.QC.Container.Application.Docker:
     derived_from:  tosca.nodes.QC.Application
     description: description of container
@@ -65,45 +101,8 @@ node_types:
           node: tosca.nodes.QC.docker.Orchestrator
           relationship: tosca.relationships.HostedOn         
     attributes:
-      service_url:
-        type: string
-        required: false
-        description: url of the service 
-    interfaces:
-      Kubernetes:
-        type: tosca.interfaces.QC.Kubernetes
-        delete:
-          inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - k8s/delete_service.yml
-        create:
-          inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - k8s/create_service.yml
-        configure:
-          inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - k8s/get_services.yaml              
-        scale:
-          inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - k8s/scale_service.yml
-            replicas: 1
-        autoscale:
-          inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - k8s/autoscale_service.yml
-            horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml
-        info:
-          inputs:
-            repository: https://github.com/QCDIS/playbooks.git
-            resources:
-              - k8s/get_services.yaml
+      type: map
+      required: false
 
   tosca.nodes.QC.docker.Orchestrator:
     derived_from: tosca.nodes.QC.Application
@@ -147,8 +146,6 @@ node_types:
     interfaces:
         Kubernetes:
           type: tosca.interfaces.QC.Kubernetes
-        Helm:
-          type: tosca.interfaces.QC.Helm
                     
         
 
