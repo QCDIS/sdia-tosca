@@ -65,11 +65,20 @@ interface_types:
 
   tosca.interfaces.QC.Helm:
     derived_from: tosca.interfaces.QC.Ansible
+    inputs:
+      chart_name:
+        type: string
+        required: true
+      location:
+        type: string
+        required: false
     install_requirements:
       description: install
     install:
       description: install
     set_attributes:
+    uninstall:
+
       
   tosca.interfaces.QC.Kubernetes:
     derived_from: tosca.interfaces.QC.Ansible
