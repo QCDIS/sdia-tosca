@@ -66,15 +66,27 @@ interface_types:
   tosca.interfaces.QC.Helm:
     derived_from: tosca.interfaces.QC.Ansible
     inputs:
-      chart_name:
+      name:
         type: string
         required: true
       location:
         type: string
         required: false
+      ref:
+        type: string
+        required: false
+      version:
+        type: string
+        required: false
+      namespace:
+        type: string
+        required: false
+      values:
+        type: map
+        required: false
     install_requirements:
       description: install
-    install:
+    install_chart:
       description: install
     set_attributes:
     uninstall:
