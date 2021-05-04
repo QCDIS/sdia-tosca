@@ -54,6 +54,7 @@ topology_template:
               repository: https://github.com/QCDIS/azure_playbooks.git
               extra_variables:
                 resource_group_name: { get_attribute: [ topology, resource_group ] }
+                topology_name: topology
               inventory:
                 all:
                   hosts:
