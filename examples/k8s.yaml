@@ -46,6 +46,7 @@ topology_template:
     monitoring:
       type: tosca.nodes.QC.Container.Application.Helm
       properties:
+        credential: { get_attribute: [ compute,user_key_pair ] }
         location: https://prometheus-community.github.io/helm-charts
         ref: prometheus-community/kube-prometheus-stack
       requirements:
@@ -228,6 +229,12 @@ topology_template:
   workflows:
     deploy_k8s:
       description: deploy k8s
+      preconditions:
+        - target: topology
+          condition:
+            - assert:
+              - desired_state: [{equal: RUNNING }]
+              - current_state: [{equal: UNDEFINED }]
       steps:
         install_requirements:
           activities:
@@ -254,12 +261,22 @@ topology_template:
         create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
-            on_success: set_k8s_attributes
+            on_success: install_heml_requirements
 #        create_k8s_metrics_server:
 #          activities:
 #          - call_operation: Kubernetes.create_k8s_metrics_server
 #            on_success: set_k8s_attributes
-          target: kubernetes
+        install_heml_requirements:
+          activities:
+          - call_operation: Helm.install_requirements
+            on_success: install_chart
+          target:  monitoring
+        install_chart:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success:
+            - set_k8s_attributes
+          target:  monitoring
         set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
