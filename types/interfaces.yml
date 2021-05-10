@@ -62,7 +62,6 @@ interface_types:
       description: Provision the defined objects (resources). ObjectType can be SubTopology or VM.
       
 
-
   tosca.interfaces.QC.Helm:
     derived_from: tosca.interfaces.QC.Ansible
     inputs:
@@ -199,7 +198,7 @@ interface_types:
 
 
   tosca.interfaces.QC.Ansible:
-#    derived_from: tosca.interfaces.QC.Standard
+    derived_from: tosca.interfaces.QC.Ansible
     inputs:
       inventory:
         type: list
