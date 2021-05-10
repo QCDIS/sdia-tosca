@@ -15,6 +15,15 @@ capability_types:
       some_properties:
         type: string
         required: no
+
+  tosca.capabilities.QC.docker.Kubernetes:
+    derived_from: tosca.capabilities.QC.docker.Orchestrator
+    properties:
+      some_properties:
+        type: string
+        required: no
+
+
         
   tosca.capabilities.QC.VM:
     derived_from: tosca.capabilities.Compute
