@@ -237,7 +237,6 @@ node_types:
           inputs:
             code_type: SEQ
             object_type: SubTopology
-          type: tosca.interfaces.QC.CloudsStorm
       Openstack:
         type: tosca.interfaces.QC.Openstack
         create:
