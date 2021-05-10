@@ -127,35 +127,6 @@ topology_template:
           file: "alogo53/ws-pema-lifewatch"
           repository: "docker_hub"
           type: "tosca.artifacts.Deployment.Image.Container.Docker"
-      interfaces:
-        Kubernetes:
-            delete:
-                inputs:
-                    repository: https://github.com/QCDIS/playbooks.git
-                    resources:
-                        - k8s/delete_service.yml
-            create:
-                inputs:
-                    repository: https://github.com/QCDIS/playbooks.git
-                    resources:
-                        - k8s/create_service.yml
-            scale:
-                inputs:
-                    repository: https://github.com/QCDIS/playbooks.git
-                    resources:
-                        - k8s/scale_service.yml  
-                    replicas: 1
-            autoscale:
-                inputs:
-                    repository: https://github.com/QCDIS/playbooks.git                
-                    resources:
-                        - k8s/autoscale_service.yml  
-                    horizontal_pod_autoscaler: horizontal_pod_autoscaler.yml  
-            info:
-                inputs:
-                    repository: https://github.com/QCDIS/playbooks.git   
-                    resources:
-                        - k8s/get_info_service.yml
                         
              
                         
