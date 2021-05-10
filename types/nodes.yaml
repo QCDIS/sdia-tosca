@@ -35,6 +35,9 @@ node_types:
   tosca.nodes.QC.Container.Application.Helm:
     derived_from:  tosca.nodes.QC.Application
     description: description of helm applicat
+    capabilities:
+      scalable:
+        type: tosca.capabilities.Scalable
     properties:
       name:
         type: string
@@ -136,6 +139,9 @@ node_types:
   tosca.nodes.QC.docker.Orchestrator.Kubernetes:
     derived_from: tosca.nodes.QC.docker.Orchestrator
     description: Kubernetes orchestrator
+    capabilities:
+      kubernetes:
+        type: tosca.capabilities.QC.docker.Kubernetes
     attributes:
       tokens:
         type: list
