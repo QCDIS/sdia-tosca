@@ -126,9 +126,9 @@ topology_template:
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           set_master:
+            implementation: set_master_k8s_cluster.yaml
             inputs:
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: set_master_k8s_cluster.yaml
               inventory:
                 all:
                   hosts:
