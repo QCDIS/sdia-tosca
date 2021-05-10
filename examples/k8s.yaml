@@ -196,8 +196,7 @@ topology_template:
         - target: topology
           condition:
             - assert:
-              - desired_state: [{equal: RUNNING }]
-              - current_state: [{equal: UNDEFINED }]
+              - current_state: [{equal: RUNNING }]
       steps:
         install_requirements:
           activities:
@@ -219,27 +218,16 @@ topology_template:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
               - create_k8s_dashboard
-#              - create_k8s_metrics_server
+              - install_heml_requirements
           target: kubernetes
         create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
-            on_success: install_heml_requirements
+            on_success: set_k8s_attributes
 #        create_k8s_metrics_server:
 #          activities:
 #          - call_operation: Kubernetes.create_k8s_metrics_server
 #            on_success: set_k8s_attributes
-        install_heml_requirements:
-          activities:
-          - call_operation: Helm.install_requirements
-            on_success: install_chart
-          target:  monitoring
-        install_chart:
-          activities:
-          - call_operation: Helm.install_chart
-            on_success:
-            - set_k8s_attributes
-          target:  monitoring
         set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
