@@ -42,10 +42,10 @@ node_types:
       name:
         type: string
         required: false
-      location:
+      repo_url:
         type: string
         required: false
-      ref:
+      chart:
         type: string
         required: true
       version:
