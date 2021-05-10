@@ -234,8 +234,7 @@ topology_template:
         - target: topology
           condition:
             - assert:
-              - desired_state: [{equal: RUNNING }]
-              - current_state: [{equal: UNDEFINED }]
+              - current_state: [{equal: RUNNING }]
       steps:
         install_requirements:
           activities:
