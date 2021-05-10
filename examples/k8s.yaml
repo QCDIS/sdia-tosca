@@ -71,6 +71,7 @@ topology_template:
               repository: https://github.com/QCDIS/helm_playbooks.git
               ref: { get_property: [ monitoring,ref ] }
               location: { get_property: [ monitoring,location ] }
+              name: monitoring
               inventory:
                 all:
                   hosts:
