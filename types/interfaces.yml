@@ -91,6 +91,7 @@ interface_types:
     uninstall:
 
       
+
   tosca.interfaces.QC.Kubernetes:
     derived_from: tosca.interfaces.QC.Ansible
     inputs:
@@ -149,7 +150,6 @@ interface_types:
     select_network:
     delete:
 
-
   tosca.interfaces.QC.Openstack:
     derived_from: tosca.interfaces.QC.Ansible
     inputs:
@@ -196,9 +196,8 @@ interface_types:
       description: creates access token
     set_attributes:
 
-
   tosca.interfaces.QC.Ansible:
-    derived_from: tosca.interfaces.QC.Ansible
+    #    derived_from: tosca.interfaces.QC.Standard
     inputs:
       inventory:
         type: list
