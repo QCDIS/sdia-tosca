@@ -69,8 +69,8 @@ topology_template:
             implementation: install_chart.yaml
             inputs:
               repository: https://github.com/QCDIS/helm_playbooks.git
-              ref: { get_property: [ monitoring,chart ] }
-              location: { get_property: [ monitoring,repo_url ] }
+              ref: prometheus-community/kube-prometheus-stack
+              location: https://prometheus-community.github.io/helm-charts
               name: monitoring
               inventory:
                 all:
