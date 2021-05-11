@@ -1,4 +1,4 @@
-tosca_definitions_version: tosca_simple_yaml_1_0
+tosca_definitions_version: tosca_simple_yaml_1_2
 
 imports:
   - nodes: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/nodes.yaml
@@ -63,8 +63,10 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                    localhost:
-                      ansible_connection: local
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
           install_chart:
             implementation: install_chart.yaml
             inputs:
@@ -261,7 +263,7 @@ topology_template:
         create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
-            on_success: set_k8s_attributes
+            on_success: install_chart
         install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
@@ -270,8 +272,7 @@ topology_template:
         install_chart:
           activities:
           - call_operation: Helm.install_chart
-            on_success:
-            - set_k8s_attributes
+            on_success: set_k8s_attributes
           target:  monitoring
         set_k8s_attributes:
           activities:
