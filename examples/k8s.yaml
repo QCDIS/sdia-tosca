@@ -224,10 +224,10 @@ topology_template:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success: set_k8s_attributes
-#        create_k8s_metrics_server:
-#          activities:
-#          - call_operation: Kubernetes.create_k8s_metrics_server
-#            on_success: set_k8s_attributes
+        create_k8s_metrics_server:
+          activities:
+          - call_operation: Kubernetes.create_k8s_metrics_server
+            on_success: set_k8s_attributes
         set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
