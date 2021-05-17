@@ -70,51 +70,30 @@ topology_template:
           install_chart:
             implementation: install_chart.yaml
             inputs:
-              chart_name: prometheus-community/kube-prometheus-stack
-              repo_name: prometheus-community
-              repo_url: 'https://prometheus-community.github.io/helm-charts'
-              name: monitoring
-              namespace: default
-              values:
-                kube-prometheus-stack:
-                  grafana:
-                    adminPassword: admin
-                    ingress:
-                      enabled: false
-                      hosts:
-                        - grafana.mogplay.academy.mog.local
-                      path: /
-                      tls:
-                        - secretName: mogplay-ingress-tls
-                          hosts:
-                          - grafana.mogplay.academy.mog.local
-                    sidecar:
-                      enabled: true
+              repository: https://github.com/QCDIS/helm_playbooks.git
+              extra_variables:
+                chart_name: prometheus-community/kube-prometheus-stack
+                repo_name: prometheus-community
+                repo_url: 'https://prometheus-community.github.io/helm-charts'
+                name: monitoring
+                namespace: default
+                values:
+                  alertmanager:
+                    enabled: true
+                    service:
+                      type: ClusterIP
+                  prometheusOperator:
+                    enabled: true
                     service:
                       type: NodePort
-                      nodePort: 30009
                   prometheus:
-                    prometheusSpec:
-                      serviceMonitorSelectorNilUsesHelmValues : false
-                    ingress:
-                      enabled: true
-                      hosts:
-                        - prometheus.mogplay.academy.mog.local
-                      path: /
-                      tls:
-                        - secretName: mogplay-ingress-tls
-                          hosts:
-                          - prometheus.mogplay.academy.mog.local
-                  prometheus-operator:
-                    namespaces:
-                      releaseNamespace: true
-                prometheus-pushgateway:
-                  serviceMonitor:
                     enabled: true
-                    namespace: articonf
-                    additionalLabels:
-                      release: articonf
-
+                    service:
+                      type: NodePort
+                  grafana:
+                    enabled: true
+                    service:
+                      type: NodePort
               inventory:
                 all:
                   hosts:
@@ -300,21 +279,23 @@ topology_template:
             on_success:
               - create_k8s_dashboard
               - install_heml_requirements
-              - create_k8s_metrics_server
+#              - create_k8s_metrics_server
           target: kubernetes
         create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success: install_chart
+            target:  kubernetes
         install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success: install_chart
           target:  monitoring
-        create_k8s_metrics_server:
-          activities:
-          - call_operation: Kubernetes.create_k8s_metrics_server
-            on_success: install_chart
+#        create_k8s_metrics_server:
+#          activities:
+#          - call_operation: Kubernetes.create_k8s_metrics_server
+#            on_success: install_chart
+#          target:  kubernetes
         install_chart:
           activities:
           - call_operation: Helm.install_chart
