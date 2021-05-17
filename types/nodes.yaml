@@ -38,25 +38,25 @@ node_types:
     capabilities:
       scalable:
         type: tosca.capabilities.Scalable
-    properties:
-      name:
-        type: string
-        required: false
-      repo_url:
-        type: string
-        required: false
-      chart:
-        type: string
-        required: true
-      version:
-        type: string
-        required: false
-      namespace:
-        type: string
-        required: false
-      values:
-        type: map
-        required: false
+#    properties:
+#      name:
+#        type: string
+#        required: false
+#      repo_url:
+#        type: string
+#        required: false
+#      chart:
+#        type: string
+#        required: true
+#      version:
+#        type: string
+#        required: false
+#      namespace:
+#        type: string
+#        required: false
+#      values:
+#        type: map
+#        required: false
     requirements:
       - host:
           capability: tosca.capabilities.QC.docker.Kubernetes
