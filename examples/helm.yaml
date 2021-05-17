@@ -47,8 +47,6 @@ topology_template:
       type: tosca.nodes.QC.Container.Application.Helm
       properties:
         credential: { get_attribute: [ compute,user_key_pair ] }
-        chart: https://prometheus-community.github.io/helm-charts
-        repo_url: prometheus-community/kube-prometheus-stack
       requirements:
       - kubernetes:
           capability: tosca.capabilities.QC.Kubernetes
