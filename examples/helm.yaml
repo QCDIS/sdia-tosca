@@ -285,7 +285,7 @@ topology_template:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success: install_chart
-            target:  kubernetes
+          target:  kubernetes
         install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
