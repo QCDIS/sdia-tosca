@@ -38,7 +38,7 @@ node_types:
     capabilities:
       scalable:
         type: tosca.capabilities.Scalable
-#    properties:
+    properties:
 #      name:
 #        type: string
 #        required: false
