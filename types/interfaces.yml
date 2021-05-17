@@ -65,16 +65,16 @@ interface_types:
   tosca.interfaces.QC.Helm:
     derived_from: tosca.interfaces.QC.Ansible
     inputs:
-      name:
+      chart_name:
         type: string
         required: true
-      location:
+      repo_name:
         type: string
         required: false
-      ref:
+      repo_url:
         type: string
         required: false
-      version:
+      name:
         type: string
         required: false
       namespace:

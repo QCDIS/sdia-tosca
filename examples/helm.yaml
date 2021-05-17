@@ -1,4 +1,4 @@
-tosca_definitions_version: tosca_simple_yaml_1_0
+tosca_definitions_version: tosca_simple_yaml_1_2
 
 imports:
   - nodes: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/nodes.yaml
@@ -63,15 +63,37 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                    localhost:
-                      ansible_connection: local
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
           install_chart:
             implementation: install_chart.yaml
             inputs:
               repository: https://github.com/QCDIS/helm_playbooks.git
-              ref: prometheus-community/kube-prometheus-stack
-              location: https://prometheus-community.github.io/helm-charts
-              name: monitoring
+              extra_variables:
+                chart_name: prometheus-community/kube-prometheus-stack
+                repo_name: prometheus-community
+                repo_url: 'https://prometheus-community.github.io/helm-charts'
+                name: monitoring
+                namespace: default
+                values:
+                  alertmanager:
+                    enabled: true
+                    service:
+                      type: ClusterIP
+                  prometheusOperator:
+                    enabled: true
+                    service:
+                      type: NodePort
+                  prometheus:
+                    enabled: true
+                    service:
+                      type: NodePort
+                  grafana:
+                    enabled: true
+                    service:
+                      type: NodePort
               inventory:
                 all:
                   hosts:
@@ -164,9 +186,9 @@ topology_template:
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           set_master:
+            implementation: set_master_k8s_cluster.yaml
             inputs:
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
-              implementation: set_master_k8s_cluster.yaml
               inventory:
                 all:
                   hosts:
@@ -234,8 +256,7 @@ topology_template:
         - target: topology
           condition:
             - assert:
-              - desired_state: [{equal: RUNNING }]
-              - current_state: [{equal: UNDEFINED }]
+              - current_state: [{equal: RUNNING }]
       steps:
         install_requirements:
           activities:
@@ -257,28 +278,34 @@ topology_template:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
               - create_k8s_dashboard
+              - install_heml_requirements
 #              - create_k8s_metrics_server
           target: kubernetes
         create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
-            on_success: install_heml_requirements
-#        create_k8s_metrics_server:
-#          activities:
-#          - call_operation: Kubernetes.create_k8s_metrics_server
-#            on_success: set_k8s_attributes
+            on_success: install_chart
+            target:  kubernetes
         install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success: install_chart
           target:  monitoring
+#        create_k8s_metrics_server:
+#          activities:
+#          - call_operation: Kubernetes.create_k8s_metrics_server
+#            on_success: install_chart
+#          target:  kubernetes
         install_chart:
           activities:
           - call_operation: Helm.install_chart
-            on_success:
-            - set_k8s_attributes
+            on_success: set_k8s_attributes
           target:  monitoring
         set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
+
+
+
+
