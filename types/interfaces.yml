@@ -213,6 +213,8 @@ interface_types:
         required: false
     set_attributes:
       description: get keys, ports, urls.
+    install_requirements:
+      description: install requirements
 
   tosca.interfaces.QC.TIC:
     derived_from: tosca.interfaces.QC.Ansible
