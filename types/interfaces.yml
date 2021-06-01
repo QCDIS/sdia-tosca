@@ -83,8 +83,8 @@ interface_types:
       values:
         type: map
         required: false
-#    install_requirements:
-#      description: install
+    install_requirements:
+      description: install
     install_chart:
       description: install
     set_attributes:
