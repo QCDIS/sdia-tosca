@@ -65,7 +65,7 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-          install_monitoring_chart:
+          install_chart:
             implementation: install_chart.yaml
             inputs:
               repository: https://github.com/QCDIS/helm_playbooks.git
@@ -123,7 +123,7 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-          install_vialog_chart:
+          install_chart:
             implementation: install_chart.yaml
             inputs:
               repository: https://github.com/QCDIS/helm_playbooks.git
