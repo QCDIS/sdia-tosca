@@ -65,7 +65,7 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-          install_chart:
+          install_monitoring_chart:
             implementation: install_chart.yaml
             inputs:
               repository: https://github.com/QCDIS/helm_playbooks.git
@@ -123,7 +123,7 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-          install_chart:
+          install_vialog_chart:
             implementation: install_chart.yaml
             inputs:
               repository: https://github.com/QCDIS/helm_playbooks.git
@@ -321,28 +321,29 @@ topology_template:
             on_success:
               - create_k8s_dashboard
               - install_heml_requirements
-#              - create_k8s_metrics_server
           target: kubernetes
         create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
-            on_success: install_chart
-          target:  kubernetes
+            on_success:
+            - install_monitoring_chart
+            - install_vialog_chart
+          target: kubernetes
         install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
-            on_success: install_chart
-          target:  monitoring
-#        create_k8s_metrics_server:
-#          activities:
-#          - call_operation: Kubernetes.create_k8s_metrics_server
-#            on_success: install_chart
-#          target:  kubernetes
-        install_chart:
+            on_success: install_monitoring_chart
+          target: monitoring
+        install_monitoring_chart:
           activities:
           - call_operation: Helm.install_chart
             on_success: set_k8s_attributes
-          target:  monitoring
+          target: monitoring
+        install_vialog_chart:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: set_k8s_attributes
+          target: vialog
         set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
