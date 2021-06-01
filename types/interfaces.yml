@@ -107,8 +107,8 @@ interface_types:
       description: horizontal_pod_autoscaler
     info:
       description: get information on pods,services or deployments
-#    install_requirements:
-#      description: install
+    install_requirements:
+      description: install
     install_k8s:
       description: install
     set_master:
@@ -144,7 +144,7 @@ interface_types:
     create:
     create_ssh_key:
     delete_ssh_key:
-#    install_requirements:
+    install_requirements:
     select_image:
     select_instance_type:
     select_network:
@@ -176,8 +176,8 @@ interface_types:
         required: false
     info:
       description: get information
-#    install_requirements:
-#      description: installs openstacksdk and
+    install_requirements:
+      description: installs openstacksdk and
     select_image:
       description: selects image to satisfy mem cpu  etc
     select_instance_type:
