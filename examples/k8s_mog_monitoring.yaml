@@ -100,50 +100,6 @@ topology_template:
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
 
-
-    vialog:
-      type: tosca.nodes.QC.Container.Application.Helm
-      properties:
-        credential: { get_attribute: [ compute,user_key_pair ] }
-      requirements:
-      - kubernetes:
-          capability: tosca.capabilities.QC.Kubernetes
-          node: kubernetes
-          relationship: tosca.relationships.HostedOn
-      interfaces:
-        Helm:
-          install_requirements:
-            implementation: install_requirements.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-          install_chart:
-            implementation: install_chart.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              extra_variables:
-                chart_name: qcdis/vialog-helm-dataservice
-                repo_name: qcdis
-                repo_url: 'https://qcdis.github.io/vialog-helm-dataservice/'
-                name: vialog
-                namespace: default
-                values:
-                  service:
-                    type: NodePort
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-
     topology:
       properties:
         domain: "Ireland"
@@ -321,28 +277,28 @@ topology_template:
             on_success:
               - create_k8s_dashboard
               - install_heml_requirements
+#              - create_k8s_metrics_server
           target: kubernetes
         create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
-          target: kubernetes
+            on_success: install_chart
+          target:  kubernetes
         install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
-            on_success:
-            - install_monitoring_chart
-            - install_vialog_chart
-          target: monitoring
-        install_monitoring_chart:
+            on_success: install_chart
+          target:  monitoring
+#        create_k8s_metrics_server:
+#          activities:
+#          - call_operation: Kubernetes.create_k8s_metrics_server
+#            on_success: install_chart
+#          target:  kubernetes
+        install_chart:
           activities:
           - call_operation: Helm.install_chart
             on_success: set_k8s_attributes
-          target: monitoring
-        install_vialog_chart:
-          activities:
-          - call_operation: Helm.install_chart
-            on_success: set_k8s_attributes
-          target: vialog
+          target:  monitoring
         set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
