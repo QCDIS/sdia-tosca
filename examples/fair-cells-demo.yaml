@@ -356,13 +356,18 @@ topology_template:
 
 
   workflows:
-    deploy_monitoring:
-      description: deploy k8s
+    fair-cells-deploy_monitoring:
+      description: deploy helm monitoring
       preconditions:
         - target: kubernetes
           condition:
             - assert:
-              - current_state: [{equal: RUNNING }]
+              - desired_state: [{equal: RUNNING }]
+        - target: monitoring
+          condition:
+            - assert:
+              - desired_state: [{equal: RUNNING }]
+              - current_state: [{equal: UNDEFINED }]
       steps:
         install_heml_requirements:
           activities:
@@ -378,13 +383,10 @@ topology_template:
         set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
-            on_success:
-            - set_k8s_attributes
+          - set_state: RUNNING
           target: kubernetes
 
-
-
-    deploy_k8s:
+    fair-cells-deploy_k8s:
       description: deploy k8s
       preconditions:
         - target: topology
@@ -426,7 +428,7 @@ topology_template:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
 
-    provision:
+    fair-cells-provision:
       description: Workflow to deploy azure topology
       preconditions:
         - target: topology
@@ -487,7 +489,7 @@ topology_template:
           - call_operation: Azure.set_attributes
           target: topology
 
-    delete_topology:
+    fair-cells-delete_topology:
       description: delete_topology
       preconditions:
         - target: topology
