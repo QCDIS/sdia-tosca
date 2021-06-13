@@ -362,7 +362,7 @@ topology_template:
         - target: kubernetes
           condition:
             - assert:
-              - desired_state: [{equal: RUNNING }]
+              - current_state: [{equal: RUNNING }]
         - target: monitoring
           condition:
             - assert:
@@ -393,6 +393,12 @@ topology_template:
           condition:
             - assert:
               - current_state: [{equal: RUNNING }]
+
+        - target: kubernetes
+          condition:
+            - assert:
+              - desired_state: [{equal: RUNNING }]
+              - current_state: [{equal: UNDEFINED }]
       steps:
         install_k8s_requirements:
           activities:
