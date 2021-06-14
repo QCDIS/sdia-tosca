@@ -1,0 +1,122 @@
+        Kubernetes:
+          install_requirements:
+            implementation: install_prerequisites.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          install_k8s:
+            implementation: install_k8s.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  children:
+                    cluster:
+                      children:
+                        master:
+                          hosts:
+                            m1:
+                              ansible_host: { get_attribute: [ compute,public_ip ] }
+                              ansible_python_interpreter: /usr/bin/python3
+                              ansible_ssh_user: { get_property: [ compute,user_name ] }
+                        worker:
+                          hosts:
+                            w1:
+                              ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                              ansible_python_interpreter: /usr/bin/python3
+                              ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+                    ungrouped: {}
+          set_master:
+            implementation: set_master_k8s_cluster.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  children:
+                    cluster:
+                      children:
+                        master:
+                          hosts:
+                            m1:
+                              ansible_host: { get_attribute: [ compute,public_ip ] }
+                              ansible_python_interpreter: /usr/bin/python3
+                              ansible_ssh_user: { get_property: [ compute,user_name ] }
+          join_k8s_cluster:
+            implementation: join_k8s_cluster.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  children:
+                    cluster:
+                      children:
+                        master:
+                          hosts:
+                            m1:
+                              ansible_host: { get_attribute: [ compute,public_ip ] }
+                              ansible_python_interpreter: /usr/bin/python3
+                              ansible_ssh_user: { get_property: [ compute,user_name ] }
+                        worker:
+                          hosts:
+                            w1:
+                              ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                              ansible_python_interpreter: /usr/bin/python3
+                              ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          create_k8s_dashboard:
+            implementation: create_k8s_dashboard.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  children:
+                    cluster:
+                      children:
+                        master:
+                          hosts:
+                            m1:
+                              ansible_host: { get_attribute: [ compute,public_ip ] }
+                              ansible_python_interpreter: /usr/bin/python3
+                              ansible_ssh_user: { get_property: [ compute,user_name ] }
+          create_k8s_metrics_server:
+            implementation: create_k8s_metrics_server.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  children:
+                    cluster:
+                      children:
+                        master:
+                          hosts:
+                            m1:
+                              ansible_host: { get_attribute: [ compute,public_ip ] }
+                              ansible_python_interpreter: /usr/bin/python3
+                              ansible_ssh_user: { get_property: [ compute,user_name ] }
+          scale:
+          autoscale:
+          info:
+          set_attributes:
+            implementation: get_attributes.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  children:
+                    cluster:
+                      children:
+                        master:
+                          hosts:
+                            m1:
+                              ansible_host: { get_attribute: [ compute,public_ip ] }
+                              ansible_python_interpreter: /usr/bin/python3
+                              ansible_ssh_user: { get_property: [ compute,user_name ] }

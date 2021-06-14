@@ -1,0 +1,61 @@
+deploy_k8s:
+  description: deploy k8s
+  preconditions:
+    - target: topology
+      condition:
+        - assert:
+          - current_state: [{equal: RUNNING }]
+
+    - target: kubernetes
+      condition:
+        - assert:
+          - desired_state: [{equal: RUNNING }]
+          - current_state: [{equal: UNDEFINED }]
+  steps:
+    install_k8s_requirements:
+      activities:
+      - set_state: CREATING
+      - call_operation: Kubernetes.install_requirements
+        on_success: install_k8s
+      target: kubernetes
+    install_k8s:
+      activities:
+      - call_operation: Kubernetes.install_k8s
+        on_success: set_master
+      target: kubernetes
+    set_master:
+      activities:
+      - call_operation: Kubernetes.set_master
+        on_success:
+        - join_k8s_cluster
+        - install_heml_requirements
+        - create_k8s_dashboard
+      target: kubernetes
+    join_k8s_cluster:
+      activities:
+      - call_operation: Kubernetes.join_k8s_cluster
+        on_success:
+          - install_chart
+      target: kubernetes
+    install_heml_requirements:
+      activities:
+      - call_operation: Helm.install_requirements
+        on_success: install_chart
+      target:  monitoring
+    install_chart:
+      activities:
+      - call_operation: Helm.install_chart
+        on_success: set_k8s_attributes
+      - set_state: RUNNING
+      target:  monitoring
+    create_k8s_dashboard:
+      activities:
+      - call_operation: Kubernetes.create_k8s_dashboard
+        on_success:
+        - install_chart
+      - set_state: RUNNING
+      target: kubernetes
+    set_k8s_attributes:
+      activities:
+      - call_operation: Kubernetes.set_attributes
+      target: kubernetes

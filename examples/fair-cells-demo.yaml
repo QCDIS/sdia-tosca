@@ -354,77 +354,10 @@ topology_template:
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
 
 
-#    kaniko:
-#      type: tosca.nodes.QC.Container.Application.Helm
-#      properties:
-#        credential: { get_attribute: [ compute,user_key_pair ] }
-#      requirements:
-#      - kubernetes:
-#          capability: tosca.capabilities.QC.Kubernetes
-#          node: kubernetes
-#          relationship: tosca.relationships.HostedOn
-#      interfaces:
-#        Helm:
-#          install_requirements:
-#            implementation: install_requirements.yaml
-#            inputs:
-#              repository: https://github.com/QCDIS/helm_playbooks.git
-#              inventory:
-#                all:
-#                  hosts:
-#                    master:
-#                      ansible_host: { get_attribute: [ compute,public_ip ] }
-#                      ansible_python_interpreter: /usr/bin/python3
-#                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-#          install_chart:
-#            implementation: install_chart.yaml
-#            inputs:
-#              repository: https://github.com/QCDIS/helm_playbooks.git
-#              extra_variables:
-#                chart_name:
-#                repo_name:
-#                repo_url: ''
-#                name: kaniko
-#                namespace: default
-#                values:
-#
-#              inventory:
-#                all:
-#                  hosts:
-#                    master:
-#                      ansible_host: { get_attribute: [ compute,public_ip ] }
-#                      ansible_python_interpreter: /usr/bin/python3
-#                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+
 
   workflows:
-#    fair-cells-deploy_kaniko:
-#      description: deploy helm monitoring
-#      preconditions:
-#        - target: kubernetes
-#          condition:
-#            - assert:
-#              - current_state: [{equal: RUNNING }]
-#        - target: kaniko
-#          condition:
-#            - assert:
-#              - desired_state: [{equal: RUNNING }]
-#      steps:
-#        install_heml_kaniko:
-#          activities:
-#          - call_operation: Helm.install_requirements
-#            on_success: install_chart
-#          target:  kaniko
-#        install_chart:
-#          activities:
-#          - call_operation: Helm.install_chart
-#            on_success: set_k8s_attributes
-#          - set_state: RUNNING
-#          target:  kaniko
-#        set_k8s_attributes:
-#          activities:
-#          - call_operation: Kubernetes.set_attributes
-#          - set_state: RUNNING
-#          target: kubernetes
+
 
     fair-cells-deploy_k8s:
       description: deploy k8s
