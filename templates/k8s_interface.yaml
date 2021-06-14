@@ -27,7 +27,7 @@ Kubernetes:
                     m_0:
                 worker:
                   hosts:
-            ungrouped: {}
+            
   set_master:
     implementation: set_master_k8s_cluster.yaml
     inputs:
