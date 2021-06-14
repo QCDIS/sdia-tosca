@@ -27,7 +27,6 @@ Kubernetes:
                     m_0:
                 worker:
                   hosts:
-            
   set_master:
     implementation: set_master_k8s_cluster.yaml
     inputs:
@@ -90,9 +89,6 @@ Kubernetes:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-  scale:
-  autoscale:
-  info:
   set_attributes:
     implementation: get_attributes.yaml
     inputs:
