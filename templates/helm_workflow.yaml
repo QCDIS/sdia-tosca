@@ -1,0 +1,29 @@
+deploy_helm:
+  description: deploy helm 
+  preconditions:
+    - target: kubernetes
+      condition:
+        - assert:
+          - current_state: [{equal: RUNNING }]
+    - target: 
+      condition:
+        - assert:
+          - desired_state: [{equal: RUNNING }]
+          - current_state: [{equal: UNDEFINED }]
+  steps:
+    install_heml_requirements:
+      activities:
+      - call_operation: Helm.install_requirements
+        on_success: install_chart
+      target:  helm
+    install_chart:
+      activities:
+      - call_operation: Helm.install_chart
+        on_success: set_k8s_attributes
+      - set_state: RUNNING
+      target:  helm
+    set_k8s_attributes:
+      activities:
+      - call_operation: Kubernetes.set_attributes
+      - set_state: RUNNING
+      target:
