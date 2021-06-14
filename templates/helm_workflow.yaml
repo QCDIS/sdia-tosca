@@ -26,4 +26,4 @@ deploy_helm:
       activities:
       - call_operation: Kubernetes.set_attributes
       - set_state: RUNNING
-      target:
+      target: kubernetes
