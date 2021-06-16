@@ -1,0 +1,47 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+imports:
+  - nodes: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/nodes.yaml
+  - data: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/data.yml
+  - capabilities: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/capabilities.yaml
+  - policies: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/policies.yaml
+  - interfaces: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/interfaces.yml
+  
+repositories:
+  docker_hub: https://hub.docker.com/  
+
+description: >
+  TOSCA example
+
+topology_template:
+  node_templates:        
+    gluster_fs:
+      type: tosca.nodes.QC.Application.GlusterFS     
+      interfaces:
+        Glusterfs:
+          purge:
+            inputs:
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
+              implementation: 000.purge.yml
+          requirements:
+            inputs:
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
+              implementation: 001.requirements.yml
+          setup_glusterfs_infra:
+            inputs:
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
+              implementation: 002.setup_glusterfs_infra.yml
+          setup_glusterfs_cluster:
+            inputs:
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
+              implementation: 003.setup_glusterfs_cluster.yml
+#        Standard:
+#         create:
+#           inputs:
+#             repository: https://github.com/bityoga/mysome_glusterfs.git
+#             resources:
+#               - 000.purge.yml
+#               - 001.requirements.yml
+#               - 002.setup_glusterfs_infra.yml
+#               - 003.setup_glusterfs_cluster.yml
+##               - 004.mount_glusterfs.yml

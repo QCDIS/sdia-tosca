@@ -1,0 +1,64 @@
+tosca_definitions_version: "tosca_simple_yaml_1_0"
+topology_template:
+  node_templates:
+    tic_application:
+      type: "tosca.nodes.QC.Application.TIC"
+      interfaces:
+        TIC:
+          initialize_hosts:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 011.initialize_hosts.yml
+          prepare_docker_images:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 012.prepare_docker_images.yml
+          mount_fs:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 013.mount_fs.yml
+          spawn_swarm:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 014.spawn_swarm.yml
+          deploy_swarm_visualizer:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 015.deploy_swarm_visualizer.yml
+          deploy_portainer:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 016.deploy_portainer.yml
+          deploy_ca:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 100.deploy_ca.yml
+          deploy_orderer:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 101.deploy_orderer.yml
+          deploy_peers:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 102.deploy_peers.yml
+          deploy_cli:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 103.deploy_cli.yml
+          deploy_hlf_explorer:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 103.deploy_hlf_explorer.yml
+          deploy_bank_app:
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              implementation: 103.deploy_bank_app.yml
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+
+description: "TOSCA example"
+imports:
+- nodes: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/nodes.yaml"
+- data: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/data.yml"
+- capabilities: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/capabilities.yaml"
+- policies: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/policies.yaml"
+- interfaces: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/interfaces.yml"
