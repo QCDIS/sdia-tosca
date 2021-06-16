@@ -1,0 +1,54 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+topology_template:
+  node_templates:
+    db_server:
+      properties:
+        disk_size: 20 GB
+        mem_size: 4098 MB
+        num_cores: 1
+        os_distro: Ubuntu
+        os_version: 18.04
+        user_name: vm_user
+      interfaces:
+        Standard:
+          create: dumy.yaml
+      type: tosca.nodes.QC.VM.Compute
+    topology:
+      properties:
+        domain: Frankfurt
+        provider: EC2
+      requirements:
+      - vm:
+          capability: tosca.capabilities.QC.VM
+          node: db_server
+          relationship: tosca.relationships.DependsOn
+      interfaces:
+        CloudsStorm:
+          delete:
+            inputs:
+              code_type: SEQ
+              object_type: SubTopology
+          hscale:
+            inputs:
+              code_type: SEQ
+              object_type: SubTopology
+          provision:
+            inputs:
+              code_type: SEQ
+              object_type: SubTopology
+          start:
+            inputs:
+              code_type: SEQ
+              object_type: SubTopology
+          stop:
+            inputs:
+              code_type: SEQ
+              object_type: SubTopology
+      type: tosca.nodes.QC.VM.topology
+description: TOSCA template
+imports:
+- nodes: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/nodes.yaml
+- data: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/data.yml
+- capabilities: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/capabilities.yaml
+- policies: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/policies.yaml
+- interfaces: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/interfaces.yml
