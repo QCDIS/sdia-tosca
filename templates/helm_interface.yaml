@@ -1,0 +1,24 @@
+Helm:
+  install_requirements:
+    implementation: install_requirements.yaml
+    inputs:
+      repository: https://github.com/QCDIS/helm_playbooks.git
+      inventory:
+        all:
+          hosts:
+            master:
+  install_chart:
+    implementation: install_chart.yaml
+    inputs:
+      repository: https://github.com/QCDIS/helm_playbooks.git
+      extra_variables:
+        chart_name:
+        repo_name:
+        repo_url:
+        name:
+        namespace: default
+#                values:
+      inventory:
+        all:
+          hosts:
+            master:
