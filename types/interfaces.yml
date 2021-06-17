@@ -87,6 +87,8 @@ interface_types:
       description: install
     install_chart:
       description: install
+    uninstall_chart:
+      description: uninstall
     set_attributes:
     uninstall:
 

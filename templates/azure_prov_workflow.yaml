@@ -1,0 +1,82 @@
+provision_azure:
+  description: Workflow to deploy azure topology
+  preconditions:
+    - target: topology
+      condition:
+        - assert:
+          - desired_state: [{equal: RUNNING }]
+          - current_state: [{equal: UNDEFINED }]
+  steps:
+    install_requirements:
+      activities:
+      - set_state: CREATING
+      - call_operation: Azure.install_requirements
+        on_success:
+        - create_resoucre_group
+      target: topology
+    create_resoucre_group:
+      activities:
+      - call_operation: Azure.create_resoucre_group
+        on_success:
+        - select_instance_type
+        - select_network
+        - create_ssh_key
+        - select_image
+      target: topology
+    select_instance_type:
+      activities:
+      - call_operation: Azure.select_instance_type
+        on_success:
+        - create
+      target: topology
+    select_network:
+      activities:
+      - call_operation: Azure.select_network
+        on_success:
+        - create
+      target: topology
+    create_ssh_key:
+      activities:
+      - call_operation: Azure.create_ssh_key
+        on_success:
+        - create
+      target: topology
+    select_image:
+      activities:
+        - call_operation: Azure.select_image
+          on_success:
+            - create
+      target: topology
+    create:
+      activities:
+      - call_operation: Azure.create
+        on_success:
+        - set_attributes
+      - set_state: RUNNING
+      target: topology
+    set_attributes:
+      activities:
+      - call_operation: Azure.set_attributes
+      target: topology
+
+delete_azure_topology:
+  description: delete_topology
+  preconditions:
+    - target: topology
+      condition:
+        - assert:
+          - desired_state: [{equal: DELETED }]
+          - current_state: [{equal: RUNNING }]
+  steps:
+    delete:
+      activities:
+      - set_state: DELETING
+      - call_operation: Azure.delete
+        on_success:
+        - set_attributes
+      - set_state: DELETED
+      target: topology
+    set_attributes:
+      activities:
+      - call_operation: Azure.set_attributes
+      target: topology
