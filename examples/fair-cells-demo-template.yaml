@@ -387,9 +387,9 @@ topology_template:
                 namespace: default
                 values:
                   azure_key: "KEY"
-                  dockerhub_auth: "AUTH" --set
-                  dockerfile: "DOCKER_FILE_URL_LOCATION"
-                  context: "CONTEXT_URL_LOCATION"
+                  dockerhub_auth: "DOCK_AUTH"
+                  dockerfile: "DOCKER_FILE_URL"
+                  context: "CONTEXT_URL"
                   destination: "cloudcells/cell_name"
               inventory:
                 all:
@@ -432,19 +432,19 @@ topology_template:
           activities:
           - call_operation: Helm.install_requirements
             on_success: install_chart
-          target: kaniko
+          target:  kaniko
         install_chart:
           activities:
           - call_operation: Helm.install_chart
             on_success: uninstall_chart
           - set_state: RUNNING
-          target: kaniko
+          target:  kaniko
         uninstall_chart:
           activities:
           - call_operation: Helm.uninstall_chart
             on_success: set_k8s_attributes
           - set_state: UNDEFINED
-          target: kaniko
+          target:  kaniko
         set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
@@ -494,13 +494,13 @@ topology_template:
           activities:
           - call_operation: Helm.install_requirements
             on_success: install_chart
-          target: monitoring
+          target:  monitoring
         install_chart:
           activities:
           - call_operation: Helm.install_chart
             on_success: set_k8s_attributes
           - set_state: RUNNING
-          target: monitoring
+          target:  monitoring
         create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
