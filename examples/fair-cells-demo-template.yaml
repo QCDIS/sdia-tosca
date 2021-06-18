@@ -380,16 +380,16 @@ topology_template:
             inputs:
               repository: https://github.com/QCDIS/helm_playbooks.git
               extra_variables:
-                chart_name: prometheus-community/kube-prometheus-stack
-                repo_name: prometheus-community
-                repo_url: 'https://prometheus-community.github.io/helm-charts'
+                chart_name: vrecharts/kaniko-chart
+                repo_name: vrecharts
+                repo_url: 'https://r-whites.github.io/vrecharts/'
                 name: kaniko
                 namespace: default
                 values:
                   azure_key: "KEY"
-                  dockerhub_auth: "DOCK_AUTH"
-                  dockerfile: "DOCKER_FILE_URL"
-                  context: "CONTEXT_URL"
+                  dockerhub_auth: "KEY"
+                  dockerfile: "URL"
+                  context: "URL"
                   destination: "cloudcells/cell_name"
               inventory:
                 all:
@@ -428,11 +428,6 @@ topology_template:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        install_heml_requirements:
-          activities:
-          - call_operation: Helm.install_requirements
-            on_success: install_chart
-          target:  kaniko
         install_chart:
           activities:
           - call_operation: Helm.install_chart
