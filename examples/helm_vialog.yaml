@@ -131,7 +131,7 @@ topology_template:
                 chart_name: qcdis/vialog-helm-dataservice
                 repo_name: qcdis
                 repo_url: 'https://qcdis.github.io/vialog-helm-dataservice/'
-                name: vialog
+                helm_name: vialog
                 namespace: default
                 values:
                   service:
