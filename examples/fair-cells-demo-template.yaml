@@ -326,7 +326,7 @@ topology_template:
                 chart_name: prometheus-community/kube-prometheus-stack
                 repo_name: prometheus-community
                 repo_url: 'https://prometheus-community.github.io/helm-charts'
-                name: monitoring
+                helm_name: monitoring
                 namespace: default
                 values:
                   alertmanager:
@@ -383,8 +383,9 @@ topology_template:
                 chart_name: vrecharts/kaniko-chart
                 repo_name: vrecharts
                 repo_url: 'https://r-whites.github.io/vrecharts/'
-                name: kaniko
+                helm_name: kaniko
                 namespace: default
+                status: Completed
                 values:
                   azure_key: "KEY"
                   dockerhub_auth: "KEY"
