@@ -281,12 +281,12 @@ topology_template:
         articonf_mog_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
-            on_success: articonf_mog_install_chart
+            on_success: articonf_mog_install_monitoring_chart
           target:  kubernetes
         articonf_mog_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
-            on_success: articonf_mog_install_chart
+            on_success: articonf_mog_install_monitoring_chart
           target:  monitoring
         articonf_mog_install_monitoring_chart:
           activities:
