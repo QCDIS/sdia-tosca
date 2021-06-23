@@ -326,7 +326,7 @@ topology_template:
                 chart_name: prometheus-community/kube-prometheus-stack
                 repo_name: prometheus-community
                 repo_url: 'https://prometheus-community.github.io/helm-charts'
-                name: monitoring
+                helm_name: monitoring
                 namespace: default
                 values:
                   alertmanager:
@@ -380,16 +380,17 @@ topology_template:
             inputs:
               repository: https://github.com/QCDIS/helm_playbooks.git
               extra_variables:
-                chart_name: prometheus-community/kube-prometheus-stack
-                repo_name: prometheus-community
-                repo_url: 'https://prometheus-community.github.io/helm-charts'
-                name: kaniko
+                chart_name: vrecharts/kaniko-chart
+                repo_name: vrecharts
+                repo_url: 'https://r-whites.github.io/vrecharts/'
+                helm_name: kaniko
                 namespace: default
+                status: Succeeded
                 values:
                   azure_key: "KEY"
-                  dockerhub_auth: "AUTH" --set
-                  dockerfile: "DOCKER_FILE_URL_LOCATION"
-                  context: "CONTEXT_URL_LOCATION"
+                  dockerhub_auth: "KEY"
+                  dockerfile: "URL"
+                  context: "URL"
                   destination: "cloudcells/cell_name"
               inventory:
                 all:
@@ -428,18 +429,13 @@ topology_template:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        install_heml_requirements:
-          activities:
-          - call_operation: Helm.install_requirements
-            on_success: install_chart
-          target:  helm
-        install_chart:
+        install_kaniko:
           activities:
           - call_operation: Helm.install_chart
-            on_success: uninstall_chart
+            on_success: uninstall_kaniko
           - set_state: RUNNING
           target:  kaniko
-        uninstall_chart:
+        uninstall_kaniko:
           activities:
           - call_operation: Helm.uninstall_chart
             on_success: set_k8s_attributes
@@ -488,14 +484,14 @@ topology_template:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - install_chart
+              - install_monitoring
           target: kubernetes
         install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
-            on_success: install_chart
+            on_success: install_monitoring
           target:  monitoring
-        install_chart:
+        install_monitoring:
           activities:
           - call_operation: Helm.install_chart
             on_success: set_k8s_attributes
@@ -505,7 +501,7 @@ topology_template:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
-            - install_chart
+            - install_monitoring
           - set_state: RUNNING
           target: kubernetes
         set_k8s_attributes:
