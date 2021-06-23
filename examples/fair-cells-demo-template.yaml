@@ -385,7 +385,7 @@ topology_template:
                 repo_url: 'https://r-whites.github.io/vrecharts/'
                 helm_name: kaniko
                 namespace: default
-                status: Completed
+                status: Succeeded
                 values:
                   azure_key: "KEY"
                   dockerhub_auth: "KEY"
@@ -429,13 +429,13 @@ topology_template:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        install_chart:
+        install_kaniko:
           activities:
           - call_operation: Helm.install_chart
-            on_success: uninstall_chart
+            on_success: uninstall_kaniko
           - set_state: RUNNING
           target:  kaniko
-        uninstall_chart:
+        uninstall_kaniko:
           activities:
           - call_operation: Helm.uninstall_chart
             on_success: set_k8s_attributes
@@ -484,14 +484,14 @@ topology_template:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - install_chart
+              - install_monitoring
           target: kubernetes
         install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
-            on_success: install_chart
+            on_success: install_monitoring
           target:  monitoring
-        install_chart:
+        install_monitoring:
           activities:
           - call_operation: Helm.install_chart
             on_success: set_k8s_attributes
@@ -501,7 +501,7 @@ topology_template:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
-            - install_chart
+            - install_monitoring
           - set_state: RUNNING
           target: kubernetes
         set_k8s_attributes:
