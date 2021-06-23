@@ -6,13 +6,13 @@ imports:
   - capabilities: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/capabilities.yaml
   - policies: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/policies.yaml
   - interfaces: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/interfaces.yml
-  
+
 repositories:
-  docker_hub: https://hub.docker.com/  
+  docker_hub: https://hub.docker.com/
 
 description: >
   TOSCA example
-  
+
 
 topology_template:
 
@@ -248,7 +248,7 @@ topology_template:
 
 
   workflows:
-    mog_deploy_k8s:
+    articonf_mog_deploy_k8s:
       description: deploy k8s
       preconditions:
         - target: topology
@@ -256,45 +256,44 @@ topology_template:
             - assert:
               - current_state: [{equal: RUNNING }]
       steps:
-        install_k8s_requirements:
+        articonf_mog_install_k8s_requirements:
           activities:
           - call_operation: Kubernetes.install_requirements
-            on_success: install_k8s
+            on_success: articonf_mog_install_k8s
           target: kubernetes
-        install_k8s:
+        articonf_mog_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: set_master
+            on_success: articonf_mog_set_master
           target: kubernetes
-        set_master:
+        articonf_mog_set_master:
           activities:
           - call_operation: Kubernetes.set_master
-            on_success: join_k8s_cluster
+            on_success: articonf_mog_join_k8s_cluster
           target: kubernetes
-        join_k8s_cluster:
+        articonf_mog_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - create_k8s_dashboard
-              - install_heml_requirements
-#              - create_k8s_metrics_server
+              - articonf_mog_create_k8s_dashboard
+              - articonf_mog_install_heml_requirements
           target: kubernetes
-        create_k8s_dashboard:
+        articonf_mog_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
-            on_success: install_chart
+            on_success: articonf_mog_install_chart
           target:  kubernetes
-        install_heml_requirements:
+        articonf_mog_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
-            on_success: install_chart
+            on_success: articonf_mog_install_chart
           target:  monitoring
-        install_monitoring_chart:
+        articonf_mog_install_monitoring_chart:
           activities:
           - call_operation: Helm.install_chart
-            on_success: set_k8s_attributes
+            on_success: articonf_mog_set_k8s_attributes
           target:  monitoring
-        set_k8s_attributes:
+        articonf_mog_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
