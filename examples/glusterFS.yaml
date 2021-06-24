@@ -20,21 +20,21 @@ topology_template:
       interfaces:
         Glusterfs:
           purge:
+            implementation: 000.purge.yml
             inputs:
               repository: "https://github.com/bityoga/mysome_glusterfs.git"
-              implementation: 000.purge.yml
           requirements:
+            implementation: 001.requirements.yml
             inputs:
               repository: "https://github.com/bityoga/mysome_glusterfs.git"
-              implementation: 001.requirements.yml
           setup_glusterfs_infra:
+            implementation: 002.setup_glusterfs_infra.yml
             inputs:
               repository: "https://github.com/bityoga/mysome_glusterfs.git"
-              implementation: 002.setup_glusterfs_infra.yml
           setup_glusterfs_cluster:
+            implementation: 003.setup_glusterfs_cluster.yml
             inputs:
               repository: "https://github.com/bityoga/mysome_glusterfs.git"
-              implementation: 003.setup_glusterfs_cluster.yml
 #        Standard:
 #         create:
 #           inputs:
