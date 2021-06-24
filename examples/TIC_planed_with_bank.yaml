@@ -41,9 +41,9 @@ topology_template:
       interfaces:
         Glusterfs:
           purge:
+            implementation: 000.purge.yml
             inputs:
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
-              implementation: 000.purge.yml
               extra_variables:
                 devmode: False
                 device_path: "/dev/xvdh"
@@ -66,18 +66,18 @@ topology_template:
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
                           gluster_mount_server: { get_attribute: [ compute,public_ip ] }
           requirements:
+            implementation: 001.requirements.yml
             inputs:
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
-              implementation: 001.requirements.yml
               inventory:
                 all:
                   hosts:
                     localhost:
                       ansible_connection: local
           setup_glusterfs_infra:
+            implementation: 002.setup_glusterfs_infra.yml
             inputs:
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
-              implementation: 002.setup_glusterfs_infra.yml
               extra_variables:
                 devmode: False
                 device_path: "/dev/xvdh"
@@ -100,9 +100,9 @@ topology_template:
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
                           gluster_mount_server: { get_attribute: [ compute,public_ip ] }
           setup_glusterfs_cluster:
+            implementation: 003.setup_glusterfs_cluster.yml
             inputs:
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
-              implementation: 003.setup_glusterfs_cluster.yml
               extra_variables:
                 devmode: False
                 device_path: "/dev/xvdh"
@@ -132,9 +132,9 @@ topology_template:
       interfaces:
         TIC:
           initialize_hosts:
+            implementation: 011.initialize_hosts.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 011.initialize_hosts.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -164,9 +164,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           prepare_docker_images:
+            implementation: 012.prepare_docker_images.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 012.prepare_docker_images.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -196,9 +196,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           mount_fs:
+            implementation: 013.mount_fs.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 013.mount_fs.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -228,9 +228,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           purge_swarm:
+            implementation: 014.purge_swarm.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 014.purge_swarm.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -260,9 +260,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           set_attributes:
+            implementation: 106.set_attributes.yml
             inputs:
               repository: "https://github.com/QCDIS/fabric_as_code"
-              implementation: 106.set_attributes.yml
               inventory:
                 all:
                   children:
@@ -275,9 +275,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute,user_name ] }
           spawn_swarm:
+            implementation: 014.spawn_swarm.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 014.spawn_swarm.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -307,9 +307,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_swarm_visualizer:
+            implementation: 015.deploy_swarm_visualizer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 015.deploy_swarm_visualizer.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -339,9 +339,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_portainer:
+            implementation: 016.deploy_portainer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 016.deploy_portainer.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -371,9 +371,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_ca:
+            implementation: 100.deploy_ca.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 100.deploy_ca.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -403,9 +403,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_orderer:
+            implementation: 101.deploy_orderer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 101.deploy_orderer.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -435,9 +435,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_peers:
+            implementation: 102.deploy_peers.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 102.deploy_peers.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -467,9 +467,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_cli:
+            implementation: 103.deploy_cli.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 103.deploy_cli.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -499,9 +499,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_hlf_explorer:
+            implementation: 104.deploy_hlf_explorer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 104.deploy_hlf_explorer.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -531,9 +531,9 @@ topology_template:
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_bank_app:
+            implementation: 105.deploy_bank_app.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              implementation: 105.deploy_bank_app.yml
               extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
               inventory:
                 all:
@@ -607,100 +607,105 @@ topology_template:
 
 
   workflows:
-    deploy_tic_with:
+    deploy_tic_with-bank:
       description: Workflow to deploy TIC
+      preconditions:
+        - target: topology
+          condition:
+            - assert:
+              - current_state: [{equal: RUNNING }]
       steps:
-        requirements:
+        deploy_tic-bank-requirements:
           activities:
           - call_operation: Glusterfs.requirements
-            on_success: purge
+            on_success: deploy_tic-bank-purge
           target: glusterfs
-        purge:
+        deploy_tic-bank-purge:
           activities:
           - call_operation: Glusterfs.purge
-            on_success: setup_glusterfs_infra
+            on_success: deploy_tic-bank-setup_glusterfs_infra
           target: glusterfs
-        setup_glusterfs_infra:
+        deploy_tic-bank-setup_glusterfs_infra:
           activities:
           - call_operation: Glusterfs.setup_glusterfs_infra
-            on_success: setup_glusterfs_cluster
+            on_success: deploy_tic-bank-setup_glusterfs_cluster
           target: glusterfs
-        setup_glusterfs_cluster:
+        deploy_tic-bank-setup_glusterfs_cluster:
           activities:
           - call_operation: Glusterfs.setup_glusterfs_cluster
             on_success:
-            - initialize_hosts
-            - mount_fs
+            - deploy_tic-bank-initialize_hosts
+            - deploy_tic-bank-mount_fs
           target: glusterfs
-        initialize_hosts:
+        deploy_tic-bank-initialize_hosts:
           activities:
           - set_state: creating
           - call_operation: TIC.initialize_hosts
             on_success:
-            - purge_swarm
+            - deploy_tic-bank-purge_swarm
           target: tic
-        mount_fs:
+        deploy_tic-bank-mount_fs:
           activities:
           - call_operation: TIC.mount_fs
-            on_success: purge_swarm
+            on_success: deploy_tic-bank-purge_swarm
           target: tic
-        purge_swarm:
+        deploy_tic-bank-purge_swarm:
           activities:
           - call_operation: TIC.purge_swarm
-            on_success: spawn_swarm
+            on_success: deploy_tic-bank-spawn_swarm
           target: tic
-        spawn_swarm:
+        deploy_tic-bank-spawn_swarm:
           activities:
           - call_operation: TIC.spawn_swarm
-            on_success: deploy_ca
+            on_success: deploy_tic-bank-deploy_ca
           target: tic
-        deploy_swarm_visualizer:
+        deploy_tic-bank-deploy_swarm_visualizer:
           activities:
           - call_operation: TIC.deploy_swarm_visualizer
-            on_success: deploy_cli
+            on_success: deploy_tic-bank-deploy_cli
           target: tic
-        deploy_portainer:
+        deploy_tic-bank-deploy_portainer:
           activities:
           - call_operation: TIC.deploy_portainer
-            on_success: deploy_cli
+            on_success: deploy_tic-bank-deploy_cli
           target: tic
-        deploy_ca:
+        deploy_tic-bank-deploy_ca:
           activities:
           - call_operation: TIC.deploy_ca
             on_success:
-              - deploy_orderer
-              - deploy_peers
-              - deploy_hlf_explorer
-              - deploy_swarm_visualizer
-              - deploy_portainer
+              - deploy_tic-bank-deploy_orderer
+              - deploy_tic-bank-deploy_peers
+              - deploy_tic-bank-deploy_hlf_explorer
+              - deploy_tic-bank-deploy_swarm_visualizer
+              - deploy_tic-bank-deploy_portainer
           target: tic
-        deploy_orderer:
+        deploy_tic-bank-deploy_orderer:
           activities:
           - call_operation: TIC.deploy_orderer
-            on_success: deploy_cli
+            on_success: deploy_tic-bank-deploy_cli
           target: tic
-        deploy_peers:
+        deploy_tic-bank-deploy_peers:
           activities:
           - call_operation: TIC.deploy_peers
-            on_success: deploy_cli
+            on_success: deploy_tic-bank-deploy_cli
           target: tic
-        deploy_cli:
+        deploy_tic-bank-deploy_cli:
           activities:
           - call_operation: TIC.deploy_cli
-            on_success: deploy_bank_app
+            on_success: deploy_tic-bank-deploy_bank_app
           target: tic
-        deploy_hlf_explorer:
+        deploy_tic-bank-deploy_hlf_explorer:
           activities:
           - call_operation: TIC.deploy_hlf_explorer
-            on_success: deploy_cli
+            on_success: deploy_tic-bank-deploy_cli
           target: tic
-        deploy_bank_app:
+        deploy_tic-bank-deploy_bank_app:
           activities:
           - call_operation: TIC.deploy_bank_app
-            on_success: set_tic_attributes
+            on_success: deploy_tic-bank-set_tic_attributes
           - set_state: created
           target: tic
-        set_tic_attributes:
+        deploy_tic-bank-set_tic_attributes:
           activities:
           - call_operation: TIC.set_attributes
           - set_state: created
