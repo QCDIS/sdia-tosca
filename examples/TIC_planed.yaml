@@ -68,10 +68,6 @@ topology_template:
           requirements:
             implementation: 001.requirements.yml
             inputs:
-              extra_variables:
-                devmode: False
-                device_path: "/dev/xvdh"
-                ansible_user: "vm_user"
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
               inventory:
                 all:
@@ -611,100 +607,99 @@ topology_template:
 
 
   workflows:
-    deploy_tic_with:
+    deploy_tic:
       description: Workflow to deploy TIC
+      preconditions:
+        - target: topology
+          condition:
+            - assert:
+              - current_state: [{equal: RUNNING }]
       steps:
-        requirements:
+        deploy_tic-requirements:
           activities:
           - call_operation: Glusterfs.requirements
-            on_success: purge
+            on_success: deploy_tic-purge
           target: glusterfs
-        purge:
+        deploy_tic-purge:
           activities:
           - call_operation: Glusterfs.purge
-            on_success: setup_glusterfs_infra
+            on_success: deploy_tic-setup_glusterfs_infra
           target: glusterfs
-        setup_glusterfs_infra:
+        deploy_tic-setup_glusterfs_infra:
           activities:
           - call_operation: Glusterfs.setup_glusterfs_infra
-            on_success: setup_glusterfs_cluster
+            on_success: deploy_tic-setup_glusterfs_cluster
           target: glusterfs
-        setup_glusterfs_cluster:
+        deploy_tic-setup_glusterfs_cluster:
           activities:
           - call_operation: Glusterfs.setup_glusterfs_cluster
             on_success:
-            - initialize_hosts
-            - mount_fs
+            - deploy_tic-initialize_hosts
+            - deploy_tic-mount_fs
           target: glusterfs
-        initialize_hosts:
+        deploy_tic-initialize_hosts:
           activities:
           - set_state: creating
           - call_operation: TIC.initialize_hosts
             on_success:
-            - purge_swarm
+            - deploy_tic-purge_swarm
           target: tic
-        mount_fs:
+        deploy_tic-mount_fs:
           activities:
           - call_operation: TIC.mount_fs
-            on_success: purge_swarm
+            on_success: deploy_tic-purge_swarm
           target: tic
-        purge_swarm:
+        deploy_tic-purge_swarm:
           activities:
           - call_operation: TIC.purge_swarm
-            on_success: spawn_swarm
+            on_success: deploy_tic-spawn_swarm
           target: tic
-        spawn_swarm:
+        deploy_tic-spawn_swarm:
           activities:
           - call_operation: TIC.spawn_swarm
-            on_success: deploy_ca
+            on_success: deploy_tic-deploy_ca
           target: tic
-        deploy_swarm_visualizer:
+        deploy_tic-deploy_swarm_visualizer:
           activities:
           - call_operation: TIC.deploy_swarm_visualizer
-            on_success: deploy_cli
+            on_success: deploy_tic-deploy_cli
           target: tic
-        deploy_portainer:
+        deploy_tic-deploy_portainer:
           activities:
           - call_operation: TIC.deploy_portainer
-            on_success: deploy_cli
+            on_success: deploy_tic-deploy_cli
           target: tic
-        deploy_ca:
+        deploy_tic-deploy_ca:
           activities:
           - call_operation: TIC.deploy_ca
             on_success:
-              - deploy_orderer
-              - deploy_peers
-              - deploy_hlf_explorer
-              - deploy_swarm_visualizer
-              - deploy_portainer
+              - deploy_tic-deploy_orderer
+              - deploy_tic-deploy_peers
+              - deploy_tic-deploy_hlf_explorer
+              - deploy_tic-deploy_swarm_visualizer
+              - deploy_tic-deploy_portainer
           target: tic
-        deploy_orderer:
+        deploy_tic-deploy_orderer:
           activities:
           - call_operation: TIC.deploy_orderer
-            on_success: deploy_cli
+            on_success: deploy_tic-deploy_cli
           target: tic
-        deploy_peers:
+        deploy_tic-deploy_peers:
           activities:
           - call_operation: TIC.deploy_peers
-            on_success: deploy_cli
+            on_success: deploy_tic-deploy_cli
           target: tic
-        deploy_cli:
+        deploy_tic-deploy_cli:
           activities:
           - call_operation: TIC.deploy_cli
-            on_success: set_tic_attributes
+            on_success: deploy_tic-set_tic_attributes
           target: tic
-        deploy_hlf_explorer:
+        deploy_tic-deploy_hlf_explorer:
           activities:
           - call_operation: TIC.deploy_hlf_explorer
-            on_success: deploy_cli
+            on_success: deploy_tic-deploy_cli
           target: tic
-#        deploy_bank_app:
-#          activities:
-#          - call_operation: TIC.deploy_bank_app
-#            on_success: set_tic_attributes
-#          - set_state: created
-#          target: tic
-        set_tic_attributes:
+        deploy_tic-set_tic_attributes:
           activities:
           - call_operation: TIC.set_attributes
           - set_state: created
