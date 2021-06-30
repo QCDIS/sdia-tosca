@@ -348,7 +348,7 @@ topology_template:
               extra_variables:
                 region:
                   get_property:
-                  - topology
+                  - topology_1
                   - domain
               inventory:
                 all:
@@ -388,7 +388,7 @@ topology_template:
               extra_variables:
                 region:
                   get_property:
-                  - topology
+                  - topology_1
                   - domain
               inventory:
                 all:
@@ -481,7 +481,7 @@ topology_template:
               extra_variables:
                 region:
                   get_property:
-                  - topology
+                  - topology_1
                   - domain
               inventory:
                 all:
@@ -521,7 +521,7 @@ topology_template:
               extra_variables:
                 region:
                   get_property:
-                  - topology
+                  - topology_1
                   - domain
               inventory:
                 all:
@@ -530,7 +530,7 @@ topology_template:
                       ansible_connection: local
                       credentials:
                         get_attribute:
-                        - topology
+                        - topology_1
                         - credentials
                       instances:
                         compute_1_topology_1:
@@ -565,7 +565,7 @@ topology_template:
               extra_variables:
                 region:
                   get_property:
-                  - topology
+                  - topology_1
                   - domain
               inventory:
                 all:
