@@ -4,7 +4,7 @@ Azure:
       inputs:
         repository: https://github.com/QCDIS/azure_playbooks.git
         extra_variables:
-          resource_group_name: { get_attribute: [ TOPOLOGY_NAMEBankrekeningen, resource_group ] }
+          resource_group_name: { get_attribute: [ TOPOLOGY_NAME, resource_group ] }
           topology_name: TOPOLOGY_NAME
         inventory:
           all:
@@ -102,7 +102,7 @@ Azure:
       implementation: info/get_inst_flavors.yaml
       inputs:
         extra_variables:
-          region: { get_property: [ topology, domain ] }
+          region: { get_property: [ TOPOLOGY_NAME, domain ] }
         inventory:
           all:
             hosts:
