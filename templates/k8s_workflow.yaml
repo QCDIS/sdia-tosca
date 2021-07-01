@@ -1,7 +1,7 @@
 deploy_k8s:
   description: deploy k8s
   preconditions:
-    - target: topology
+    - target: TOPOLOGY_NAME
       condition:
         - assert:
           - current_state: [{equal: RUNNING }]

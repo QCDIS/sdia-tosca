@@ -390,6 +390,7 @@ topology_template:
                   get_property:
                   - topology_1
                   - domain
+                topology_name: topology_1
               inventory:
                 all:
                   hosts:
@@ -456,6 +457,21 @@ topology_template:
                             get_property:
                             - compute_1_topology_1
                             - user_name
+              repository: https://github.com/QCDIS/azure_playbooks.git
+          delete:
+            implementation: resource_group/delete_resource_group.yaml
+            inputs:
+              extra_variables:
+                resource_group_name:
+                  get_attribute:
+                  - topology_1
+                  - resource_group
+                topology_name: topology_1
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
               repository: https://github.com/QCDIS/azure_playbooks.git
           delete_ssh_key:
             implementation: key/delete_keys.yaml
@@ -652,7 +668,7 @@ topology_template:
         - assert:
           - current_state:
             - equal: RUNNING
-        target: kubernetes
+        target: app
       - condition:
         - assert:
           - desired_state:
@@ -684,7 +700,7 @@ topology_template:
         - assert:
           - current_state:
             - equal: RUNNING
-        target: kubernetes
+        target: monitoring
       - condition:
         - assert:
           - desired_state:
@@ -723,7 +739,7 @@ topology_template:
             - equal: RUNNING
           - current_state:
             - equal: UNDEFINED
-        target: kubernetes
+        target: KUBERNETES_NAME
       steps:
         create_k8s_dashboard:
           activities:
