@@ -6,7 +6,7 @@ deploy_k8s:
         - assert:
           - current_state: [{equal: RUNNING }]
 
-    - target: kubernetes
+    - target: KUBERNETES_NAME
       condition:
         - assert:
           - desired_state: [{equal: RUNNING }]
@@ -17,12 +17,12 @@ deploy_k8s:
       - set_state: CREATING
       - call_operation: Kubernetes.install_requirements
         on_success: install_k8s
-      target: kubernetes
+      target: KUBERNETES_NAME
     install_k8s:
       activities:
       - call_operation: Kubernetes.install_k8s
         on_success: set_master
-      target: kubernetes
+      target: KUBERNETES_NAME
     set_master:
       activities:
       - call_operation: Kubernetes.set_master
@@ -30,13 +30,13 @@ deploy_k8s:
         - join_k8s_cluster
         - install_heml_requirements
         - create_k8s_dashboard
-      target: kubernetes
+      target: KUBERNETES_NAME
     join_k8s_cluster:
       activities:
       - call_operation: Kubernetes.join_k8s_cluster
         on_success:
           - install_chart
-      target: kubernetes
+      target: KUBERNETES_NAME
     install_heml_requirements:
       activities:
       - call_operation: Helm.install_requirements
@@ -54,8 +54,8 @@ deploy_k8s:
         on_success:
         - install_chart
       - set_state: RUNNING
-      target: kubernetes
+      target: KUBERNETES_NAME
     set_k8s_attributes:
       activities:
       - call_operation: Kubernetes.set_attributes
-      target: kubernetes
+      target: KUBERNETES_NAME
