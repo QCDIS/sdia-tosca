@@ -240,6 +240,62 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
+    monitoring:
+      type: tosca.nodes.QC.Container.Application.Helm
+      properties:
+        credential: { get_attribute: [ compute,user_key_pair ] }
+      requirements:
+      - kubernetes:
+          capability: tosca.capabilities.QC.Kubernetes
+          node: kubernetes
+          relationship: tosca.relationships.HostedOn
+      interfaces:
+        Helm:
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              repository: https://github.com/QCDIS/helm_playbooks.git
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              repository: https://github.com/QCDIS/helm_playbooks.git
+              extra_variables:
+                chart_name: prometheus-community/kube-prometheus-stack
+                repo_name: prometheus-community
+                repo_url: 'https://prometheus-community.github.io/helm-charts'
+                helm_name: monitoring
+                namespace: default
+                values:
+                  alertmanager:
+                    enabled: true
+                    service:
+                      type: ClusterIP
+                  prometheusOperator:
+                    enabled: true
+                    service:
+                      type: ClusterIP
+                  prometheus:
+                    enabled: true
+                    service:
+                      type: ClusterIP
+                  grafana:
+                    enabled: true
+                    service:
+                      type: NodePort
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
 
 
   workflows:
@@ -281,6 +337,7 @@ topology_template:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
               - vialog_install_data_service
+              - vialog_install_monitoring
           target: kubernetes
         vialog_install_heml_requirements:
           activities:
@@ -293,6 +350,12 @@ topology_template:
             on_success: vialog_set_k8s_attributes
           - set_state: RUNNING
           target:  data_service
+        vialog_install_monitoring:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: vialog_set_k8s_attributes
+          - set_state: RUNNING
+          target:  monitoring
         vialog_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
