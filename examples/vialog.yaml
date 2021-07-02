@@ -212,22 +212,8 @@ topology_template:
                 helm_name: dataservice
                 namespace: default
                 values:
-                  alertmanager:
-                    enabled: true
-                    service:
-                      type: ClusterIP
-                  prometheusOperator:
-                    enabled: true
-                    service:
-                      type: ClusterIP
-                  prometheus:
-                    enabled: true
-                    service:
-                      type: ClusterIP
-                  grafana:
-                    enabled: true
-                    service:
-                      type: NodePort
+                  service:
+                    type: NodePort
               inventory:
                 all:
                   hosts:
