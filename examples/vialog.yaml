@@ -9,29 +9,31 @@ imports:
 topology_template:
   node_templates:
     compute:
-      interfaces:
-        Standard:
-          create: dumy.yaml
       properties:
-        disk_size: 10000 MB
-        mem_size: 2048 MB
+        disk_size: "40000 MB"
+        mem_size: "4000 MB"
         num_cores: 2
-        os_distro: Ubuntu
-        os_version: 18.04
-        user_name: vm_user
-      type: tosca.nodes.QC.VM.Compute
-    compute_1:
+        os_distro: "Ubuntu"
+        os_version: "18.04"
+        user_name: "vm_user"
       interfaces:
         Standard:
-          create: dumy.yaml
+          create: "dumy.yaml"
+      type: "tosca.nodes.QC.VM.Compute"
+
+    compute_1:
       properties:
-        disk_size: 10000 MB
-        mem_size: 2048 MB
-        num_cores: 1
-        os_distro: Ubuntu
-        os_version: 18.04
-        user_name: vm_user
-      type: tosca.nodes.QC.VM.Compute
+        disk_size: "40000 MB"
+        mem_size: "4000 MB"
+        num_cores: 2
+        os_distro: "Ubuntu"
+        os_version: "18.04"
+        user_name: "vm_user"
+      interfaces:
+        Standard:
+          create: "dumy.yaml"
+      type: "tosca.nodes.QC.VM.Compute"
+
     topology:
       properties:
         domain: "Ireland"
@@ -44,14 +46,6 @@ topology_template:
         - vm:
             capability: "tosca.capabilities.QC.VM"
             node: "compute_1"
-            relationship: "tosca.relationships.DependsOn"
-        - vm:
-            capability: "tosca.capabilities.QC.VM"
-            node: "compute_2"
-            relationship: "tosca.relationships.DependsOn"
-        - vm:
-            capability: "tosca.capabilities.QC.VM"
-            node: "compute_3"
             relationship: "tosca.relationships.DependsOn"
       interfaces:
         CloudsStorm:
@@ -81,6 +75,7 @@ topology_template:
         provisioned_files:
           required: false
           type: "string"
+
     kubernetes:
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
       requirements:
@@ -342,7 +337,9 @@ topology_template:
         vialog_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
-            on_success: vialog_install_data_service
+            on_success:
+            - vialog_install_data_service
+            - vialog_install_monitoring
           target:  data_service
         vialog_install_data_service:
           activities:
@@ -361,6 +358,7 @@ topology_template:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
             - vialog_install_data_service
+            - vialog_install_monitoring
           - set_state: RUNNING
           target: kubernetes
         vialog_set_k8s_attributes:

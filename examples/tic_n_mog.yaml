@@ -584,14 +584,6 @@ topology_template:
           capability: "tosca.capabilities.QC.VM"
           node: "compute_1"
           relationship: "tosca.relationships.DependsOn"
-      - vm:
-          capability: "tosca.capabilities.QC.VM"
-          node: "compute_2"
-          relationship: "tosca.relationships.DependsOn"
-      - vm:
-          capability: "tosca.capabilities.QC.VM"
-          node: "compute_3"
-          relationship: "tosca.relationships.DependsOn"
       interfaces:
         CloudsStorm:
           delete:
