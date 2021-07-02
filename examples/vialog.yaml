@@ -32,7 +32,6 @@ topology_template:
         os_version: 18.04
         user_name: vm_user
       type: tosca.nodes.QC.VM.Compute
-
     topology:
       properties:
         domain: "Ireland"
@@ -45,6 +44,14 @@ topology_template:
         - vm:
             capability: "tosca.capabilities.QC.VM"
             node: "compute_1"
+            relationship: "tosca.relationships.DependsOn"
+        - vm:
+            capability: "tosca.capabilities.QC.VM"
+            node: "compute_2"
+            relationship: "tosca.relationships.DependsOn"
+        - vm:
+            capability: "tosca.capabilities.QC.VM"
+            node: "compute_3"
             relationship: "tosca.relationships.DependsOn"
       interfaces:
         CloudsStorm:
@@ -74,7 +81,6 @@ topology_template:
         provisioned_files:
           required: false
           type: "string"
-
     kubernetes:
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
       requirements:
@@ -178,65 +184,7 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-
-    monitoring:
-      type: tosca.nodes.QC.Container.Application.Helm
-      properties:
-        credential: { get_attribute: [ compute,user_key_pair ] }
-      requirements:
-      - kubernetes:
-          capability: tosca.capabilities.QC.Kubernetes
-          node: kubernetes
-          relationship: tosca.relationships.HostedOn
-      interfaces:
-        Helm:
-          install_requirements:
-            implementation: install_requirements.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-          install_chart:
-            implementation: install_chart.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              extra_variables:
-                chart_name: prometheus-community/kube-prometheus-stack
-                repo_name: prometheus-community
-                repo_url: 'https://prometheus-community.github.io/helm-charts'
-                name: monitoring
-                namespace: default
-                values:
-                  alertmanager:
-                    enabled: true
-                    service:
-                      type: NodePort
-                  prometheusOperator:
-                    enabled: true
-                    service:
-                      type: NodePort
-                  prometheus:
-                    enabled: true
-                    service:
-                      type: NodePort
-                  grafana:
-                    enabled: true
-                    service:
-                      type: NodePort
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-
-    vialog:
+    data_service:
       type: tosca.nodes.QC.Container.Application.Helm
       properties:
         credential: { get_attribute: [ compute,user_key_pair ] }
@@ -266,11 +214,25 @@ topology_template:
                 chart_name: qcdis/vialog-helm-dataservice
                 repo_name: qcdis
                 repo_url: 'https://qcdis.github.io/vialog-helm-dataservice/'
-                name: vialog
+                helm_name: data_service
                 namespace: default
                 values:
-                  service:
-                    type: NodePort
+                  alertmanager:
+                    enabled: true
+                    service:
+                      type: ClusterIP
+                  prometheusOperator:
+                    enabled: true
+                    service:
+                      type: ClusterIP
+                  prometheus:
+                    enabled: true
+                    service:
+                      type: ClusterIP
+                  grafana:
+                    enabled: true
+                    service:
+                      type: NodePort
               inventory:
                 all:
                   hosts:
@@ -295,59 +257,50 @@ topology_template:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        install_k8s_requirements:
+        vialog_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
-            on_success: install_k8s
+            on_success: vialog_install_k8s
           target: kubernetes
-        install_k8s:
+        vialog_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: set_master
+            on_success: vialog_set_master
           target: kubernetes
-        set_master:
+        vialog_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
-            - join_k8s_cluster
-            - install_heml_requirements
-            - create_k8s_dashboard
+            - vialog_join_k8s_cluster
+            - vialog_install_heml_requirements
+            - vialog_create_k8s_dashboard
           target: kubernetes
-        join_k8s_cluster:
+        vialog_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - install_chart
+              - vialog_install_data_service
           target: kubernetes
-        install_heml_requirements:
+        vialog_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
-            on_success:
-            - install_chart
-            - install_vialog_chart
-          target:  monitoring
-        install_vialog_chart:
+            on_success: vialog_install_data_service
+          target:  data_service
+        vialog_install_data_service:
           activities:
           - call_operation: Helm.install_chart
-            on_success: set_k8s_attributes
+            on_success: vialog_set_k8s_attributes
           - set_state: RUNNING
-          target:  vialog
-
-        install_chart:
-          activities:
-          - call_operation: Helm.install_chart
-            on_success: set_k8s_attributes
-          - set_state: RUNNING
-          target:  monitoring
-        create_k8s_dashboard:
+          target:  data_service
+        vialog_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
-            - install_chart
+            - vialog_install_data_service
           - set_state: RUNNING
           target: kubernetes
-        set_k8s_attributes:
+        vialog_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
