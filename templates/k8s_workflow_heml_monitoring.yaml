@@ -28,19 +28,40 @@ template_wf_deploy_k8s:
       - call_operation: Kubernetes.set_master
         on_success:
         - template_wf_join_k8s_cluster
+        - template_wf_install_heml_requirements
         - template_wf_create_k8s_dashboard
       target: KUBERNETES_NAME
     template_wf_join_k8s_cluster:
       activities:
       - call_operation: Kubernetes.join_k8s_cluster
         on_success:
-          - template_wf_set_k8s_attributes
+          - template_wf_install_monitoring
+          - template_wf_install_HELM_NAME
       target: KUBERNETES_NAME
+    template_wf_install_heml_requirements:
+      activities:
+      - call_operation: Helm.install_requirements
+        on_success:
+          - template_wf_install_monitoring
+          - template_wf_install_HELM_NAME
+      target:  monitoring
+    template_wf_install_monitoring:
+      activities:
+      - call_operation: Helm.install_chart
+        on_success: template_wf_set_k8s_attributes
+      - set_state: RUNNING
+      target:  monitoring
+    template_wf_install_HELM_NAME:
+      activities:
+      - call_operation: Helm.install_chart
+        on_success: template_wf_set_k8s_attributes
+      - set_state: RUNNING
+      target:  HELM_NAME
     template_wf_create_k8s_dashboard:
       activities:
       - call_operation: Kubernetes.create_k8s_dashboard
         on_success:
-        - template_wf_set_k8s_attributes
+        - template_wf_install_monitoring
       - set_state: RUNNING
       target: KUBERNETES_NAME
     template_wf_set_k8s_attributes:
