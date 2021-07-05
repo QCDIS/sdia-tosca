@@ -7,54 +7,54 @@ provision_azure:
           - desired_state: [{equal: RUNNING }]
           - current_state: [{equal: UNDEFINED }]
   steps:
-    install_requirements:
+    provision_azure_install_requirements:
       activities:
       - set_state: CREATING
       - call_operation: Azure.install_requirements
         on_success:
         - create_resoucre_group
       target: TOPOLOGY_NAME
-    create_resoucre_group:
+    provision_azure_create_resoucre_group:
       activities:
       - call_operation: Azure.create_resoucre_group
         on_success:
-        - select_instance_type
-        - select_network
-        - create_ssh_key
-        - select_image
+        - provision_azure_select_instance_type
+        - provision_azure_select_network
+        - provision_azure_create_ssh_key
+        - provision_azure_select_image
       target: TOPOLOGY_NAME
-    select_instance_type:
+    provision_azure_select_instance_type:
       activities:
       - call_operation: Azure.select_instance_type
         on_success:
-        - create
+        - provision_azure_create
       target: TOPOLOGY_NAME
-    select_network:
+    provision_azure_select_network:
       activities:
       - call_operation: Azure.select_network
         on_success:
-        - create
+        - provision_azure_create
       target: TOPOLOGY_NAME
-    create_ssh_key:
+    provision_azure_create_ssh_key:
       activities:
       - call_operation: Azure.create_ssh_key
         on_success:
-        - create
+        - provision_azure_create
       target: TOPOLOGY_NAME
-    select_image:
+    provision_azure_select_image:
       activities:
         - call_operation: Azure.select_image
           on_success:
-            - create
+            - provision_azure_create
       target: TOPOLOGY_NAME
-    create:
+    provision_azure_create:
       activities:
       - call_operation: Azure.create
         on_success:
-        - set_attributes
+        - provision_azure_set_attributes
       - set_state: RUNNING
       target: TOPOLOGY_NAME
-    set_attributes:
+    provision_azure_set_attributes:
       activities:
       - call_operation: Azure.set_attributes
       target: TOPOLOGY_NAME
@@ -68,15 +68,15 @@ delete_azure_topology:
           - desired_state: [{equal: DELETED }]
           - current_state: [{equal: RUNNING }]
   steps:
-    delete:
+    delete_azure_topology_delete:
       activities:
       - set_state: DELETING
       - call_operation: Azure.delete
         on_success:
-        - set_attributes
+        - delete_azure_topology_set_attributes
       - set_state: DELETED
       target: TOPOLOGY_NAME
-    set_attributes:
+    delete_azure_topology_set_attributes:
       activities:
       - call_operation: Azure.set_attributes
       target: TOPOLOGY_NAME
