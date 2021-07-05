@@ -14,8 +14,8 @@ topology_template:
           create: dumy.yaml
       properties:
         disk_size: 40000 MB
-        mem_size: 2048 MB
-        num_cores: 1
+        mem_size: 8000 MB
+        num_cores: 2
         os_distro: Ubuntu
         os_version: 18.04
         user_name: vm_user
@@ -385,6 +385,9 @@ topology_template:
                 repo_url: 'https://argoproj.github.io/argo-helm'
                 helm_name: argowf
                 namespace: default
+                values:
+                  server:
+                    serviceType: NodePort
               inventory:
                 all:
                   hosts:
@@ -452,7 +455,9 @@ topology_template:
         fair-cells_retil_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
-            on_success: fair-cells_retil_install_monitoring
+            on_success:
+              - fair-cells_retil_install_monitoring
+              - fair-cells_retil_install_argowf
           target:  monitoring
         fair-cells_retil_install_monitoring:
           activities:
