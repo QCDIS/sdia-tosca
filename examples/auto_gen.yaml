@@ -739,7 +739,7 @@ topology_template:
             - equal: RUNNING
           - current_state:
             - equal: UNDEFINED
-        target: KUBERNETES_NAME
+        target: kubernetes
       steps:
         create_k8s_dashboard:
           activities:
