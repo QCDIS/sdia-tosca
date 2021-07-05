@@ -649,15 +649,15 @@ topology_template:
             - equal: RUNNING
         target: topology_1
       steps:
-        delete:
+        delete_azure_topology_delete:
           activities:
           - set_state: DELETING
           - call_operation: Azure.delete
             on_success:
-            - set_attributes
+            - delete_azure_topology_set_attributes
           - set_state: DELETED
           target: topology_1
-        set_attributes:
+        delete_azure_topology_set_attributes:
           activities:
           - call_operation: Azure.set_attributes
           target: topology_1
@@ -741,52 +741,52 @@ topology_template:
             - equal: UNDEFINED
         target: kubernetes
       steps:
-        create_k8s_dashboard:
+        deploy_k8s_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
-            - install_chart
+            - deploy_k8s_install_chart
           - set_state: RUNNING
           target: kubernetes
-        install_chart:
+        deploy_k8s_install_chart:
           activities:
           - call_operation: Helm.install_chart
-            on_success: set_k8s_attributes
+            on_success: deploy_k8s_set_k8s_attributes
           - set_state: RUNNING
           target: kubernetes
-        install_heml_requirements:
+        deploy_k8s_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
-            on_success: install_chart
+            on_success: deploy_k8s_install_chart
           target: kubernetes
-        install_k8s:
+        deploy_k8s_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: set_master
+            on_success: deploy_k8s_set_master
           target: kubernetes
-        install_k8s_requirements:
+        deploy_k8s_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
-            on_success: install_k8s
+            on_success: deploy_k8s_install_k8s
           target: kubernetes
-        join_k8s_cluster:
+        deploy_k8s_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-            - install_chart
+            - deploy_k8s_install_chart
           target: kubernetes
-        set_k8s_attributes:
+        deploy_k8s_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
-        set_master:
+        deploy_k8s_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
-            - join_k8s_cluster
-            - install_heml_requirements
-            - create_k8s_dashboard
+            - deploy_k8s_join_k8s_cluster
+            - deploy_k8s_install_heml_requirements
+            - deploy_k8s_create_k8s_dashboard
           target: kubernetes
     provision_azure_topology_1:
       description: Workflow to deploy azure topology
@@ -799,54 +799,54 @@ topology_template:
             - equal: UNDEFINED
         target: topology_1
       steps:
-        create:
+        provision_azure_create:
           activities:
           - call_operation: Azure.create
             on_success:
-            - set_attributes
+            - provision_azure_set_attributes
           - set_state: RUNNING
           target: topology_1
-        create_resoucre_group:
+        provision_azure_create_resoucre_group:
           activities:
           - call_operation: Azure.create_resoucre_group
             on_success:
-            - select_instance_type
-            - select_network
-            - create_ssh_key
-            - select_image
+            - provision_azure_select_instance_type
+            - provision_azure_select_network
+            - provision_azure_create_ssh_key
+            - provision_azure_select_image
           target: topology_1
-        create_ssh_key:
+        provision_azure_create_ssh_key:
           activities:
           - call_operation: Azure.create_ssh_key
             on_success:
-            - create
+            - provision_azure_create
           target: topology_1
-        install_requirements:
+        provision_azure_install_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Azure.install_requirements
             on_success:
             - create_resoucre_group
           target: topology_1
-        select_image:
+        provision_azure_select_image:
           activities:
           - call_operation: Azure.select_image
             on_success:
-            - create
+            - provision_azure_create
           target: topology_1
-        select_instance_type:
+        provision_azure_select_instance_type:
           activities:
           - call_operation: Azure.select_instance_type
             on_success:
-            - create
+            - provision_azure_create
           target: topology_1
-        select_network:
+        provision_azure_select_network:
           activities:
           - call_operation: Azure.select_network
             on_success:
-            - create
+            - provision_azure_create
           target: topology_1
-        set_attributes:
+        provision_azure_set_attributes:
           activities:
           - call_operation: Azure.set_attributes
           target: topology_1
