@@ -15,7 +15,6 @@ Helm:
         chart_name:
         repo_name:
         repo_url:
-        name:
         namespace: default
 #                values:
       inventory:

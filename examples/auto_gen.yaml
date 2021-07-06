@@ -824,9 +824,11 @@ topology_template:
       preconditions:
       - condition:
         - assert:
-          - current_state:
+          - desired_state:
             - equal: RUNNING
-        target: TOPOLOGY_NAME
+          - current_state:
+            - equal: UNDEFINED
+        target: kubernetes
       - condition:
         - assert:
           - current_state:
