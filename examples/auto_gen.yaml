@@ -17,7 +17,6 @@ topology_template:
               extra_variables:
                 chart_name: argo/argo-workflows
                 helm_name: argowf
-                name: null
                 namespace: default
                 repo_name: argo
                 repo_url: https://argoproj.github.io/argo-helm
@@ -296,15 +295,15 @@ topology_template:
             implementation: install_chart.yaml
             inputs:
               extra_variables:
-                chart_name: argo/argo-workflows
-                helm_name: argowf
-                name: null
+                chart_name: prometheus-community/kube-prometheus-stack
+                helm_name: monitoring
                 namespace: default
-                repo_name: argo
-                repo_url: https://argoproj.github.io/argo-helm
+                repo_name: prometheus-community
+                repo_url: https://prometheus-community.github.io/helm-charts
                 values:
-                  server:
-                    serviceType: NodePort
+                  grafana:
+                    service:
+                      type: NodePort
               inventory:
                 all:
                   hosts:
