@@ -811,21 +811,61 @@ topology_template:
           activities:
           - call_operation: Azure.set_attributes
           target: topology_1
-    template_wf_deploy_k8s_monitoring:
+    template_wf_deploy_k8s:
       description: deploy k8s
       preconditions:
-      - condition:
-        - assert:
-          - current_state:
-            - equal: RUNNING
-        target: monitoring
       - condition:
         - assert:
           - desired_state:
             - equal: RUNNING
           - current_state:
             - equal: UNDEFINED
-        target: monitoring
+        target: kubernetes
+      - condition:
+        - assert:
+          - current_state:
+            - equal: RUNNING
+        target: topology_1
+      - condition:
+        - assert:
+          - current_state:
+            - equal: RUNNING
+        target: topology_1
+      - condition:
+        - assert:
+          - current_state:
+            - equal: RUNNING
+        target: topology_1
+      - condition:
+        - assert:
+          - current_state:
+            - equal: RUNNING
+        target: topology_1
+      - condition:
+        - assert:
+          - current_state:
+            - equal: RUNNING
+        target: topology_1
+      - condition:
+        - assert:
+          - current_state:
+            - equal: RUNNING
+        target: topology_1
+      - condition:
+        - assert:
+          - current_state:
+            - equal: RUNNING
+        target: topology_1
+      - condition:
+        - assert:
+          - current_state:
+            - equal: RUNNING
+        target: topology_1
+      - condition:
+        - assert:
+          - current_state:
+            - equal: RUNNING
+        target: topology_1
       steps:
         template_wf_create_k8s_dashboard:
           activities:
@@ -833,44 +873,44 @@ topology_template:
             on_success:
             - template_wf_install_monitoring
           - set_state: RUNNING
-          target: monitoring
+          target: kubernetes
         template_wf_install_HELM_NAME:
           activities:
           - call_operation: Helm.install_chart
             on_success: template_wf_set_k8s_attributes
           - set_state: RUNNING
-          target: monitoring
+          target: kubernetes
         template_wf_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success:
             - template_wf_install_monitoring
             - template_wf_install_HELM_NAME
-          target: monitoring
+          target: kubernetes
         template_wf_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
             on_success: template_wf_set_master
-          target: monitoring
+          target: kubernetes
         template_wf_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
             on_success: template_wf_install_k8s
-          target: monitoring
+          target: kubernetes
         template_wf_install_monitoring:
           activities:
           - call_operation: Helm.install_chart
             on_success: template_wf_set_k8s_attributes
           - set_state: RUNNING
-          target: monitoring
+          target: kubernetes
         template_wf_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
             - template_wf_install_monitoring
             - template_wf_install_HELM_NAME
-          target: monitoring
+          target: kubernetes
         template_wf_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
@@ -882,7 +922,7 @@ topology_template:
             - template_wf_join_k8s_cluster
             - template_wf_install_heml_requirements
             - template_wf_create_k8s_dashboard
-          target: monitoring
+          target: kubernetes
     template_wf_provision_topology_1:
       description: Workflow to deploy azure topology
       preconditions:

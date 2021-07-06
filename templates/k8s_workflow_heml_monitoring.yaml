@@ -1,11 +1,10 @@
 template_wf_deploy_k8s:
   description: deploy k8s
   preconditions:
-#    - target: TOPOLOGY_NAME
-#      condition:
-#        - assert:
-#          - current_state: [{equal: RUNNING }]
-
+    - target: TOPOLOGY_NAME
+      condition:
+        - assert:
+          - current_state: [{equal: RUNNING }]
     - target: KUBERNETES_NAME
       condition:
         - assert:
