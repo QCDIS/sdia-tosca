@@ -331,38 +331,7 @@ topology_template:
 
 
   workflows:
-    fair-cells_deploy_kaniko:
-      description: deploy kaniko
-      preconditions:
-        - target: kubernetes
-          condition:
-            - assert:
-              - current_state: [{equal: RUNNING }]
-        - target: kaniko
-          condition:
-            - assert:
-              - desired_state: [{equal: RUNNING }]
-              - current_state: [{equal: UNDEFINED }]
-      steps:
-        fair-cells_install_kaniko:
-          activities:
-          - call_operation: Helm.install_chart
-            on_success: fair-cells_uninstall_kaniko
-          - set_state: RUNNING
-          target:  kaniko
-        fair-cells_uninstall_kaniko:
-          activities:
-          - call_operation: Helm.uninstall_chart
-            on_success: fair-cells_set_k8s_attributes
-          - set_state: UNDEFINED
-          target:  kaniko
-        fair-cells_set_k8s_attributes:
-          activities:
-          - call_operation: Kubernetes.set_attributes
-          - set_state: RUNNING
-          target: kubernetes
-
-    fair-cells-deploy_k8s:
+    carsharing-deploy_k8s:
       description: deploy k8s
       preconditions:
         - target: topology
@@ -376,134 +345,61 @@ topology_template:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        fair-cells_install_k8s_requirements:
+        carsharing_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
-            on_success: fair-cells_install_k8s
+            on_success: carsharing_install_k8s
           target: kubernetes
-        fair-cells_install_k8s:
+        carsharing_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: fair-cells_set_master
+            on_success: carsharing_set_master
           target: kubernetes
-        fair-cells_set_master:
+        carsharing_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
-            - fair-cells_join_k8s_cluster
-            - fair-cells_install_heml_requirements
-            - fair-cells_create_k8s_dashboard
+            - carsharing_join_k8s_cluster
+            - carsharing_install_heml_requirements
+            - carsharing_create_k8s_dashboard
           target: kubernetes
-        fair-cells_join_k8s_cluster:
+        carsharing_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - fair-cells_install_monitoring
+              - carsharing_install_carsharing
+              - carsharing_install_monitoring
           target: kubernetes
-        fair-cells_install_heml_requirements:
+        carsharing_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
-            on_success: fair-cells_install_monitoring
-          target:  monitoring
-        fair-cells_install_monitoring:
+            on_success:
+            - carsharing_install_carsharing
+            - carsharing_install_monitoring
+          target:  carsharing
+        carsharing_install_carsharing:
           activities:
           - call_operation: Helm.install_chart
-            on_success: fair-cells_set_k8s_attributes
+            on_success: carsharing_set_k8s_attributes
+          - set_state: RUNNING
+          target:  carsharing
+        carsharing_install_monitoring:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: carsharing_set_k8s_attributes
           - set_state: RUNNING
           target:  monitoring
-        fair-cells_create_k8s_dashboard:
+        carsharing_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
-            - fair-cells_install_monitoring
+            - carsharing_install_carsharing
+            - carsharing_install_monitoring
           - set_state: RUNNING
           target: kubernetes
-        fair-cells_set_k8s_attributes:
+        carsharing_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
-
-    fair-cells-provision:
-      description: Workflow to deploy azure topology
-      preconditions:
-        - target: topology
-          condition:
-            - assert:
-              - desired_state: [{equal: RUNNING }]
-              - current_state: [{equal: UNDEFINED }]
-      steps:
-        fair-cells_install_requirements:
-          activities:
-          - set_state: CREATING
-          - call_operation: Azure.install_requirements
-            on_success:
-            - fair-cells_create_resoucre_group
-          target: topology
-        fair-cells_create_resoucre_group:
-          activities:
-          - call_operation: Azure.create_resoucre_group
-            on_success:
-            - fair-cells_select_instance_type
-            - fair-cells_select_network
-            - fair-cells_create_ssh_key
-            - fair-cells_select_image
-          target: topology
-        fair-cells_select_instance_type:
-          activities:
-          - call_operation: Azure.select_instance_type
-            on_success:
-            - fair-cells_create
-          target: topology
-        fair-cells_select_network:
-          activities:
-          - call_operation: Azure.select_network
-            on_success:
-            - fair-cells_create
-          target: topology
-        fair-cells_create_ssh_key:
-          activities:
-          - call_operation: Azure.create_ssh_key
-            on_success:
-            - fair-cells_create
-          target: topology
-        fair-cells_select_image:
-          activities:
-            - call_operation: Azure.select_image
-              on_success:
-                - fair-cells_create
-          target: topology
-        fair-cells_create:
-          activities:
-          - call_operation: Azure.create
-            on_success:
-            - fair-cells_set_attributes
-          - set_state: RUNNING
-          target: topology
-        fair-cells_set_attributes:
-          activities:
-          - call_operation: Azure.set_attributes
-          target: topology
-
-    fair-cells-delete_topology:
-      description: delete_topology
-      preconditions:
-        - target: topology
-          condition:
-            - assert:
-              - desired_state: [{equal: DELETED }]
-              - current_state: [{equal: RUNNING }]
-      steps:
-        fair-cells_delete:
-          activities:
-          - set_state: DELETING
-          - call_operation: Azure.delete
-            on_success:
-            - fair-cells_set_attributes
-          - set_state: DELETED
-          target: topology
-        fair-cells_set_attributes:
-          activities:
-          - call_operation: Azure.set_attributes
-          target: topology
 
