@@ -286,6 +286,8 @@ topology_template:
                       fcm_apikey:
                       paypal_client_id:
                       paypal_client_secret:
+                      paypal_webhook_buy_cs_coin:
+                      paypal_webhook_withdraw_cs_coin:
                   nodesocialnetwork:
                     secret:
                       docker_auth:
@@ -305,8 +307,6 @@ topology_template:
                     env:
                       mongo_initdb_root_password:
                       mongo_initdb_root_username:
-
-
               inventory:
                 all:
                   hosts:
