@@ -206,7 +206,7 @@ topology_template:
             inputs:
               repository: https://github.com/QCDIS/helm_playbooks.git
               extra_variables:
-                chart_name: carsharing/carsharing-helm-charts
+                chart_name: carsharing-helm-charts/carsharing-helm-charts
                 repo_name: carsharing-helm-charts
                 repo_url: 'https://qcdis.github.io/carsharing-helm-charts/'
                 helm_name: carsharing
