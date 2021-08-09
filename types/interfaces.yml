@@ -123,6 +123,41 @@ interface_types:
     reset_k8s_cluster:
     set_attributes:
 
+  tosca.interfaces.QC.EC2:
+    derived_from: tosca.interfaces.QC.Ansible
+    inputs:
+      repository:
+        type: string
+        required: true
+      os:
+        type: string
+        required: false
+      disk_size:
+        type: string
+        required: false
+      mem_size:
+        type: string
+        required: false
+      num_cores:
+        type: integer
+        required: false
+    set_attributes:
+    create_security_group:
+    delete_security_group:
+    create:
+    create_ssh_key:
+    delete_ssh_key:
+    install_requirements:
+    select_image:
+    select_instance_type:
+    create_vpc:
+    delete_vpc:
+    create_vpc_subnet:
+    delete_vpc_subnet:
+    create_random_name:
+    delete:
+
+
   tosca.interfaces.QC.Azure:
     derived_from: tosca.interfaces.QC.Ansible
     inputs:
