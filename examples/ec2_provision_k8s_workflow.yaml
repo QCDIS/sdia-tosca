@@ -343,7 +343,7 @@ topology_template:
             - assert:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
-        steps:
+      steps:
           ec2_install_requirements:
             activities:
             - set_state: CREATING
@@ -353,6 +353,7 @@ topology_template:
               - ec2_select_image
               - ec2_create_vpc
               - ec2_create_ssh_key
+            target: topology
           ec2_create_random_name:
             activities:
             - call_operation: EC2.create_random_name
@@ -369,6 +370,7 @@ topology_template:
               on_success:
               - ec2_create_vpc_subnet
               - ec2_create_security_group
+            target: topology
           ec2_select_image:
             activities:
             - set_state: CREATING
@@ -376,6 +378,7 @@ topology_template:
               on_success:
               - ec2_create_vpc_subnet
               - ec2_create_security_group
+            target: topology
           ec2_create_ssh_key:
             activities:
             - set_state: CREATING
@@ -383,6 +386,7 @@ topology_template:
               on_success:
               - ec2_create_vpc_subnet
               - ec2_create_security_group
+            target: topology
           ec2_create_vpc:
             activities:
             - set_state: CREATING
@@ -390,18 +394,21 @@ topology_template:
               on_success:
               - ec2_create_vpc_subnet
               - ec2_create_security_group
+            target: topology
           ec2_create_vpc_subnet:
             activities:
             - set_state: CREATING
             - call_operation: EC2.create_vpc_subnet
               on_success:
               - ec2_create
+            target: topology
           ec2_create_security_group:
             activities:
             - set_state: CREATING
             - call_operation: EC2.create_security_group
               on_success:
               - ec2_create
+            target: topology
           ec2_create:
             activities:
             - set_state: CREATING
@@ -409,7 +416,9 @@ topology_template:
               on_success:
               - ec2_set_attributes
             - set_state: RUNNING
+            target: topology
           ec2_set_attributes:
             activities:
             - set_state: CREATING
             - call_operation: EC2.set_attributes
+            target: topology
