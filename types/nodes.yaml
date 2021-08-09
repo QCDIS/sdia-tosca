@@ -226,6 +226,10 @@ node_types:
         type: tosca.interfaces.QC.Azure
         create:
 #        configure:
+      EC2:
+        type: tosca.interfaces.QC.EC2
+        create:
+#        configure:
 
   tosca.nodes.QC.VM.Compute:
     derived_from: tosca.nodes.QC.Infrastructure

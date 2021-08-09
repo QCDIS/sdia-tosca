@@ -21,6 +21,7 @@ topology_template:
                 repo_name: argo
                 repo_url: https://argoproj.github.io/argo-helm
                 values:
+                  containerRuntimeExecutor: k8sapi
                   server:
                     serviceType: NodePort
               inventory:
@@ -29,12 +30,12 @@ topology_template:
                     master:
                       ansible_host:
                         get_attribute:
-                        - compute_0_topology_1
+                        - compute_0_topology_2
                         - public_ip
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user:
                         get_property:
-                        - compute_0_topology_1
+                        - compute_0_topology_2
                         - user_name
               repository: https://github.com/QCDIS/helm_playbooks.git
           install_requirements:
@@ -46,18 +47,18 @@ topology_template:
                     master:
                       ansible_host:
                         get_attribute:
-                        - compute_0_topology_1
+                        - compute_0_topology_2
                         - public_ip
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user:
                         get_property:
-                        - compute_0_topology_1
+                        - compute_0_topology_2
                         - user_name
               repository: https://github.com/QCDIS/helm_playbooks.git
       properties:
         credential:
           get_attribute:
-          - compute_0_topology_1
+          - compute_0_topology_2
           - user_key_pair
       requirements:
       - kubernetes:
@@ -70,22 +71,22 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
-        disk_size: 20000 MB
-        mem_size: 4048 MB
-        num_cores: '2'
+        disk_size: 10000 MB
+        mem_size: 2048 MB
+        num_cores: '1'
         os_distro: Ubuntu
         os_version: '18.04'
         user_name: vm_user
       requirements: null
       type: tosca.nodes.QC.VM.Compute
-    compute_1_topology_1:
+    compute_0_topology_2:
       interfaces:
         Standard:
           create: dumy.yaml
       properties:
-        disk_size: 20000 MB
-        mem_size: 4048 MB
-        num_cores: '2'
+        disk_size: 10000 MB
+        mem_size: 2048 MB
+        num_cores: '1'
         os_distro: Ubuntu
         os_version: '18.04'
         user_name: vm_user
@@ -107,12 +108,12 @@ topology_template:
                             m_0:
                               ansible_host:
                                 get_attribute:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - public_ip
                               ansible_python_interpreter: /usr/bin/python3
                               ansible_ssh_user:
                                 get_property:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - user_name
               repository: https://github.com/QCDIS/k8s_playbooks.git
           create_k8s_metrics_server:
@@ -128,12 +129,12 @@ topology_template:
                             m_0:
                               ansible_host:
                                 get_attribute:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - public_ip
                               ansible_python_interpreter: /usr/bin/python3
                               ansible_ssh_user:
                                 get_property:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - user_name
               repository: https://github.com/QCDIS/k8s_playbooks.git
           install_k8s:
@@ -149,25 +150,15 @@ topology_template:
                             m_0:
                               ansible_host:
                                 get_attribute:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - public_ip
                               ansible_python_interpreter: /usr/bin/python3
                               ansible_ssh_user:
                                 get_property:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - user_name
                         worker:
-                          hosts:
-                            w_1:
-                              ansible_host:
-                                get_attribute:
-                                - compute_1_topology_1
-                                - public_ip
-                              ansible_python_interpreter: /usr/bin/python3
-                              ansible_ssh_user:
-                                get_property:
-                                - compute_1_topology_1
-                                - user_name
+                          hosts: null
               repository: https://github.com/QCDIS/k8s_playbooks.git
           install_requirements:
             implementation: install_prerequisites.yaml
@@ -182,25 +173,15 @@ topology_template:
                             m_0:
                               ansible_host:
                                 get_attribute:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - public_ip
                               ansible_python_interpreter: /usr/bin/python3
                               ansible_ssh_user:
                                 get_property:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - user_name
                         worker:
-                          hosts:
-                            w_1:
-                              ansible_host:
-                                get_attribute:
-                                - compute_1_topology_1
-                                - public_ip
-                              ansible_python_interpreter: /usr/bin/python3
-                              ansible_ssh_user:
-                                get_property:
-                                - compute_1_topology_1
-                                - user_name
+                          hosts: null
               repository: https://github.com/QCDIS/k8s_playbooks.git
           join_k8s_cluster:
             implementation: join_k8s_cluster.yaml
@@ -215,25 +196,15 @@ topology_template:
                             m_0:
                               ansible_host:
                                 get_attribute:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - public_ip
                               ansible_python_interpreter: /usr/bin/python3
                               ansible_ssh_user:
                                 get_property:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - user_name
                         worker:
-                          hosts:
-                            w_1:
-                              ansible_host:
-                                get_attribute:
-                                - compute_1_topology_1
-                                - public_ip
-                              ansible_python_interpreter: /usr/bin/python3
-                              ansible_ssh_user:
-                                get_property:
-                                - compute_1_topology_1
-                                - user_name
+                          hosts: null
               repository: https://github.com/QCDIS/k8s_playbooks.git
           set_attributes:
             implementation: get_attributes.yaml
@@ -248,12 +219,12 @@ topology_template:
                             m_0:
                               ansible_host:
                                 get_attribute:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - public_ip
                               ansible_python_interpreter: /usr/bin/python3
                               ansible_ssh_user:
                                 get_property:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - user_name
               repository: https://github.com/QCDIS/k8s_playbooks.git
           set_master:
@@ -269,23 +240,27 @@ topology_template:
                             m_0:
                               ansible_host:
                                 get_attribute:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - public_ip
                               ansible_python_interpreter: /usr/bin/python3
                               ansible_ssh_user:
                                 get_property:
-                                - compute_0_topology_1
+                                - compute_0_topology_2
                                 - user_name
               repository: https://github.com/QCDIS/k8s_playbooks.git
       properties:
         credential:
           get_attribute:
-          - compute_0_topology_1
+          - compute_0_topology_2
           - user_key_pair
       requirements:
       - host:
           capability: tosca.capabilities.QC.VM.topology
           node: topology_1
+          relationship: tosca.relationships.HostedOn
+      - host:
+          capability: tosca.capabilities.QC.VM.topology
+          node: topology_2
           relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.docker.Orchestrator.Kubernetes
     monitoring:
@@ -310,12 +285,12 @@ topology_template:
                     master:
                       ansible_host:
                         get_attribute:
-                        - compute_0_topology_1
+                        - compute_0_topology_2
                         - public_ip
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user:
                         get_property:
-                        - compute_0_topology_1
+                        - compute_0_topology_2
                         - user_name
               repository: https://github.com/QCDIS/helm_playbooks.git
           install_requirements:
@@ -327,18 +302,18 @@ topology_template:
                     master:
                       ansible_host:
                         get_attribute:
-                        - compute_0_topology_1
+                        - compute_0_topology_2
                         - public_ip
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user:
                         get_property:
-                        - compute_0_topology_1
+                        - compute_0_topology_2
                         - user_name
               repository: https://github.com/QCDIS/helm_playbooks.git
       properties:
         credential:
           get_attribute:
-          - compute_0_topology_1
+          - compute_0_topology_2
           - user_key_pair
       requirements:
       - kubernetes:
@@ -388,31 +363,6 @@ topology_template:
                             get_property:
                             - compute_0_topology_1
                             - user_name
-                        compute_1_topology_1:
-                          disk_size:
-                            get_property:
-                            - compute_1_topology_1
-                            - disk_size
-                          mem_size:
-                            get_property:
-                            - compute_1_topology_1
-                            - mem_size
-                          num_cores:
-                            get_property:
-                            - compute_1_topology_1
-                            - num_cores
-                          os_distro:
-                            get_property:
-                            - compute_1_topology_1
-                            - os_distro
-                          os_version:
-                            get_property:
-                            - compute_1_topology_1
-                            - os_version
-                          user_name:
-                            get_property:
-                            - compute_1_topology_1
-                            - user_name
               repository: https://github.com/QCDIS/azure_playbooks.git
           create_resoucre_group:
             implementation: resource_group/create_resource_groups.yaml
@@ -454,31 +404,6 @@ topology_template:
                             get_property:
                             - compute_0_topology_1
                             - user_name
-                        compute_1_topology_1:
-                          disk_size:
-                            get_property:
-                            - compute_1_topology_1
-                            - disk_size
-                          mem_size:
-                            get_property:
-                            - compute_1_topology_1
-                            - mem_size
-                          num_cores:
-                            get_property:
-                            - compute_1_topology_1
-                            - num_cores
-                          os_distro:
-                            get_property:
-                            - compute_1_topology_1
-                            - os_distro
-                          os_version:
-                            get_property:
-                            - compute_1_topology_1
-                            - os_version
-                          user_name:
-                            get_property:
-                            - compute_1_topology_1
-                            - user_name
               repository: https://github.com/QCDIS/azure_playbooks.git
           create_ssh_key:
             implementation: key/create_keys.yaml
@@ -513,31 +438,6 @@ topology_template:
                           user_name:
                             get_property:
                             - compute_0_topology_1
-                            - user_name
-                        compute_1_topology_1:
-                          disk_size:
-                            get_property:
-                            - compute_1_topology_1
-                            - disk_size
-                          mem_size:
-                            get_property:
-                            - compute_1_topology_1
-                            - mem_size
-                          num_cores:
-                            get_property:
-                            - compute_1_topology_1
-                            - num_cores
-                          os_distro:
-                            get_property:
-                            - compute_1_topology_1
-                            - os_distro
-                          os_version:
-                            get_property:
-                            - compute_1_topology_1
-                            - os_version
-                          user_name:
-                            get_property:
-                            - compute_1_topology_1
                             - user_name
               repository: https://github.com/QCDIS/azure_playbooks.git
           delete:
@@ -612,31 +512,6 @@ topology_template:
                             get_property:
                             - compute_0_topology_1
                             - user_name
-                        compute_1_topology_1:
-                          disk_size:
-                            get_property:
-                            - compute_1_topology_1
-                            - disk_size
-                          mem_size:
-                            get_property:
-                            - compute_1_topology_1
-                            - mem_size
-                          num_cores:
-                            get_property:
-                            - compute_1_topology_1
-                            - num_cores
-                          os_distro:
-                            get_property:
-                            - compute_1_topology_1
-                            - os_distro
-                          os_version:
-                            get_property:
-                            - compute_1_topology_1
-                            - os_version
-                          user_name:
-                            get_property:
-                            - compute_1_topology_1
-                            - user_name
               repository: https://github.com/QCDIS/azure_playbooks.git
           select_instance_type:
             implementation: info/get_inst_flavors.yaml
@@ -681,31 +556,6 @@ topology_template:
                             get_property:
                             - compute_0_topology_1
                             - user_name
-                        compute_1_topology_1:
-                          disk_size:
-                            get_property:
-                            - compute_1_topology_1
-                            - disk_size
-                          mem_size:
-                            get_property:
-                            - compute_1_topology_1
-                            - mem_size
-                          num_cores:
-                            get_property:
-                            - compute_1_topology_1
-                            - num_cores
-                          os_distro:
-                            get_property:
-                            - compute_1_topology_1
-                            - os_distro
-                          os_version:
-                            get_property:
-                            - compute_1_topology_1
-                            - os_version
-                          user_name:
-                            get_property:
-                            - compute_1_topology_1
-                            - user_name
               repository: https://github.com/QCDIS/azure_playbooks.git
           select_network:
             implementation: network/create_network_interfaces.yaml
@@ -746,30 +596,299 @@ topology_template:
                             get_property:
                             - compute_0_topology_1
                             - user_name
-                        compute_1_topology_1:
+              repository: https://github.com/QCDIS/azure_playbooks.git
+          set_attributes:
+            implementation: set_attributes.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+              repository: https://github.com/QCDIS/azure_playbooks.git
+      properties:
+        domain: northeurope
+        provider: Azure
+      requirements:
+      - vm:
+          capability: tosca.capabilities.QC.VM
+          node: compute_0_topology_1
+          relationship: tosca.relationships.DependsOn
+      type: tosca.nodes.QC.VM.topology
+    topology_2:
+      interfaces:
+        Azure:
+          create:
+            implementation: vm/create_vms.yaml
+            inputs:
+              extra_variables:
+                region:
+                  get_property:
+                  - topology_2
+                  - domain
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+                      instances:
+                        compute_0_topology_2:
                           disk_size:
                             get_property:
-                            - compute_1_topology_1
+                            - compute_0_topology_2
                             - disk_size
                           mem_size:
                             get_property:
-                            - compute_1_topology_1
+                            - compute_0_topology_2
                             - mem_size
                           num_cores:
                             get_property:
-                            - compute_1_topology_1
+                            - compute_0_topology_2
                             - num_cores
                           os_distro:
                             get_property:
-                            - compute_1_topology_1
+                            - compute_0_topology_2
                             - os_distro
                           os_version:
                             get_property:
-                            - compute_1_topology_1
+                            - compute_0_topology_2
                             - os_version
                           user_name:
                             get_property:
-                            - compute_1_topology_1
+                            - compute_0_topology_2
+                            - user_name
+              repository: https://github.com/QCDIS/azure_playbooks.git
+          create_resoucre_group:
+            implementation: resource_group/create_resource_groups.yaml
+            inputs:
+              extra_variables:
+                region:
+                  get_property:
+                  - topology_2
+                  - domain
+                topology_name: topology_2
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+                      instances:
+                        compute_0_topology_2:
+                          disk_size:
+                            get_property:
+                            - compute_0_topology_2
+                            - disk_size
+                          mem_size:
+                            get_property:
+                            - compute_0_topology_2
+                            - mem_size
+                          num_cores:
+                            get_property:
+                            - compute_0_topology_2
+                            - num_cores
+                          os_distro:
+                            get_property:
+                            - compute_0_topology_2
+                            - os_distro
+                          os_version:
+                            get_property:
+                            - compute_0_topology_2
+                            - os_version
+                          user_name:
+                            get_property:
+                            - compute_0_topology_2
+                            - user_name
+              repository: https://github.com/QCDIS/azure_playbooks.git
+          create_ssh_key:
+            implementation: key/create_keys.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+                      instances:
+                        compute_0_topology_2:
+                          disk_size:
+                            get_property:
+                            - compute_0_topology_2
+                            - disk_size
+                          mem_size:
+                            get_property:
+                            - compute_0_topology_2
+                            - mem_size
+                          num_cores:
+                            get_property:
+                            - compute_0_topology_2
+                            - num_cores
+                          os_distro:
+                            get_property:
+                            - compute_0_topology_2
+                            - os_distro
+                          os_version:
+                            get_property:
+                            - compute_0_topology_2
+                            - os_version
+                          user_name:
+                            get_property:
+                            - compute_0_topology_2
+                            - user_name
+              repository: https://github.com/QCDIS/azure_playbooks.git
+          delete:
+            implementation: resource_group/delete_resource_group.yaml
+            inputs:
+              extra_variables:
+                resource_group_name:
+                  get_attribute:
+                  - topology_2
+                  - resource_group
+                topology_name: topology_2
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+              repository: https://github.com/QCDIS/azure_playbooks.git
+          delete_ssh_key:
+            implementation: key/delete_keys.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+              repository: https://github.com/QCDIS/azure_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+              repository: https://github.com/QCDIS/azure_playbooks.git
+          select_image:
+            implementation: info/get_images.yaml
+            inputs:
+              extra_variables:
+                region:
+                  get_property:
+                  - topology_2
+                  - domain
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+                      instances:
+                        compute_0_topology_2:
+                          disk_size:
+                            get_property:
+                            - compute_0_topology_2
+                            - disk_size
+                          mem_size:
+                            get_property:
+                            - compute_0_topology_2
+                            - mem_size
+                          num_cores:
+                            get_property:
+                            - compute_0_topology_2
+                            - num_cores
+                          os_distro:
+                            get_property:
+                            - compute_0_topology_2
+                            - os_distro
+                          os_version:
+                            get_property:
+                            - compute_0_topology_2
+                            - os_version
+                          user_name:
+                            get_property:
+                            - compute_0_topology_2
+                            - user_name
+              repository: https://github.com/QCDIS/azure_playbooks.git
+          select_instance_type:
+            implementation: info/get_inst_flavors.yaml
+            inputs:
+              extra_variables:
+                region:
+                  get_property:
+                  - topology_2
+                  - domain
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+                      credentials:
+                        get_attribute:
+                        - topology_2
+                        - credentials
+                      instances:
+                        compute_0_topology_2:
+                          disk_size:
+                            get_property:
+                            - compute_0_topology_2
+                            - disk_size
+                          mem_size:
+                            get_property:
+                            - compute_0_topology_2
+                            - mem_size
+                          num_cores:
+                            get_property:
+                            - compute_0_topology_2
+                            - num_cores
+                          os_distro:
+                            get_property:
+                            - compute_0_topology_2
+                            - os_distro
+                          os_version:
+                            get_property:
+                            - compute_0_topology_2
+                            - os_version
+                          user_name:
+                            get_property:
+                            - compute_0_topology_2
+                            - user_name
+              repository: https://github.com/QCDIS/azure_playbooks.git
+          select_network:
+            implementation: network/create_network_interfaces.yaml
+            inputs:
+              extra_variables:
+                region:
+                  get_property:
+                  - topology_2
+                  - domain
+              inventory:
+                all:
+                  hosts:
+                    localhost:
+                      ansible_connection: local
+                      instances:
+                        compute_0_topology_2:
+                          disk_size:
+                            get_property:
+                            - compute_0_topology_2
+                            - disk_size
+                          mem_size:
+                            get_property:
+                            - compute_0_topology_2
+                            - mem_size
+                          num_cores:
+                            get_property:
+                            - compute_0_topology_2
+                            - num_cores
+                          os_distro:
+                            get_property:
+                            - compute_0_topology_2
+                            - os_distro
+                          os_version:
+                            get_property:
+                            - compute_0_topology_2
+                            - os_version
+                          user_name:
+                            get_property:
+                            - compute_0_topology_2
                             - user_name
               repository: https://github.com/QCDIS/azure_playbooks.git
           set_attributes:
@@ -787,11 +906,7 @@ topology_template:
       requirements:
       - vm:
           capability: tosca.capabilities.QC.VM
-          node: compute_0_topology_1
-          relationship: tosca.relationships.DependsOn
-      - vm:
-          capability: tosca.capabilities.QC.VM
-          node: compute_1_topology_1
+          node: compute_0_topology_2
           relationship: tosca.relationships.DependsOn
       type: tosca.nodes.QC.VM.topology
   workflows:
@@ -818,6 +933,29 @@ topology_template:
           activities:
           - call_operation: Azure.set_attributes
           target: topology_1
+    template_wf_delete_topology_topology_2:
+      description: delete_topology
+      preconditions:
+      - condition:
+        - assert:
+          - desired_state:
+            - equal: DELETED
+          - current_state:
+            - equal: RUNNING
+        target: topology_2
+      steps:
+        template_wf_delete:
+          activities:
+          - set_state: DELETING
+          - call_operation: Azure.delete
+            on_success:
+            - template_wf_set_attributes
+          - set_state: DELETED
+          target: topology_2
+        template_wf_set_attributes:
+          activities:
+          - call_operation: Azure.set_attributes
+          target: topology_2
     template_wf_deploy_k8s:
       description: deploy k8s
       preconditions:
@@ -833,6 +971,11 @@ topology_template:
           - current_state:
             - equal: RUNNING
         target: topology_1
+      - condition:
+        - assert:
+          - current_state:
+            - equal: RUNNING
+        target: topology_2
       steps:
         template_wf_create_k8s_dashboard:
           activities:
@@ -952,4 +1095,66 @@ topology_template:
           activities:
           - call_operation: Azure.set_attributes
           target: topology_1
+    template_wf_provision_topology_2:
+      description: Workflow to deploy azure topology
+      preconditions:
+      - condition:
+        - assert:
+          - desired_state:
+            - equal: RUNNING
+          - current_state:
+            - equal: UNDEFINED
+        target: topology_2
+      steps:
+        template_wf_create:
+          activities:
+          - call_operation: Azure.create
+            on_success:
+            - template_wf_set_attributes
+          - set_state: RUNNING
+          target: topology_2
+        template_wf_create_resoucre_group:
+          activities:
+          - call_operation: Azure.create_resoucre_group
+            on_success:
+            - template_wf_select_instance_type
+            - template_wf_select_network
+            - template_wf_create_ssh_key
+            - template_wf_select_image
+          target: topology_2
+        template_wf_create_ssh_key:
+          activities:
+          - call_operation: Azure.create_ssh_key
+            on_success:
+            - template_wf_create
+          target: topology_2
+        template_wf_install_requirements:
+          activities:
+          - set_state: CREATING
+          - call_operation: Azure.install_requirements
+            on_success:
+            - template_wf_create_resoucre_group
+          target: topology_2
+        template_wf_select_image:
+          activities:
+          - call_operation: Azure.select_image
+            on_success:
+            - template_wf_create
+          target: topology_2
+        template_wf_select_instance_type:
+          activities:
+          - call_operation: Azure.select_instance_type
+            on_success:
+            - template_wf_create
+          target: topology_2
+        template_wf_select_network:
+          activities:
+          - call_operation: Azure.select_network
+            on_success:
+            - template_wf_create
+          target: topology_2
+        template_wf_set_attributes:
+          activities:
+          - call_operation: Azure.set_attributes
+          target: topology_2
 tosca_definitions_version: tosca_simple_yaml_1_2
