@@ -83,11 +83,11 @@ topology_template:
                   prometheusOperator:
                     enabled: true
                     service:
-                      type: NodePort
+                      type: ClusterIP
                   prometheus:
                     enabled: true
                     service:
-                      type: NodePort
+                      type: ClusterIP
                   grafana:
                     enabled: true
                     service:
