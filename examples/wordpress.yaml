@@ -30,7 +30,7 @@ topology_template:
         num_cores: 2
         os_distro: Ubuntu
         os_version: 18.04
-        user_name: vm_user
+        user_name: vm_usercredentials
       type: tosca.nodes.QC.VM.Compute
     topology:
       properties:
@@ -562,4 +562,8 @@ topology_template:
           activities:
           - call_operation: Azure.set_attributes
           target: topology
+
+
+
+
 
