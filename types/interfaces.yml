@@ -156,6 +156,7 @@ interface_types:
     delete_vpc_subnet:
     create_random_name:
     delete:
+    create_user:
 
 
   tosca.interfaces.QC.Azure:
