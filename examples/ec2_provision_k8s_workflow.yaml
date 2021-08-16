@@ -190,6 +190,7 @@ topology_template:
           create_user:
             implementation: create_users.yaml
             inputs:
+              repository: https://github.com/QCDIS/ec2_playbooks.git
               inventory:
                 all:
                   hosts:
@@ -447,6 +448,9 @@ topology_template:
             target: topology
           ec2_set_attributes:
             activities:
-            - set_state: CREATING
             - call_operation: EC2.set_attributes
+            target: topology
+          create_user:
+            activities:
+            - call_operation: EC2.create_user
             target: topology
