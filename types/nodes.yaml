@@ -399,7 +399,3 @@ node_types:
           type: string
           required: true
           default: gv0
-
-
-.ProcessorInfo:
-  SupportedArchitectures:
