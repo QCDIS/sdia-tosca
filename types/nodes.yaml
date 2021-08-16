@@ -277,6 +277,10 @@ node_types:
         type: string
         required: true
         default: "vm_user"
+      architecture:
+        type: string
+        required: false
+        default: "x86_64"
     # outputs for this node
     attributes:
       private_ip:
@@ -395,5 +399,7 @@ node_types:
           type: string
           required: true
           default: gv0
-          
-          
+
+
+.ProcessorInfo:
+  SupportedArchitectures:
