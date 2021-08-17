@@ -14,7 +14,7 @@ topology_template:
           create: dumy.yaml
       properties:
         disk_size: 10000 MB
-        mem_size: 4048 MB
+        mem_size: 4000 MB
         num_cores: 2
         os_distro: Ubuntu
         os_version: 18.04
@@ -25,8 +25,8 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
-        disk_size: 40000 MB
-        mem_size: 4048 MB
+        disk_size: 10000 MB
+        mem_size: 4000 MB
         num_cores: 2
         os_distro: Ubuntu
         os_version: 18.04
@@ -443,14 +443,16 @@ topology_template:
             - set_state: CREATING
             - call_operation: EC2.create
               on_success:
-              - ec2_set_attributes
+              - ec_create_user
             - set_state: RUNNING
             target: topology
           ec2_set_attributes:
             activities:
             - call_operation: EC2.set_attributes
             target: topology
-          create_user:
+          ec_create_user:
             activities:
             - call_operation: EC2.create_user
+              on_success:
+              - ec2_set_attributes
             target: topology
