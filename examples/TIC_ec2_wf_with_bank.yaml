@@ -694,8 +694,9 @@ topology_template:
               repository: https://github.com/QCDIS/ec2_playbooks.git
           delete_ssh_key:
             implementation: key/delete_key.yaml
-            user_key_pair: { get_attributes: [ compute, user_key_pair ] }
             inputs:
+              extra_variables:
+                user_key_pair: { get_attributes: [ compute, user_key_pair ] }
               inventory:
                 all:
                   hosts:

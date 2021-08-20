@@ -216,7 +216,7 @@ topology_template:
     vialog:
       type: tosca.nodes.QC.Container.Application.Helm
       properties:
-        credential: { get_attribute: [ compute,user_key_pair ] }
+        credential: { get_attribute: [ compute, user_key_pair ] }
       requirements:
       - kubernetes:
           capability: tosca.capabilities.QC.Kubernetes
