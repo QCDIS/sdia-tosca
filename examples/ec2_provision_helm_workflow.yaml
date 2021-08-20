@@ -347,6 +347,7 @@ topology_template:
                 repo_name: prometheus-community
                 repo_url: 'https://prometheus-community.github.io/helm-charts'
                 name: monitoring
+                helm_name: monitoring
                 namespace: default
                 values:
                   alertmanager:
@@ -551,3 +552,6 @@ topology_template:
               on_success:
               - ec2_set_attributes
             target: topology
+
+
+
