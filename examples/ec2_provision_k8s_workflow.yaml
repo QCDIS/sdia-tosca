@@ -367,7 +367,7 @@ topology_template:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
-    provision:
+    ec2_provision:
       description: Workflow to deploy ec2 topology
       preconditions:
         - target: topology
@@ -401,8 +401,6 @@ topology_template:
             - call_operation: EC2.select_instance_type
               on_success:
                 - ec2_create
-#              - ec2_create_vpc_subnet
-#              - ec2_create_security_group
             target: topology
           ec2_select_image:
             activities:
@@ -449,14 +447,14 @@ topology_template:
             activities:
             - call_operation: EC2.create
               on_success:
-              - ec_create_user
+              - ec2_create_user
             - set_state: RUNNING
             target: topology
           ec2_set_attributes:
             activities:
             - call_operation: EC2.set_attributes
             target: topology
-          ec_create_user:
+          ec2_create_user:
             activities:
             - call_operation: EC2.create_user
               on_success:
