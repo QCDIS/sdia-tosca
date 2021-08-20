@@ -213,6 +213,48 @@ topology_template:
                     localhost:
                       ansible_connection: local
               repository: https://github.com/QCDIS/ec2_playbooks.git
+    vialog:
+      type: tosca.nodes.QC.Container.Application.Helm
+      properties:
+        credential: { get_attribute: [ compute,user_key_pair ] }
+      requirements:
+      - kubernetes:
+          capability: tosca.capabilities.QC.Kubernetes
+          node: kubernetes
+          relationship: tosca.relationships.HostedOn
+      interfaces:
+        Helm:
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              repository: https://github.com/QCDIS/helm_playbooks.git
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              repository: https://github.com/QCDIS/helm_playbooks.git
+              extra_variables:
+                chart_name: qcdis/vialog-helm-dataservice
+                repo_name: qcdis
+                repo_url: 'https://qcdis.github.io/vialog-helm-dataservice/'
+                helm_name: vialog
+                namespace: default
+                values:
+                  service:
+                    type: NodePort
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
     monitoring:
       type: tosca.nodes.QC.Container.Application.Helm
       properties:
@@ -269,152 +311,109 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-    vialog:
-        type: tosca.nodes.QC.Container.Application.Helm
-        properties:
-          credential: { get_attribute: [ compute,user_key_pair ] }
-        requirements:
-        - kubernetes:
-            capability: tosca.capabilities.QC.Kubernetes
-            node: kubernetes
-            relationship: tosca.relationships.HostedOn
-        interfaces:
-          Helm:
-            install_requirements:
-              implementation: install_requirements.yaml
-              inputs:
-                repository: https://github.com/QCDIS/helm_playbooks.git
-                inventory:
-                  all:
-                    hosts:
-                      master:
-                        ansible_host: { get_attribute: [ compute,public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_user: { get_property: [ compute,user_name ] }
-            install_chart:
-              implementation: install_chart.yaml
-              inputs:
-                repository: https://github.com/QCDIS/helm_playbooks.git
-                extra_variables:
-                  chart_name: qcdis/vialog-helm-dataservice
-                  repo_name: qcdis
-                  repo_url: 'https://qcdis.github.io/vialog-helm-dataservice/'
-                  helm_name: vialog
-                  namespace: default
-                  values:
-                    service:
-                      type: NodePort
-                inventory:
-                  all:
-                    hosts:
-                      master:
-                        ansible_host: { get_attribute: [ compute,public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_user: { get_property: [ compute,user_name ] }
-
-      kubernetes:
-        type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
-        requirements:
-          - host:
-              capability: "tosca.capabilities.QC.VM.topology"
-              node: "topology"
-              relationship: "tosca.relationships.HostedOn"
-        properties:
-          credential: { get_attribute: [ compute,user_key_pair ] }
-        interfaces:
-          Kubernetes:
-            install_requirements:
-              implementation: install_prerequisites.yaml
-              inputs:
-                repository: "https://github.com/QCDIS/k8s_playbooks.git"
-                inventory:
-                  all:
-                    hosts:
-                      master:
-                        ansible_host: { get_attribute: [ compute,public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_user: { get_property: [ compute,user_name ] }
-                      worker:
-                        ansible_host: { get_attribute: [ compute_1,public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_user: { get_property: [ compute_1,user_name ] }
-            install_k8s:
-              implementation: install_k8s.yaml
-              inputs:
-                repository: "https://github.com/QCDIS/k8s_playbooks.git"
-                inventory:
-                  all:
-                    hosts:
-                      master:
-                        ansible_host: { get_attribute: [ compute,public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_user: { get_property: [ compute,user_name ] }
-                      worker:
-                        ansible_host: { get_attribute: [ compute_1,public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_user: { get_property: [ compute_1,user_name ] }
-            set_master:
-              implementation: set_master_k8s_cluster.yaml
-              inputs:
-                repository: "https://github.com/QCDIS/k8s_playbooks.git"
-                inventory:
-                  all:
-                    hosts:
-                      master:
-                        ansible_host: { get_attribute: [ compute,public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_user: { get_property: [ compute,user_name ] }
-            join_k8s_cluster:
-              implementation: join_k8s_cluster.yaml
-              inputs:
-                repository: "https://github.com/QCDIS/k8s_playbooks.git"
-                inventory:
-                  all:
-                    hosts:
-                      master:
-                        ansible_host: { get_attribute: [ compute,public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_user: { get_property: [ compute,user_name ] }
-                      worker:
-                        ansible_host: { get_attribute: [ compute_1,public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_user: { get_property: [ compute_1,user_name ] }
-            create_k8s_dashboard:
-              implementation: create_k8s_dashboard.yaml
-              inputs:
-                repository: "https://github.com/QCDIS/k8s_playbooks.git"
-                inventory:
-                  all:
-                    hosts:
-                      master:
-                        ansible_host: { get_attribute: [ compute,public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_user: { get_property: [ compute,user_name ] }
-            create_k8s_metrics_server:
-              implementation: create_k8s_metrics_server.yaml
-              inputs:
-                repository: "https://github.com/QCDIS/k8s_playbooks.git"
-                inventory:
-                  all:
-                    hosts:
-                      master:
-                        ansible_host: { get_attribute: [ compute,public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_user: { get_property: [ compute,user_name ] }
-            scale:
-            autoscale:
-            info:
-            set_attributes:
-              implementation: get_attributes.yaml
-              inputs:
-                repository: "https://github.com/QCDIS/k8s_playbooks.git"
-                inventory:
-                  all:
-                    hosts:
-                      master:
-                        ansible_host: { get_attribute: [ compute,public_ip ] }
-                        ansible_python_interpreter: /usr/bin/python3
-                        ansible_ssh_user: { get_property: [ compute,user_name ] }
+    kubernetes:
+      type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
+      requirements:
+        - host:
+            capability: "tosca.capabilities.QC.VM.topology"
+            node: "topology"
+            relationship: "tosca.relationships.HostedOn"
+      properties:
+        credential: { get_attribute: [ compute,user_key_pair ] }
+      interfaces:
+        Kubernetes:
+          install_requirements:
+            implementation: install_prerequisites.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          install_k8s:
+            implementation: install_k8s.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          set_master:
+            implementation: set_master_k8s_cluster.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+          join_k8s_cluster:
+            implementation: join_k8s_cluster.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          create_k8s_dashboard:
+            implementation: create_k8s_dashboard.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+          create_k8s_metrics_server:
+            implementation: create_k8s_metrics_server.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+          scale:
+          autoscale:
+          info:
+          set_attributes:
+            implementation: get_attributes.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
 
 
   workflows:
