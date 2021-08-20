@@ -470,13 +470,12 @@ topology_template:
             on_success: set_k8s_attributes
           - set_state: RUNNING
           target: vialog
-
-        install_chart:
-          activities:
-          - call_operation: Helm.install_chart
-            on_success: set_k8s_attributes
-          - set_state: RUNNING
-          target: monitoring
+#        install_chart:
+#          activities:
+#          - call_operation: Helm.install_chart
+#            on_success: set_k8s_attributes
+#          - set_state: RUNNING
+#          target: monitoring
         create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
