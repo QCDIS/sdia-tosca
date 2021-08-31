@@ -81,7 +81,7 @@ topology_template:
                     service:
                       type: ClusterIP
                   prometheusOperator:
-                    enabled: true
+                    enabled: false
                     service:
                       type: NodePort
                   prometheus:
