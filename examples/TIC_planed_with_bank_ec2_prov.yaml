@@ -46,7 +46,7 @@ topology_template:
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
               extra_variables:
                 devmode: False
-                device_path: "/dev/nvme1n1"
+                device_path: "/dev/xvdh"
                 ansible_user: "vm_user"
               inventory:
                 all:
@@ -80,7 +80,7 @@ topology_template:
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
               extra_variables:
                 devmode: False
-                device_path: "/dev/nvme1n1"
+                device_path: "/dev/xvdh"
                 ansible_user: "vm_user"
               inventory:
                 all:
@@ -105,7 +105,7 @@ topology_template:
               repository: "https://github.com/QCDIS/mysome_glusterfs.git"
               extra_variables:
                 devmode: False
-                device_path: "/dev/nvme1n1"
+                device_path: "/dev/xvdh"
                 ansible_user: "vm_user"
               inventory:
                 all:
@@ -770,6 +770,11 @@ topology_template:
     deploy_tic_with-bank:
       description: Workflow to deploy TIC
       preconditions:
+        - target: glusterfs
+          condition:
+            - assert:
+              - desired_state: [{equal: RUNNING }]
+              - current_state: [{equal: UNDEFINED }]
         - target: topology
           condition:
             - assert:
