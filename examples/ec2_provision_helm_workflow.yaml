@@ -9,29 +9,30 @@ imports:
 topology_template:
   node_templates:
     compute:
+      properties:
+        disk_size: "40000 MB"
+        mem_size: "4000 MB"
+        num_cores: 2
+        os_distro: "Ubuntu"
+        os_version: "18.04"
+        user_name: "vm_user"
       interfaces:
         Standard:
-          create: dumy.yaml
-      properties:
-        disk_size: 10000 MB
-        mem_size: 4000 MB
-        num_cores: 2
-        os_distro: Ubuntu
-        os_version: 18.04
-        user_name: vm_user
-      type: tosca.nodes.QC.VM.Compute
+          create: "dumy.yaml"
+      type: "tosca.nodes.QC.VM.Compute"
+
     compute_1:
+      properties:
+        disk_size: "40000 MB"
+        mem_size: "4000 MB"
+        num_cores: 2
+        os_distro: "Ubuntu"
+        os_version: "18.04"
+        user_name: "vm_user"
       interfaces:
         Standard:
-          create: dumy.yaml
-      properties:
-        disk_size: 10000 MB
-        mem_size: 4000 MB
-        num_cores: 2
-        os_distro: Ubuntu
-        os_version: 18.04
-        user_name: vm_user
-      type: tosca.nodes.QC.VM.Compute
+          create: "dumy.yaml"
+      type: "tosca.nodes.QC.VM.Compute"
     topology:
       properties:
         domain: eu-west-1
@@ -347,6 +348,7 @@ topology_template:
                 repo_name: prometheus-community
                 repo_url: 'https://prometheus-community.github.io/helm-charts'
                 name: monitoring
+                helm_name: monitoring
                 namespace: default
                 values:
                   alertmanager:
@@ -354,7 +356,7 @@ topology_template:
                     service:
                       type: ClusterIP
                   prometheusOperator:
-                    enabled: true
+                    enabled: false
                     service:
                       type: NodePort
                   prometheus:
@@ -469,7 +471,6 @@ topology_template:
             on_success: set_k8s_attributes
           - set_state: RUNNING
           target: vialog
-
         install_chart:
           activities:
           - call_operation: Helm.install_chart
@@ -551,3 +552,34 @@ topology_template:
               on_success:
               - ec2_set_attributes
             target: topology
+    ec2_delete_topology:
+      description: delete_topology
+      preconditions:
+        - target: topology
+          condition:
+            - assert:
+              - desired_state: [{equal: DELETED }]
+              - current_state: [{equal: RUNNING }]
+      steps:
+        delete:
+          activities:
+          - set_state: DELETING
+          - call_operation: EC2.delete
+            on_success:
+            - set_attributes
+          - set_state: DELETED
+          target: topology
+        delete_ssh:
+          activities:
+          - set_state: DELETING
+          - call_operation: EC2.delete_ssh_key
+            on_success:
+            - set_attributes
+          target: topology
+        set_attributes:
+          activities:
+          - call_operation: EC2.set_attributes
+          target: topology
+
+
+
