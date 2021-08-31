@@ -356,7 +356,7 @@ topology_template:
                     service:
                       type: ClusterIP
                   prometheusOperator:
-                    enabled: true
+                    enabled: false
                     service:
                       type: NodePort
                   prometheus:
@@ -552,6 +552,34 @@ topology_template:
               on_success:
               - ec2_set_attributes
             target: topology
+    ec2_delete_topology:
+      description: delete_topology
+      preconditions:
+        - target: topology
+          condition:
+            - assert:
+              - desired_state: [{equal: DELETED }]
+              - current_state: [{equal: RUNNING }]
+      steps:
+        delete:
+          activities:
+          - set_state: DELETING
+          - call_operation: EC2.delete
+            on_success:
+            - set_attributes
+          - set_state: DELETED
+          target: topology
+        delete_ssh:
+          activities:
+          - set_state: DELETING
+          - call_operation: EC2.delete_ssh_key
+            on_success:
+            - set_attributes
+          target: topology
+        set_attributes:
+          activities:
+          - call_operation: EC2.set_attributes
+          target: topology
 
 
 
