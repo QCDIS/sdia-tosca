@@ -801,6 +801,7 @@ topology_template:
             on_success:
             - deploy_tic-bank-initialize_hosts
             - deploy_tic-bank-mount_fs
+            on_failure:
           target: glusterfs
         deploy_tic-bank-initialize_hosts:
           activities:
@@ -875,6 +876,8 @@ topology_template:
           - call_operation: TIC.set_attributes
           - set_state: created
           target: tic
+
+
     ec2_provision:
       description: Workflow to deploy ec2 topology
       preconditions:
