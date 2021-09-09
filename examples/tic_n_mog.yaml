@@ -47,7 +47,7 @@ topology_template:
           purge:
             implementation: 000.purge.yml
             inputs:
-              repository: "https://github.com/QCDIS/mysome_glusterfs.git"
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
               extra_variables:
                 devmode: False
                 device_path: "/dev/xvdh"
@@ -75,7 +75,7 @@ topology_template:
                 devmode: False
                 device_path: "/dev/xvdh"
                 ansible_user: "vm_user"
-              repository: "https://github.com/QCDIS/mysome_glusterfs.git"
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
               implementation: 001.requirements.yml
               inventory:
                 all:
@@ -84,7 +84,7 @@ topology_template:
                       ansible_connection: local
           setup_glusterfs_infra:
             inputs:
-              repository: "https://github.com/QCDIS/mysome_glusterfs.git"
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
               implementation: 002.setup_glusterfs_infra.yml
               extra_variables:
                 devmode: False
@@ -109,7 +109,7 @@ topology_template:
                           gluster_mount_server: { get_attribute: [ compute,public_ip ] }
           setup_glusterfs_cluster:
             inputs:
-              repository: "https://github.com/QCDIS/mysome_glusterfs.git"
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
               implementation: 003.setup_glusterfs_cluster.yml
               extra_variables:
                 devmode: False
