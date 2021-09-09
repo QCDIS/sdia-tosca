@@ -43,7 +43,7 @@ topology_template:
           purge:
             implementation: 000.purge.yml
             inputs:
-              repository: "https://github.com/QCDIS/mysome_glusterfs.git"
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
               extra_variables:
                 devmode: False
                 device_path: "/dev/xvdh"
@@ -68,7 +68,7 @@ topology_template:
           requirements:
             implementation: 001.requirements.yml
             inputs:
-              repository: "https://github.com/QCDIS/mysome_glusterfs.git"
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
               inventory:
                 all:
                   hosts:
@@ -77,7 +77,7 @@ topology_template:
           setup_glusterfs_infra:
             implementation: 002.setup_glusterfs_infra.yml
             inputs:
-              repository: "https://github.com/QCDIS/mysome_glusterfs.git"
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
               extra_variables:
                 devmode: False
                 device_path: "/dev/xvdh"
@@ -102,7 +102,7 @@ topology_template:
           setup_glusterfs_cluster:
             implementation: 003.setup_glusterfs_cluster.yml
             inputs:
-              repository: "https://github.com/QCDIS/mysome_glusterfs.git"
+              repository: "https://github.com/bityoga/mysome_glusterfs.git"
               extra_variables:
                 devmode: False
                 device_path: "/dev/xvdh"
