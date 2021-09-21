@@ -6,13 +6,13 @@ imports:
   - capabilities: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/capabilities.yaml
   - policies: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/policies.yaml
   - interfaces: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/interfaces.yml
-  
+
 repositories:
-  docker_hub: https://hub.docker.com/  
+  docker_hub: https://hub.docker.com/
 
 description: >
   TOSCA example
-  
+
 
 topology_template:
 
@@ -143,6 +143,7 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
+
     topology:
       properties:
         domain: "Ireland"
