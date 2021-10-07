@@ -13,9 +13,9 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
-        disk_size: 10000 MB
-        mem_size: 2048 MB
-        num_cores: 2
+        disk_size: 60000 MB
+        mem_size: 4000 MB
+        num_cores: 1
         os_distro: Ubuntu
         os_version: 18.04
         user_name: vm_user
@@ -25,8 +25,8 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
-        disk_size: 10000 MB
-        mem_size: 2048 MB
+        disk_size: 60000 MB
+        mem_size: 4000 MB
         num_cores: 1
         os_distro: Ubuntu
         os_version: 18.04
@@ -296,6 +296,40 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
+          create_persistent_volume:
+            implementation: create_persistent_volume.yaml
+            inputs:
+              extra_variables:
+                pv:
+                  apiVersion: v1
+                  kind: PersistentVolume
+                  metadata:
+                    name: local-pv
+                  spec:
+                    capacity:
+                      storage: 30Gi
+                    accessModes:
+                    - ReadWriteOnce
+                    persistentVolumeReclaimPolicy: Retain
+                    storageClassName: local-storage
+                    local:
+                      path: /tmp/local-pv
+                    nodeAffinity:
+                      required:
+                        nodeSelectorTerms:
+                        - matchExpressions:
+                          - key: kubernetes.io/hostname
+                            operator: In
+                            values:
+                            - cka
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
     monitoring:
       type: tosca.nodes.QC.Container.Application.Helm
       properties:
@@ -352,7 +386,6 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-
     kaniko:
       type: tosca.nodes.QC.Container.Application.Helm
       properties:
@@ -387,10 +420,10 @@ topology_template:
                 namespace: default
                 status: Succeeded
                 values:
-                  azure_key: "KEY"
-                  dockerhub_auth: "KEY"
-                  dockerfile: "URL"
-                  context: "URL"
+                  azure_key: ""
+                  dockerhub_auth: ""
+                  dockerfile: ""
+                  context: ""
                   destination: "cloudcells/cell_name"
               inventory:
                 all:
@@ -413,10 +446,69 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
+    argowf:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: argo/argo-workflows
+                helm_name: argowf
+                namespace: default
+                repo_name: argo
+                repo_url: https://argoproj.github.io/argo-helm
+                values:
+                  containerRuntimeExecutor: k8sapi
+                  server:
+                    serviceType: NodePort
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                        - compute
+                        - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                        - compute
+                        - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                        - compute
+                        - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                        - compute
+                        - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+          - compute
+          - user_key_pair
+      requirements:
+      - kubernetes:
+          capability: tosca.capabilities.QC.Kubernetes
+          node: kubernetes
+          relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
+
 
 
   workflows:
-    deploy_helm:
+    fair-cells_deploy_kaniko:
       description: deploy kaniko
       preconditions:
         - target: kubernetes
@@ -429,22 +521,20 @@ topology_template:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        install_kaniko:
+        fair-cells_install_kaniko:
           activities:
           - call_operation: Helm.install_chart
-            on_success: uninstall_kaniko
-          - set_state: RUNNING
+            on_success: fair-cells_uninstall_kaniko
           target:  kaniko
-        uninstall_kaniko:
+        fair-cells_uninstall_kaniko:
           activities:
           - call_operation: Helm.uninstall_chart
-            on_success: set_k8s_attributes
+            on_success: fair-cells_set_k8s_attributes
           - set_state: UNDEFINED
           target:  kaniko
-        set_k8s_attributes:
+        fair-cells_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
-          - set_state: RUNNING
           target: kubernetes
 
     fair-cells-deploy_k8s:
@@ -454,57 +544,75 @@ topology_template:
           condition:
             - assert:
               - current_state: [{equal: RUNNING }]
-
         - target: kubernetes
           condition:
             - assert:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        install_k8s_requirements:
+        fair-cells_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
-            on_success: install_k8s
+            on_success: fair-cells_install_k8s
           target: kubernetes
-        install_k8s:
+        fair-cells_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: set_master
+            on_success: fair-cells_set_master
           target: kubernetes
-        set_master:
+        fair-cells_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
-            - join_k8s_cluster
-            - install_heml_requirements
-            - create_k8s_dashboard
+            - fair-cells_join_k8s_cluster
+            - fair-cells_install_heml_requirements
+            - fair-cells_create_k8s_dashboard
           target: kubernetes
-        join_k8s_cluster:
+        fair-cells_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - install_monitoring
+              - fair-cells_install_monitoring
+              - fair-cells_install_argowf
           target: kubernetes
-        install_heml_requirements:
+        fair-cells_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
-            on_success: install_monitoring
+            on_success:
+            - fair-cells_install_monitoring
+            - fair-cells_install_argowf
+            - fair-cells_create_persistent_volume
           target:  monitoring
-        install_monitoring:
+
+        fair-cells_create_persistent_volume:
+          activities:
+          - call_operation: Kubernetes.create_persistent_volume
+            on_success: fair-cells_set_k8s_attributes
+          - set_state: RUNNING
+          target:  kubernetes
+
+        fair-cells_install_monitoring:
           activities:
           - call_operation: Helm.install_chart
-            on_success: set_k8s_attributes
+            on_success: fair-cells_set_k8s_attributes
           - set_state: RUNNING
           target:  monitoring
-        create_k8s_dashboard:
+        fair-cells_install_argowf:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: fair-cells_set_k8s_attributes
+          - set_state: RUNNING
+          target: argowf
+        fair-cells_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
-            - install_monitoring
+            - fair-cells_install_monitoring
+            - fair-cells_install_argowf
           - set_state: RUNNING
           target: kubernetes
-        set_k8s_attributes:
+        fair-cells_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
@@ -518,54 +626,54 @@ topology_template:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        install_requirements:
+        fair-cells_install_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Azure.install_requirements
             on_success:
-            - create_resoucre_group
+            - fair-cells_create_resoucre_group
           target: topology
-        create_resoucre_group:
+        fair-cells_create_resoucre_group:
           activities:
           - call_operation: Azure.create_resoucre_group
             on_success:
-            - select_instance_type
-            - select_network
-            - create_ssh_key
-            - select_image
+            - fair-cells_select_instance_type
+            - fair-cells_select_network
+            - fair-cells_create_ssh_key
+            - fair-cells_select_image
           target: topology
-        select_instance_type:
+        fair-cells_select_instance_type:
           activities:
           - call_operation: Azure.select_instance_type
             on_success:
-            - create
+            - fair-cells_create
           target: topology
-        select_network:
+        fair-cells_select_network:
           activities:
           - call_operation: Azure.select_network
             on_success:
-            - create
+            - fair-cells_create
           target: topology
-        create_ssh_key:
+        fair-cells_create_ssh_key:
           activities:
           - call_operation: Azure.create_ssh_key
             on_success:
-            - create
+            - fair-cells_create
           target: topology
-        select_image:
+        fair-cells_select_image:
           activities:
             - call_operation: Azure.select_image
               on_success:
-                - create
+                - fair-cells_create
           target: topology
-        create:
+        fair-cells_create:
           activities:
           - call_operation: Azure.create
             on_success:
-            - set_attributes
+            - fair-cells_set_attributes
           - set_state: RUNNING
           target: topology
-        set_attributes:
+        fair-cells_set_attributes:
           activities:
           - call_operation: Azure.set_attributes
           target: topology
@@ -579,15 +687,16 @@ topology_template:
               - desired_state: [{equal: DELETED }]
               - current_state: [{equal: RUNNING }]
       steps:
-        delete:
+        fair-cells_delete:
           activities:
           - set_state: DELETING
           - call_operation: Azure.delete
             on_success:
-            - set_attributes
+            - fair-cells_set_attributes
           - set_state: DELETED
           target: topology
-        set_attributes:
+        fair-cells_set_attributes:
           activities:
           - call_operation: Azure.set_attributes
           target: topology
+
