@@ -300,8 +300,28 @@ topology_template:
             implementation: create_persistent_volume.yaml
             inputs:
               extra_variables:
-                storage_capacity: 30Gi
-                path: /tmp/local-pv
+                pv:
+                  apiVersion: v1
+                  kind: PersistentVolume
+                  metadata:
+                    name: local-pv
+                  spec:
+                    capacity:
+                      storage: 30Gi
+                    accessModes:
+                    - ReadWriteOnce
+                    persistentVolumeReclaimPolicy: Retain
+                    storageClassName: local-storage
+                    local:
+                      path: /tmp/local-pv
+                    nodeAffinity:
+                      required:
+                        nodeSelectorTerms:
+                        - matchExpressions:
+                          - key: kubernetes.io/hostname
+                            operator: In
+                            values:
+                            - cka
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
               inventory:
                 all:
