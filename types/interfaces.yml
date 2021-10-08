@@ -300,6 +300,17 @@ interface_types:
     mount:
       description: mount
 
+  tosca.interfaces.QC.NFS:
+    derived_from: tosca.interfaces.QC.Ansible
+    purge:
+      description: purge
+    requirements:
+      description: requirements
+    install:
+      description: install
+    mount:
+      description: mount
+
 
 
       
