@@ -343,6 +343,25 @@ node_types:
 #        entry_schema:
 #          type: string
 
+  tosca.nodes.QC.Application.NFS:
+    derived_from:  tosca.nodes.QC.Application
+    description: NFS
+    capabilities:
+      storage:
+        type: tosca.capabilities.QC.NFS
+    requirements:
+      - host:
+          capability: tosca.capabilities.QC.VM.topology
+          node: tosca.nodes.QC.VM.topology
+          relationship: tosca.relationships.HostedOn
+    interfaces:
+      NFS:
+        type: tosca.interfaces.QC.NFS
+    properties:
+        prop:
+          type: string
+          required: false
+
 
   tosca.nodes.QC.Application.GlusterFS:
     derived_from:  tosca.nodes.QC.Application
