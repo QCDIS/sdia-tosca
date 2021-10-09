@@ -58,13 +58,19 @@ Azure:
                 ansible_connection: local
                 instances:
                   VM_NAME_1:
-                    user_name: { get_property: [ VM_NAME_1, user_name ] }
+                    disk_size: { get_property: [ VM_NAME_1, disk_size ] }
+                    mem_size: { get_property: [ VM_NAME_1, mem_size ] }
+                    num_cores: { get_property: [ VM_NAME_1, num_cores ] }
                     os_distro: { get_property: [ VM_NAME_1, os_distro ] }
                     os_version: { get_property: [ VM_NAME_1, os_version ] }
+                    user_name: { get_property: [ VM_NAME_1, user_name ] }
                   VM_NAME_2:
-                    user_name: { get_property: [ VM_NAME_2, user_name ] }
+                    disk_size: { get_property: [ VM_NAME_2, disk_size ] }
+                    mem_size: { get_property: [ VM_NAME_2, mem_size ] }
+                    num_cores: { get_property: [ VM_NAME_2, num_cores ] }
                     os_distro: { get_property: [ VM_NAME_2, os_distro ] }
                     os_version: { get_property: [ VM_NAME_2, os_version ] }
+                    user_name: { get_property: [ VM_NAME_2, user_name ] }
         repository: https://github.com/QCDIS/azure_playbooks.git
     create_ssh_key:
       implementation: key/create_keys.yaml
