@@ -13,9 +13,9 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
-        disk_size: 60000 MB
-        mem_size: 4000 MB
-        num_cores: 1
+        disk_size: 70000 MB
+        mem_size: 8000 MB
+        num_cores: 2
         os_distro: Ubuntu
         os_version: 18.04
         user_name: vm_user
@@ -25,9 +25,9 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
-        disk_size: 60000 MB
-        mem_size: 4000 MB
-        num_cores: 1
+        disk_size: 70000 MB
+        mem_size: 8000 MB
+        num_cores: 2
         os_distro: Ubuntu
         os_version: 18.04
         user_name: vm_user
@@ -107,12 +107,16 @@ topology_template:
                       ansible_connection: local
                       instances:
                         compute:
-                          user_name: { get_property: [ compute, user_name ] }
+                          disk_size: { get_property: [ compute, disk_size ] }
+                          mem_size: { get_property: [ compute, mem_size ] }
+                          num_cores: { get_property: [ compute, num_cores ] }
                           os_distro: { get_property: [ compute, os_distro ] }
-                          os_version: { get_property: [ compute_1, os_version ] }
+                          os_version: { get_property: [ compute, os_version ] }
                         compute_1:
-                          user_name: { get_property: [ compute_1, user_name ] }
-                          os_distro: { get_property: [ compute, os_distro ] }
+                          disk_size: { get_property: [ compute_1, disk_size ] }
+                          mem_size: { get_property: [ compute_1, mem_size ] }
+                          num_cores: { get_property: [ compute_1, num_cores ] }
+                          os_distro: { get_property: [ compute_1, os_distro ] }
                           os_version: { get_property: [ compute_1, os_version ] }
               repository: https://github.com/QCDIS/azure_playbooks.git
           create_ssh_key:
@@ -300,28 +304,8 @@ topology_template:
             implementation: create_persistent_volume.yaml
             inputs:
               extra_variables:
-                pv:
-                  apiVersion: v1
-                  kind: PersistentVolume
-                  metadata:
-                    name: local-pv
-                  spec:
-                    capacity:
-                      storage: 30Gi
-                    accessModes:
-                    - ReadWriteOnce
-                    persistentVolumeReclaimPolicy: Retain
-                    storageClassName: local-storage
-                    local:
-                      path: /tmp/local-pv
-                    nodeAffinity:
-                      required:
-                        nodeSelectorTerms:
-                        - matchExpressions:
-                          - key: kubernetes.io/hostname
-                            operator: In
-                            values:
-                            - cka
+                storage_capacity: 50Gi
+                local_path: /mnt/disk/vol1
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
               inventory:
                 all:
@@ -330,6 +314,10 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
     monitoring:
       type: tosca.nodes.QC.Container.Application.Helm
       properties:
@@ -504,8 +492,60 @@ topology_template:
           node: kubernetes
           relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
-
-
+    nfs-server-provisioner:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: kvaps/nfs-server-provisioner
+                helm_name: nfs-server-provisioner
+                namespace: default
+                repo_name: nfs-server-provisioner
+                repo_url: https://kvaps.github.io/charts
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
 
   workflows:
     fair-cells_deploy_kaniko:
@@ -537,8 +577,8 @@ topology_template:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
 
-    fair-cells-deploy_k8s:
-      description: deploy k8s
+    fair-cells-deploy:
+      description: deploy all
       preconditions:
         - target: topology
           condition:
@@ -575,6 +615,7 @@ topology_template:
             on_success:
               - fair-cells_install_monitoring
               - fair-cells_install_argowf
+              - fair-cells_install_nfs-server-provisioner
           target: kubernetes
         fair-cells_install_heml_requirements:
           activities:
@@ -582,16 +623,7 @@ topology_template:
             on_success:
             - fair-cells_install_monitoring
             - fair-cells_install_argowf
-            - fair-cells_create_persistent_volume
           target:  monitoring
-
-        fair-cells_create_persistent_volume:
-          activities:
-          - call_operation: Kubernetes.create_persistent_volume
-            on_success: fair-cells_set_k8s_attributes
-          - set_state: RUNNING
-          target:  kubernetes
-
         fair-cells_install_monitoring:
           activities:
           - call_operation: Helm.install_chart
@@ -604,6 +636,12 @@ topology_template:
             on_success: fair-cells_set_k8s_attributes
           - set_state: RUNNING
           target: argowf
+        fair-cells_install_nfs-server-provisioner:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: fair-cells_set_k8s_attributes
+          - set_state: RUNNING
+          target: nfs-server-provisioner
         fair-cells_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
