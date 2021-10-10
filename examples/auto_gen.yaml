@@ -69,10 +69,10 @@ topology_template:
     compute_0_topology_1:
       interfaces:
         Standard:
-          create: dumy.yaml
+          create: dummy.yaml
       properties:
         role: master
-        assign_public_ip: yes
+        assign_public_ip: "yes"
         disk_size: 10000 MB
         mem_size: 2048 MB
         num_cores: '1'
