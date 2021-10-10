@@ -13,6 +13,7 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
+        role: master
         disk_size: 10000 MB
         mem_size: 2048 MB
         num_cores: 2
@@ -25,6 +26,7 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
+        role: worker
         disk_size: 10000 MB
         mem_size: 2048 MB
         num_cores: 1
@@ -100,6 +102,7 @@ topology_template:
                           os_distro: { get_property: [ compute, os_distro ] }
                           os_version: { get_property: [ compute, os_version ] }
                           user_name: { get_property: [ compute, user_name ] }
+                          role: { get_property: [ compute, role ] }
                         compute_1:
                           disk_size: { get_property: [ compute_1, disk_size ] }
                           mem_size: { get_property: [ compute_1, mem_size ] }
@@ -107,6 +110,7 @@ topology_template:
                           os_distro: { get_property: [ compute_1, os_distro ] }
                           os_version: { get_property: [ compute_1, os_version ] }
                           user_name: { get_property: [ compute_1, user_name ] }
+                          role: { get_property: [ compute, role ] }
               repository: https://github.com/QCDIS/azure_playbooks.git
           create_ssh_key:
             implementation: key/create_keys.yaml

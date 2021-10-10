@@ -11,6 +11,7 @@ topology_template:
   node_templates:
     compute:
       properties:
+        role: master
         disk_size: "10 GB"
         mem_size: "2048 MB"
         num_cores: 1
@@ -23,6 +24,7 @@ topology_template:
       type: "tosca.nodes.QC.VM.Compute"
     compute_1:
       properties:
+        role: worker
         disk_size: "10000 MB"
         mem_size: "1024 MB"
         num_cores: 1

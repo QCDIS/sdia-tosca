@@ -12,6 +12,7 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
+        role: master
         disk_size: 50000 MB
         mem_size: 6000 MB
         num_cores: 2

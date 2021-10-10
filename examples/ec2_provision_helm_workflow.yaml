@@ -10,6 +10,7 @@ topology_template:
   node_templates:
     compute:
       properties:
+        role: master
         disk_size: "40000 MB"
         mem_size: "4000 MB"
         num_cores: 2
@@ -23,6 +24,7 @@ topology_template:
 
     compute_1:
       properties:
+        role: worker
         disk_size: "40000 MB"
         mem_size: "4000 MB"
         num_cores: 2
@@ -68,12 +70,14 @@ topology_template:
                           num_cores: { get_property: [ compute, num_cores ] }
                           os_distro: { get_property: [ compute, os_distro ] }
                           os_version: { get_property: [ compute, os_version ] }
+                          role: { get_property: [ compute, role ] }
                         compute_1:
                           disk_size: { get_property: [ compute_1, disk_size ] }
                           mem_size: { get_property: [ compute_1, mem_size ] }
                           num_cores: { get_property: [ compute_1, num_cores ] }
                           os_distro: { get_property: [ compute_1, os_distro ] }
                           os_version: { get_property: [ compute_1, os_version ] }
+                          role: { get_property: [ compute_1, role ] }
           create_security_group:
             implementation: security_groups.yaml
             inputs:

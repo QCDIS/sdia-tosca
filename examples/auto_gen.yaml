@@ -71,6 +71,7 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
+        role: master
         disk_size: 10000 MB
         mem_size: 2048 MB
         num_cores: '1'
@@ -376,6 +377,7 @@ topology_template:
                             get_property:
                             - compute_0_topology_1
                             - user_name
+                          role: { get_property: [ compute_0_topology_1, role ] }
               repository: https://github.com/QCDIS/azure_playbooks.git
           create_resoucre_group:
             implementation: resource_group/create_resource_groups.yaml
