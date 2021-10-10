@@ -238,7 +238,7 @@ node_types:
     properties:
       assign_public_ip:
         type: string
-        required: true
+        required: false
         default: yes
         description: the role of the VM in the topology
         constraints:
