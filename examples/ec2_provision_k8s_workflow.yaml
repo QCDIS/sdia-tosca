@@ -13,6 +13,7 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
+        role: master
         disk_size: 10000 MB
         mem_size: 2000 MB
         num_cores: 1
@@ -25,6 +26,7 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
+        role: worker
         disk_size: 10000 MB
         mem_size: 2000 MB
         num_cores: 1
@@ -37,6 +39,7 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
+        role: worker
         disk_size: 10000 MB
         mem_size: 2000 MB
         num_cores: 1
@@ -49,6 +52,7 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
+        role: worker
         disk_size: 10000 MB
         mem_size: 2000 MB
         num_cores: 1
@@ -99,24 +103,28 @@ topology_template:
                           num_cores: { get_property: [ compute_0, num_cores ] }
                           os_distro: { get_property: [ compute_0, os_distro ] }
                           os_version: { get_property: [ compute_0, os_version ] }
+                          role: { get_property: [ compute_0, role ] }
                         compute_1:
                           disk_size: { get_property: [ compute_1, disk_size ] }
                           mem_size: { get_property: [ compute_1, mem_size ] }
                           num_cores: { get_property: [ compute_1, num_cores ] }
                           os_distro: { get_property: [ compute_1, os_distro ] }
                           os_version: { get_property: [ compute_1, os_version ] }
+                          role: { get_property: [ compute_1, role ] }
                         compute_2:
                           disk_size: { get_property: [ compute_2, disk_size ] }
                           mem_size: { get_property: [ compute_2, mem_size ] }
                           num_cores: { get_property: [ compute_2, num_cores ] }
                           os_distro: { get_property: [ compute_2, os_distro ] }
                           os_version: { get_property: [ compute_2, os_version ] }
+                          role: { get_property: [ compute_2, role ] }
                         compute_3:
                           disk_size: { get_property: [ compute_3, disk_size ] }
                           mem_size: { get_property: [ compute_3, mem_size ] }
                           num_cores: { get_property: [ compute_3, num_cores ] }
                           os_distro: { get_property: [ compute_3, os_distro ] }
                           os_version: { get_property: [ compute_3, os_version ] }
+                          role: { get_property: [ compute_3, role ] }
           create_security_group:
             implementation: security_groups.yaml
             inputs:
@@ -186,7 +194,7 @@ topology_template:
                           num_cores: { get_property: [ compute_3, num_cores ] }
                           os_distro: { get_property: [ compute_3, os_distro ] }
                           os_version: { get_property: [ compute_3, os_version ] }
-                          os_version: { get_property: [ compute_3, os_version ] }
+
               repository: https://github.com/QCDIS/ec2_playbooks.git
           select_image:
             implementation: info/get_images.yaml

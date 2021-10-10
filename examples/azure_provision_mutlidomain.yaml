@@ -102,6 +102,7 @@ topology_template:
                           os_distro: { get_property: [ compute_0_0, os_distro ] }
                           os_version: { get_property: [ compute_0_0, os_version ] }
                           user_name: { get_property: [ compute_0_0, user_name ] }
+                          role: { get_property: [ compute_0_0, role ] }
                         compute_0_1:
                           disk_size: { get_property: [ compute_0_1, disk_size ] }
                           mem_size: { get_property: [ compute_0_1, mem_size ] }
@@ -109,6 +110,7 @@ topology_template:
                           os_distro: { get_property: [ compute_0_1, os_distro ] }
                           os_version: { get_property: [ compute_0_1, os_version ] }
                           user_name: { get_property: [ compute_0_1, user_name ] }
+                          role: { get_property: [ compute_0_1, role ] }
               repository: https://github.com/QCDIS/azure_playbooks.git
           create_ssh_key:
             implementation: key/create_keys.yaml
