@@ -13,7 +13,7 @@ topology_template:
           create: dummy.yaml
       properties:
         role: master
-        assign_public_ip: yes
+        assign_public_ip: "yes"
         disk_size: 50000 MB
         mem_size: 6000 MB
         num_cores: 2
