@@ -504,7 +504,7 @@ topology_template:
                         servicePort: 80
                   ingress:
                     annotations:
-                      kubernetes.io/ingress.class: nginx
+#                      kubernetes.io/ingress.class: nginx
                       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
                     domain: mogplay.academy.mog.local
                     hosts:
@@ -593,8 +593,8 @@ topology_template:
                       adminPassword: admin
                       ingress:
                         enabled: false
-                        annotations:
-                          kubernetes.io/ingress.class: "nginx"
+#                        annotations:
+#                          kubernetes.io/ingress.class: "nginx"
                         hosts:
                           - grafana.mogplay.academy.mog.local
                         path: /
@@ -612,8 +612,8 @@ topology_template:
                         serviceMonitorSelectorNilUsesHelmValues : false
                       ingress:
                         enabled: true
-                        annotations:
-                          kubernetes.io/ingress.class: "nginx"
+#                        annotations:
+#                          kubernetes.io/ingress.class: "nginx"
                         hosts:
                           - prometheus.mogplay.academy.mog.local
                         path: /
