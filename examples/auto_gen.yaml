@@ -69,7 +69,7 @@ topology_template:
     compute_0_topology_1:
       interfaces:
         Standard:
-          create: dumy.yaml
+          create: dummy.yaml
       properties:
         role: master
         assign_public_ip: yes
