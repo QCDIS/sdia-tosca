@@ -318,7 +318,7 @@ node_types:
         required: false           
     interfaces:
       Standard:
-        create: dumy.yaml        
+        create: dummy.yaml
         
 
   tosca.nodes.QC.Infrastructure:

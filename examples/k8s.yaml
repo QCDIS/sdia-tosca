@@ -20,7 +20,7 @@ topology_template:
     compute:
       properties:
         role: master
-        assign_public_ip: yes
+        assign_public_ip: "yes"
         disk_size: "40000 MB"
         mem_size: "4000 MB"
         num_cores: 2
@@ -29,13 +29,13 @@ topology_template:
         user_name: "vm_user"
       interfaces:
         Standard:
-          create: "dumy.yaml"
+          create: "dummy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
 
     compute_1:
       properties:
         role: worker
-        assign_public_ip: yes
+        assign_public_ip: "yes"
         disk_size: "40000 MB"
         mem_size: "4000 MB"
         num_cores: 2
@@ -44,7 +44,7 @@ topology_template:
         user_name: "vm_user"
       interfaces:
         Standard:
-          create: "dumy.yaml"
+          create: "dummy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
     topology:
       properties:

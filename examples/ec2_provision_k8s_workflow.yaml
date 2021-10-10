@@ -11,9 +11,9 @@ topology_template:
     compute_0:
       interfaces:
         Standard:
-          create: dumy.yaml
+          create: dummy.yaml
       properties:
-                role: master
+        role: master
         assign_public_ip: yes
         disk_size: 10000 MB
         mem_size: 2000 MB
@@ -25,7 +25,7 @@ topology_template:
     compute_1:
       interfaces:
         Standard:
-          create: dumy.yaml
+          create: dummy.yaml
       properties:
         role: worker
         assign_public_ip: yes
@@ -39,7 +39,7 @@ topology_template:
     compute_2:
       interfaces:
         Standard:
-          create: dumy.yaml
+          create: dummy.yaml
       properties:
         role: worker
         assign_public_ip: yes
@@ -53,7 +53,7 @@ topology_template:
     compute_3:
       interfaces:
         Standard:
-          create: dumy.yaml
+          create: dummy.yaml
       properties:
         role: worker
         assign_public_ip: yes
