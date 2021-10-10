@@ -3,6 +3,7 @@ topology_template:
   node_templates:
     compute:
       properties:
+        role: master
         disk_size: "40000 MB"
         mem_size: "4000 MB"
         num_cores: 2
