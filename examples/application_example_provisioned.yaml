@@ -3,7 +3,8 @@ topology_template:
   node_templates:
     compute:
       properties:
-        role: master
+ role: master
+        assign_public_ip: yes
         disk_size: "40000 MB"
         mem_size: "4000 MB"
         num_cores: 2
@@ -59,6 +60,7 @@ topology_template:
     compute_1:
       properties:
         role: worker
+        assign_public_ip: yes
         disk_size: "40000 MB"
         mem_size: "4000 MB"
         num_cores: 2
