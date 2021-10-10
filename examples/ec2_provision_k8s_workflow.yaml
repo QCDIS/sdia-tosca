@@ -13,7 +13,8 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
-        role: master
+                role: master
+        assign_public_ip: yes
         disk_size: 10000 MB
         mem_size: 2000 MB
         num_cores: 1
@@ -27,6 +28,7 @@ topology_template:
           create: dumy.yaml
       properties:
         role: worker
+        assign_public_ip: yes
         disk_size: 10000 MB
         mem_size: 2000 MB
         num_cores: 1
@@ -40,6 +42,7 @@ topology_template:
           create: dumy.yaml
       properties:
         role: worker
+        assign_public_ip: yes
         disk_size: 10000 MB
         mem_size: 2000 MB
         num_cores: 1
@@ -53,6 +56,7 @@ topology_template:
           create: dumy.yaml
       properties:
         role: worker
+        assign_public_ip: yes
         disk_size: 10000 MB
         mem_size: 2000 MB
         num_cores: 1
