@@ -29,7 +29,6 @@ node_types:
     capabilities:
       host:
         type: tosca.capabilities.Host.Compute         
-    
 
 
   tosca.nodes.QC.Container.Application.Helm:
@@ -237,10 +236,16 @@ node_types:
       compute:
         type: tosca.capabilities.QC.VM
     properties:
-      running_time:
-        type: integer
+      role:
+        type: string
         required: false
-        description: "the time units needed for this resource to execute the assigned workflow tasks"    
+        description: the role of the VM in the topology
+        constraints:
+          - valid_values: [ "master","worker" ]
+#      running_time:
+#        type: integer
+#        required: false
+#        description: "the time units needed for this resource to execute the assigned workflow tasks"
       num_cores:
         type: integer
         required: true
@@ -290,13 +295,6 @@ node_types:
         type: string
         required: false
         description: The public IP
-      role:
-        type: string
-        required: true       
-        description: the role of the VM in the topology
-        default: "master"
-        constraints:
-          - valid_values: [ "master","worker" ]
       node_type:
         type: string
         required: false
