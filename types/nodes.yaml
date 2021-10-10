@@ -239,7 +239,7 @@ node_types:
       assign_public_ip:
         type: string
         required: false
-        default: yes
+        default: "yes"
         description: the role of the VM in the topology
         constraints:
           - valid_values: [ "yes","no" ]
