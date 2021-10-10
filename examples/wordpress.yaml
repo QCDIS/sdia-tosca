@@ -13,6 +13,7 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
+        role: master
         disk_size: 10000 MB
         mem_size: 5000 MB
         num_cores: 2
@@ -25,6 +26,7 @@ topology_template:
         Standard:
           create: dumy.yaml
       properties:
+        role: worker
         disk_size: 10000 MB
         mem_size: 5000 MB
         num_cores: 2
@@ -107,13 +109,19 @@ topology_template:
                       ansible_connection: local
                       instances:
                         compute:
-                          user_name: { get_property: [ compute, user_name ] }
+                          disk_size: { get_property: [ compute, disk_size ] }
+                          mem_size: { get_property: [ compute, mem_size ] }
+                          num_cores: { get_property: [ compute, num_cores ] }
                           os_distro: { get_property: [ compute, os_distro ] }
-                          os_version: { get_property: [ compute_1, os_version ] }
+                          os_version: { get_property: [ compute, os_version ] }
+                          role: { get_property: [ compute, role ] }
                         compute_1:
-                          user_name: { get_property: [ compute_1, user_name ] }
-                          os_distro: { get_property: [ compute, os_distro ] }
+                          disk_size: { get_property: [ compute_1, disk_size ] }
+                          mem_size: { get_property: [ compute_1, mem_size ] }
+                          num_cores: { get_property: [ compute_1, num_cores ] }
+                          os_distro: { get_property: [ compute_1, os_distro ] }
                           os_version: { get_property: [ compute_1, os_version ] }
+                          role: { get_property: [ compute_1, role ] }
               repository: https://github.com/QCDIS/azure_playbooks.git
           create_ssh_key:
             implementation: key/create_keys.yaml
@@ -405,9 +413,6 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-
-    
-
 
   workflows:
     wordpress-deploy_k8s:
