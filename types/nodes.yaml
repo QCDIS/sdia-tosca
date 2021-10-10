@@ -236,6 +236,13 @@ node_types:
       compute:
         type: tosca.capabilities.QC.VM
     properties:
+      assign_public_ip:
+        type: string
+        required: true
+        default: yes
+        description: the role of the VM in the topology
+        constraints:
+          - valid_values: [ "yes","no" ]
       role:
         type: string
         required: false
