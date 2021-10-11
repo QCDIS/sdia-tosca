@@ -75,14 +75,43 @@ topology_template:
         user_key_pair:
           keys:
             name: "sdia_pjyr21a9"
-            private_key: "dG9rZW4K"
+            private_key: "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBcG5ENVc3K1Nl\n\
+              a1JpejBVMnFUcXJwVVpLSUsrSHh2RUxrU2dhVmxXb1k1YzJZNEQwCjh0Z29tcnNJMFNoMGRjak9L\n\
+              V2luQTNEMjdwa1pBTG4rN0tDVmREd3lDR3FTYUlhZUNETndkQi84NDVFdHFnTmUKSHhHZU4rUWQv\n\
+              eC9TR0Z2NUtKeXZva1UyaEx2SlVQSFpIRnN4MUY5TUJlcUlEbzJ3WDRUTDYrNG40TDZBRGZ6VQoz\n\
+              akorNnRFKzNUK3YxL0g0aitMMUQzckFDN2xmVnZ3WmRNWmh3RUtaRm1kRk1ydFpRUlBRRlovZUox\n\
+              a1FSSkZQCklPUVpuNG5FcHR0S203WFhaRWtGVmdIS0JOUEUvUWZhRG05eTFpTDN4WjI5QU5XNDdK\n\
+              UHFNejRmcHBscGJNWmgKRGJGelU4SjhyTEpoYzQvdnR4clhZQWlSMFpQR24raEFyeWRrbFFJREFR\n\
+              QUJBb0lCQUJFemVjSE9vWis3TTQ4QwpNeXo0SUVjYlpZdk5PRFlLTVV6V0hTcXcvWThWVUl5bUJp\n\
+              cVd4bE4vWXVEaTBtNWR5MWlpTlNoNDR6d3pYRThqCjZjR2dzdkZwU3k1dGZTWUtTNGpEY0NyQUo0\n\
+              MkpNblB3bHlpVTFJb29MQ1Z5cjI3UENvZjA4WDNPczF5eVg1TGEKKzdvZmZwM1pIMjA1R01pUVFo\n\
+              c05DVm9mcWNWakg5Rm5Ud0s1WTg0RnFSNTZRL1NaZmt3SVVDVTlXUUJGYjloTgp0NlJrdmZNSHJx\n\
+              V0ZGQ0YwZXNUREJQVkt0M1JHaFp4RUpva1dhWU0ybzJSc3lTT1RrZ2JoTWRtamRmTGhiaDZJClkv\n\
+              eHhoOUpEMXFPY01SOTdVdk1YVVhtTEdRSjBzQnlUR01QZ3JhZUtGWGdLWjlYaUR4Ync2djB3eFcr\n\
+              ZnFabUIKMC9Lc3RvRUNnWUVBNDFhdGJPemQwTnVJL0lWYmtKa09Tc2Z1R3RWaXd0ZmRmMG1aS1E1\n\
+              RVhjYU5lek95UlNWRQpVVjkrWmg1Ry9ldi9FWkN4TjMyRHhMQUtBclEyenBmNSt6Q2lzaEU0TmRi\n\
+              THBjcDdEVWhkVFU2UzFhcFhaUW05CjY0ZDl0VVhBZHMrWGNRSmxVN3RPOVU3VHVBWVBHV25LTEpJ\n\
+              Ymp4WE1sckVGclFDL09RU2p3blVDZ1lFQXUyelkKVkZNaWR4LzRrOVFuVHhvWWhleExVMWlLSUpo\n\
+              WVRJbzFpL2dnTHY5SEVFOExSRGZ0Qm1YaHN2cC9JdDVWYlFDdwpMRTNoazBiMHQ0TnZ4aDcvSGNO\n\
+              RlBCRkx4SXdZTDRiNE15SjNJV3JablU3cGZIT255d2tuYTcwZ2JrOFp3dGphCkxkUU15VG95NE5m\n\
+              SFllRm92cHZlY0hiWUR6aG12cXptK3l5TWxhRUNnWUVBaGRGeXVraGZkVjZVcnhnTXd2dmwKTnMy\n\
+              aThiYWpzTStDT1Rmb2FRdFY0T0ZNVExZc2ZKa29Nc0lFVkRZRVVkbUZ4aUFtd09Rb0dUSUtZbmNV\n\
+              UDkyagpyMkY4azFhaGdNZVVEbDQydXFYYkRmTnZhVWdnczMvZGhITzM0bWxSbGw0eDVicWtUSHBZ\n\
+              U3Z1QWtyVTJWQjQ2CmZLdndmdlEwL29yckxWL2dMNzcwYWpVQ2dZRUFpZ0ViU1B2dDVNa2x2N1Az\n\
+              UGNkNVJ5TTJVNmhlREtJZ1lqdGkKTWk0QmhKbHpPZzc1dk1GeFJjUys2NHFIRXFXalFSL0FtTjYv\n\
+              dWpJRS94dElzaGtnd0VtSU1US0xGNjRRSU83QQowdVlOMGcxYkx2bHI4cmMyVmNubnZPMEZkRFBL\n\
+              UkM1b2VGWXJGQUJHZGtoc0J5WnllZWRMWW9RZmt4VjBrZkcrCklqUXJVQUVDZ1lFQXo0NG1aQUpw\n\
+              ckNyK3lSbDczZTNDTjFLcm1IdW1Ba01JQytBRXpZZnU2THQ0VFBJaHFRK20KR2FFNitOMjY3b2dV\n\
+              bTZyVVNsZ1lIL2JQcmhnZGF3U0RXaUZyUFZ6bUovOFU0RVZTbERqamxudmxLTnJuZjJJVAoxYjJ2\n\
+              dkF4ei83Ti82VFo2eEN6bEVMbnY0aTBjYk9ncnRFSERNSnNtWm1nbGlVN1VVV2pUSTRJPQotLS0t\n\
+              LUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo="
             public_key: "OTQ6NGE6ZDM6NmY6N2E6NDM6MjA6MjQ6YzY6YWY6MzE6ZTU6NGM6NTk6ZjM6ODc6Zjg6YmM6NWI6Y2EK"
           protocol: "ssh"
           token: "dG9rZW4K"
-        id: "i-060189adb669db74e"
+        id: "i-00ccbb444f8ef65ad"
         node_type: "t2.2xlarge"
-        public_dns_name: "ec2-54-216-154-194.eu-west-1.compute.amazonaws.com"
-        public_ip: "54.216.154.194"
+        public_dns_name: "ec2-34-248-111-51.eu-west-1.compute.amazonaws.com"
+        public_ip: "34.248.111.51"
         random_name: "sdia_pjyr21a9"
     kubernetes:
       properties:
