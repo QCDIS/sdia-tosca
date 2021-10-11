@@ -1,10 +1,66 @@
 tosca_definitions_version: "tosca_simple_yaml_1_2"
 topology_template:
   node_templates:
+    carsharing:
+      properties:
+        credential:
+          get_attribute:
+          - "compute"
+          - "user_key_pair"
+      requirements:
+      - kubernetes:
+          capability: "tosca.capabilities.QC.Kubernetes"
+          node: "kubernetes"
+          relationship: "tosca.relationships.HostedOn"
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: "install_chart.yaml"
+            inputs:
+              extra_variables:
+                chart_name: "carsharing-helm-charts/carsharing-helm-charts"
+                helm_name: "carsharing"
+                namespace: "default"
+                repo_name: "carsharing-helm-charts"
+                repo_url: "https://qcdis.github.io/carsharing-helm-charts/"
+                values:
+                  nginx:
+                    service:
+                      type: "NodePort"
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                        - "compute"
+                        - "public_ip"
+                      ansible_python_interpreter: "/usr/bin/python3"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute"
+                        - "user_name"
+              repository: "https://github.com/QCDIS/helm_playbooks.git"
+          install_requirements:
+            implementation: "install_requirements.yaml"
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                        - "compute"
+                        - "public_ip"
+                      ansible_python_interpreter: "/usr/bin/python3"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute"
+                        - "user_name"
+              repository: "https://github.com/QCDIS/helm_playbooks.git"
+      type: "tosca.nodes.QC.Container.Application.Helm"
     compute:
       properties:
-        role: master
-        assign_public_ip: "yes"
         disk_size: "40000 MB"
         mem_size: "4000 MB"
         num_cores: 2
@@ -13,54 +69,10 @@ topology_template:
         user_name: "vm_user"
       interfaces:
         Standard:
-          create: "dummy.yaml"
+          create: "dumy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
-      attributes:
-        user_key_pair:
-          keys:
-            name: "sdia_pjyr21a9"
-            private_key: "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBcG5ENVc3K1Nl\n\
-              a1JpejBVMnFUcXJwVVpLSUsrSHh2RUxrU2dhVmxXb1k1YzJZNEQwCjh0Z29tcnNJMFNoMGRjak9L\n\
-              V2luQTNEMjdwa1pBTG4rN0tDVmREd3lDR3FTYUlhZUNETndkQi84NDVFdHFnTmUKSHhHZU4rUWQv\n\
-              eC9TR0Z2NUtKeXZva1UyaEx2SlVQSFpIRnN4MUY5TUJlcUlEbzJ3WDRUTDYrNG40TDZBRGZ6VQoz\n\
-              akorNnRFKzNUK3YxL0g0aitMMUQzckFDN2xmVnZ3WmRNWmh3RUtaRm1kRk1ydFpRUlBRRlovZUox\n\
-              a1FSSkZQCklPUVpuNG5FcHR0S203WFhaRWtGVmdIS0JOUEUvUWZhRG05eTFpTDN4WjI5QU5XNDdK\n\
-              UHFNejRmcHBscGJNWmgKRGJGelU4SjhyTEpoYzQvdnR4clhZQWlSMFpQR24raEFyeWRrbFFJREFR\n\
-              QUJBb0lCQUJFemVjSE9vWis3TTQ4QwpNeXo0SUVjYlpZdk5PRFlLTVV6V0hTcXcvWThWVUl5bUJp\n\
-              cVd4bE4vWXVEaTBtNWR5MWlpTlNoNDR6d3pYRThqCjZjR2dzdkZwU3k1dGZTWUtTNGpEY0NyQUo0\n\
-              MkpNblB3bHlpVTFJb29MQ1Z5cjI3UENvZjA4WDNPczF5eVg1TGEKKzdvZmZwM1pIMjA1R01pUVFo\n\
-              c05DVm9mcWNWakg5Rm5Ud0s1WTg0RnFSNTZRL1NaZmt3SVVDVTlXUUJGYjloTgp0NlJrdmZNSHJx\n\
-              V0ZGQ0YwZXNUREJQVkt0M1JHaFp4RUpva1dhWU0ybzJSc3lTT1RrZ2JoTWRtamRmTGhiaDZJClkv\n\
-              eHhoOUpEMXFPY01SOTdVdk1YVVhtTEdRSjBzQnlUR01QZ3JhZUtGWGdLWjlYaUR4Ync2djB3eFcr\n\
-              ZnFabUIKMC9Lc3RvRUNnWUVBNDFhdGJPemQwTnVJL0lWYmtKa09Tc2Z1R3RWaXd0ZmRmMG1aS1E1\n\
-              RVhjYU5lek95UlNWRQpVVjkrWmg1Ry9ldi9FWkN4TjMyRHhMQUtBclEyenBmNSt6Q2lzaEU0TmRi\n\
-              THBjcDdEVWhkVFU2UzFhcFhaUW05CjY0ZDl0VVhBZHMrWGNRSmxVN3RPOVU3VHVBWVBHV25LTEpJ\n\
-              Ymp4WE1sckVGclFDL09RU2p3blVDZ1lFQXUyelkKVkZNaWR4LzRrOVFuVHhvWWhleExVMWlLSUpo\n\
-              WVRJbzFpL2dnTHY5SEVFOExSRGZ0Qm1YaHN2cC9JdDVWYlFDdwpMRTNoazBiMHQ0TnZ4aDcvSGNO\n\
-              RlBCRkx4SXdZTDRiNE15SjNJV3JablU3cGZIT255d2tuYTcwZ2JrOFp3dGphCkxkUU15VG95NE5m\n\
-              SFllRm92cHZlY0hiWUR6aG12cXptK3l5TWxhRUNnWUVBaGRGeXVraGZkVjZVcnhnTXd2dmwKTnMy\n\
-              aThiYWpzTStDT1Rmb2FRdFY0T0ZNVExZc2ZKa29Nc0lFVkRZRVVkbUZ4aUFtd09Rb0dUSUtZbmNV\n\
-              UDkyagpyMkY4azFhaGdNZVVEbDQydXFYYkRmTnZhVWdnczMvZGhITzM0bWxSbGw0eDVicWtUSHBZ\n\
-              U3Z1QWtyVTJWQjQ2CmZLdndmdlEwL29yckxWL2dMNzcwYWpVQ2dZRUFpZ0ViU1B2dDVNa2x2N1Az\n\
-              UGNkNVJ5TTJVNmhlREtJZ1lqdGkKTWk0QmhKbHpPZzc1dk1GeFJjUys2NHFIRXFXalFSL0FtTjYv\n\
-              dWpJRS94dElzaGtnd0VtSU1US0xGNjRRSU83QQowdVlOMGcxYkx2bHI4cmMyVmNubnZPMEZkRFBL\n\
-              UkM1b2VGWXJGQUJHZGtoc0J5WnllZWRMWW9RZmt4VjBrZkcrCklqUXJVQUVDZ1lFQXo0NG1aQUpw\n\
-              ckNyK3lSbDczZTNDTjFLcm1IdW1Ba01JQytBRXpZZnU2THQ0VFBJaHFRK20KR2FFNitOMjY3b2dV\n\
-              bTZyVVNsZ1lIL2JQcmhnZGF3U0RXaUZyUFZ6bUovOFU0RVZTbERqamxudmxLTnJuZjJJVAoxYjJ2\n\
-              dkF4ei83Ti82VFo2eEN6bEVMbnY0aTBjYk9ncnRFSERNSnNtWm1nbGlVN1VVV2pUSTRJPQotLS0t\n\
-              LUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo="
-            public_key: "OTQ6NGE6ZDM6NmY6N2E6NDM6MjA6MjQ6YzY6YWY6MzE6ZTU6NGM6NTk6ZjM6ODc6Zjg6YmM6NWI6Y2EK"
-          protocol: "ssh"
-          token: "dG9rZW4K"
-        id: "i-00ccbb444f8ef65ad"
-        node_type: "t2.2xlarge"
-        public_dns_name: "ec2-34-248-111-51.eu-west-1.compute.amazonaws.com"
-        public_ip: "34.248.111.51"
-        random_name: "sdia_pjyr21a9"
     compute_1:
       properties:
-        role: worker
-        assign_public_ip: "yes"
         disk_size: "40000 MB"
         mem_size: "4000 MB"
         num_cores: 2
@@ -69,50 +81,8 @@ topology_template:
         user_name: "vm_user"
       interfaces:
         Standard:
-          create: "dummy.yaml"
+          create: "dumy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
-      attributes:
-        user_key_pair:
-          keys:
-            name: "sdia_pjyr21a9"
-            private_key: "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBcG5ENVc3K1Nl\n\
-              a1JpejBVMnFUcXJwVVpLSUsrSHh2RUxrU2dhVmxXb1k1YzJZNEQwCjh0Z29tcnNJMFNoMGRjak9L\n\
-              V2luQTNEMjdwa1pBTG4rN0tDVmREd3lDR3FTYUlhZUNETndkQi84NDVFdHFnTmUKSHhHZU4rUWQv\n\
-              eC9TR0Z2NUtKeXZva1UyaEx2SlVQSFpIRnN4MUY5TUJlcUlEbzJ3WDRUTDYrNG40TDZBRGZ6VQoz\n\
-              akorNnRFKzNUK3YxL0g0aitMMUQzckFDN2xmVnZ3WmRNWmh3RUtaRm1kRk1ydFpRUlBRRlovZUox\n\
-              a1FSSkZQCklPUVpuNG5FcHR0S203WFhaRWtGVmdIS0JOUEUvUWZhRG05eTFpTDN4WjI5QU5XNDdK\n\
-              UHFNejRmcHBscGJNWmgKRGJGelU4SjhyTEpoYzQvdnR4clhZQWlSMFpQR24raEFyeWRrbFFJREFR\n\
-              QUJBb0lCQUJFemVjSE9vWis3TTQ4QwpNeXo0SUVjYlpZdk5PRFlLTVV6V0hTcXcvWThWVUl5bUJp\n\
-              cVd4bE4vWXVEaTBtNWR5MWlpTlNoNDR6d3pYRThqCjZjR2dzdkZwU3k1dGZTWUtTNGpEY0NyQUo0\n\
-              MkpNblB3bHlpVTFJb29MQ1Z5cjI3UENvZjA4WDNPczF5eVg1TGEKKzdvZmZwM1pIMjA1R01pUVFo\n\
-              c05DVm9mcWNWakg5Rm5Ud0s1WTg0RnFSNTZRL1NaZmt3SVVDVTlXUUJGYjloTgp0NlJrdmZNSHJx\n\
-              V0ZGQ0YwZXNUREJQVkt0M1JHaFp4RUpva1dhWU0ybzJSc3lTT1RrZ2JoTWRtamRmTGhiaDZJClkv\n\
-              eHhoOUpEMXFPY01SOTdVdk1YVVhtTEdRSjBzQnlUR01QZ3JhZUtGWGdLWjlYaUR4Ync2djB3eFcr\n\
-              ZnFabUIKMC9Lc3RvRUNnWUVBNDFhdGJPemQwTnVJL0lWYmtKa09Tc2Z1R3RWaXd0ZmRmMG1aS1E1\n\
-              RVhjYU5lek95UlNWRQpVVjkrWmg1Ry9ldi9FWkN4TjMyRHhMQUtBclEyenBmNSt6Q2lzaEU0TmRi\n\
-              THBjcDdEVWhkVFU2UzFhcFhaUW05CjY0ZDl0VVhBZHMrWGNRSmxVN3RPOVU3VHVBWVBHV25LTEpJ\n\
-              Ymp4WE1sckVGclFDL09RU2p3blVDZ1lFQXUyelkKVkZNaWR4LzRrOVFuVHhvWWhleExVMWlLSUpo\n\
-              WVRJbzFpL2dnTHY5SEVFOExSRGZ0Qm1YaHN2cC9JdDVWYlFDdwpMRTNoazBiMHQ0TnZ4aDcvSGNO\n\
-              RlBCRkx4SXdZTDRiNE15SjNJV3JablU3cGZIT255d2tuYTcwZ2JrOFp3dGphCkxkUU15VG95NE5m\n\
-              SFllRm92cHZlY0hiWUR6aG12cXptK3l5TWxhRUNnWUVBaGRGeXVraGZkVjZVcnhnTXd2dmwKTnMy\n\
-              aThiYWpzTStDT1Rmb2FRdFY0T0ZNVExZc2ZKa29Nc0lFVkRZRVVkbUZ4aUFtd09Rb0dUSUtZbmNV\n\
-              UDkyagpyMkY4azFhaGdNZVVEbDQydXFYYkRmTnZhVWdnczMvZGhITzM0bWxSbGw0eDVicWtUSHBZ\n\
-              U3Z1QWtyVTJWQjQ2CmZLdndmdlEwL29yckxWL2dMNzcwYWpVQ2dZRUFpZ0ViU1B2dDVNa2x2N1Az\n\
-              UGNkNVJ5TTJVNmhlREtJZ1lqdGkKTWk0QmhKbHpPZzc1dk1GeFJjUys2NHFIRXFXalFSL0FtTjYv\n\
-              dWpJRS94dElzaGtnd0VtSU1US0xGNjRRSU83QQowdVlOMGcxYkx2bHI4cmMyVmNubnZPMEZkRFBL\n\
-              UkM1b2VGWXJGQUJHZGtoc0J5WnllZWRMWW9RZmt4VjBrZkcrCklqUXJVQUVDZ1lFQXo0NG1aQUpw\n\
-              ckNyK3lSbDczZTNDTjFLcm1IdW1Ba01JQytBRXpZZnU2THQ0VFBJaHFRK20KR2FFNitOMjY3b2dV\n\
-              bTZyVVNsZ1lIL2JQcmhnZGF3U0RXaUZyUFZ6bUovOFU0RVZTbERqamxudmxLTnJuZjJJVAoxYjJ2\n\
-              dkF4ei83Ti82VFo2eEN6bEVMbnY0aTBjYk9ncnRFSERNSnNtWm1nbGlVN1VVV2pUSTRJPQotLS0t\n\
-              LUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo="
-            public_key: "OTQ6NGE6ZDM6NmY6N2E6NDM6MjA6MjQ6YzY6YWY6MzE6ZTU6NGM6NTk6ZjM6ODc6Zjg6YmM6NWI6Y2EK"
-          protocol: "ssh"
-          token: "dG9rZW4K"
-        id: "i-00ccbb444f8ef65ad"
-        node_type: "t2.2xlarge"
-        public_dns_name: "ec2-34-248-111-51.eu-west-1.compute.amazonaws.com"
-        public_ip: "34.248.111.51"
-        random_name: "sdia_pjyr21a9"
     kubernetes:
       properties:
         credential:
@@ -138,7 +108,10 @@ topology_template:
                         - "compute"
                         - "public_ip"
                       ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute"
+                        - "user_name"
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
           create_k8s_metrics_server:
             implementation: "create_k8s_metrics_server.yaml"
@@ -152,7 +125,10 @@ topology_template:
                         - "compute"
                         - "public_ip"
                       ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute"
+                        - "user_name"
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
           install_k8s:
             implementation: "install_k8s.yaml"
@@ -166,14 +142,20 @@ topology_template:
                         - "compute"
                         - "public_ip"
                       ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute"
+                        - "user_name"
                     worker:
                       ansible_host:
                         get_attribute:
                         - "compute_1"
                         - "public_ip"
                       ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute_1"
+                        - "user_name"
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
           install_requirements:
             implementation: "install_prerequisites.yaml"
@@ -187,14 +169,20 @@ topology_template:
                         - "compute"
                         - "public_ip"
                       ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute"
+                        - "user_name"
                     worker:
                       ansible_host:
                         get_attribute:
                         - "compute_1"
                         - "public_ip"
                       ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute_1"
+                        - "user_name"
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
           join_k8s_cluster:
             implementation: "join_k8s_cluster.yaml"
@@ -208,14 +196,20 @@ topology_template:
                         - "compute"
                         - "public_ip"
                       ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute"
+                        - "user_name"
                     worker:
                       ansible_host:
                         get_attribute:
                         - "compute_1"
                         - "public_ip"
                       ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute_1"
+                        - "user_name"
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
           set_attributes:
             implementation: "get_attributes.yaml"
@@ -229,7 +223,10 @@ topology_template:
                         - "compute"
                         - "public_ip"
                       ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute"
+                        - "user_name"
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
           set_master:
             implementation: "set_master_k8s_cluster.yaml"
@@ -243,7 +240,10 @@ topology_template:
                         - "compute"
                         - "public_ip"
                       ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute"
+                        - "user_name"
               repository: "https://github.com/QCDIS/k8s_playbooks.git"
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
     monitoring:
@@ -265,7 +265,6 @@ topology_template:
               extra_variables:
                 chart_name: "prometheus-community/kube-prometheus-stack"
                 helm_name: "monitoring"
-                name: "monitoring"
                 namespace: "default"
                 repo_name: "prometheus-community"
                 repo_url: "https://prometheus-community.github.io/helm-charts"
@@ -281,11 +280,11 @@ topology_template:
                   prometheus:
                     enabled: true
                     service:
-                      type: "NodePort"
+                      type: "ClusterIP"
                   prometheusOperator:
                     enabled: true
                     service:
-                      type: "NodePort"
+                      type: "ClusterIP"
               inventory:
                 all:
                   hosts:
@@ -295,7 +294,10 @@ topology_template:
                         - "compute"
                         - "public_ip"
                       ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute"
+                        - "user_name"
               repository: "https://github.com/QCDIS/helm_playbooks.git"
           install_requirements:
             implementation: "install_requirements.yaml"
@@ -309,7 +311,10 @@ topology_template:
                         - "compute"
                         - "public_ip"
                       ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
+                      ansible_ssh_user:
+                        get_property:
+                        - "compute"
+                        - "user_name"
               repository: "https://github.com/QCDIS/helm_playbooks.git"
       type: "tosca.nodes.QC.Container.Application.Helm"
     topology:
@@ -332,7 +337,10 @@ topology_template:
             inputs:
               extra_variables:
                 availability_zone: "eu-west-1b"
-                region: "eu-west-1"
+                region:
+                  get_property:
+                  - "topology"
+                  - "domain"
               inventory:
                 all:
                   hosts:
@@ -340,17 +348,47 @@ topology_template:
                       ansible_connection: "local"
                       instances:
                         compute:
-                          disk_size: "40000 MB"
-                          mem_size: "4000 MB"
-                          num_cores: 2
-                          os_distro: "Ubuntu"
-                          os_version: "18.04"
+                          disk_size:
+                            get_property:
+                            - "compute"
+                            - "disk_size"
+                          mem_size:
+                            get_property:
+                            - "compute"
+                            - "mem_size"
+                          num_cores:
+                            get_property:
+                            - "compute"
+                            - "num_cores"
+                          os_distro:
+                            get_property:
+                            - "compute"
+                            - "os_distro"
+                          os_version:
+                            get_property:
+                            - "compute"
+                            - "os_version"
                         compute_1:
-                          disk_size: "40000 MB"
-                          mem_size: "4000 MB"
-                          num_cores: 2
-                          os_distro: "Ubuntu"
-                          os_version: "18.04"
+                          disk_size:
+                            get_property:
+                            - "compute_1"
+                            - "disk_size"
+                          mem_size:
+                            get_property:
+                            - "compute_1"
+                            - "mem_size"
+                          num_cores:
+                            get_property:
+                            - "compute_1"
+                            - "num_cores"
+                          os_distro:
+                            get_property:
+                            - "compute_1"
+                            - "os_distro"
+                          os_version:
+                            get_property:
+                            - "compute_1"
+                            - "os_version"
               repository: "https://github.com/QCDIS/ec2_playbooks.git"
           create_random_name:
             implementation: "random_name.yaml"
@@ -365,7 +403,10 @@ topology_template:
             implementation: "security_groups.yaml"
             inputs:
               extra_variables:
-                region: "eu-west-1"
+                region:
+                  get_property:
+                  - "topology"
+                  - "domain"
               inventory:
                 all:
                   hosts:
@@ -376,7 +417,10 @@ topology_template:
             implementation: "key/create_keys.yaml"
             inputs:
               extra_variables:
-                region: "eu-west-1"
+                region:
+                  get_property:
+                  - "topology"
+                  - "domain"
               inventory:
                 all:
                   hosts:
@@ -384,9 +428,15 @@ topology_template:
                       ansible_connection: "local"
                       instances:
                         compute:
-                          os_distro: "Ubuntu"
+                          os_distro:
+                            get_property:
+                            - "compute"
+                            - "os_distro"
                         compute_1:
-                          os_distro: "Ubuntu"
+                          os_distro:
+                            get_property:
+                            - "compute_1"
+                            - "os_distro"
               repository: "https://github.com/QCDIS/ec2_playbooks.git"
           create_user:
             implementation: "create_users.yaml"
@@ -400,15 +450,24 @@ topology_template:
                       ansible_connection: "local"
                       instances:
                         compute:
-                          user_name: "vm_user"
+                          user_name:
+                            get_property:
+                            - "compute"
+                            - "user_name"
                         compute_1:
-                          user_name: "vm_user"
+                          user_name:
+                            get_property:
+                            - "compute_1"
+                            - "user_name"
               repository: "https://github.com/QCDIS/ec2_playbooks.git"
           create_vpc:
             implementation: "network/create_vpc.yaml"
             inputs:
               extra_variables:
-                region: "eu-west-1"
+                region:
+                  get_property:
+                  - "topology"
+                  - "domain"
               inventory:
                 all:
                   hosts:
@@ -419,7 +478,10 @@ topology_template:
             implementation: "network/create_vpc_subnet.yaml"
             inputs:
               extra_variables:
-                region: "eu-west-1"
+                region:
+                  get_property:
+                  - "topology"
+                  - "domain"
               inventory:
                 all:
                   hosts:
@@ -434,7 +496,10 @@ topology_template:
                   get_attribute:
                   - "compute"
                   - "random_name"
-                region: "eu-west-1"
+                region:
+                  get_property:
+                  - "topology"
+                  - "domain"
               inventory:
                 all:
                   hosts:
@@ -460,7 +525,10 @@ topology_template:
                   get_attribute:
                   - "compute"
                   - "random_name"
-                region: "eu-west-1"
+                region:
+                  get_property:
+                  - "topology"
+                  - "domain"
               inventory:
                 all:
                   hosts:
@@ -480,7 +548,10 @@ topology_template:
             implementation: "info/get_images.yaml"
             inputs:
               extra_variables:
-                region: "eu-west-1"
+                region:
+                  get_property:
+                  - "topology"
+                  - "domain"
               inventory:
                 all:
                   hosts:
@@ -488,37 +559,68 @@ topology_template:
                       ansible_connection: "local"
                       instances:
                         compute:
-                          os_distro: "Ubuntu"
-                          os_version: "18.04"
+                          os_distro:
+                            get_property:
+                            - "compute"
+                            - "os_distro"
+                          os_version:
+                            get_property:
+                            - "compute"
+                            - "os_version"
                         compute_1:
-                          os_distro: "Ubuntu"
-                          os_version: "18.04"
+                          os_distro:
+                            get_property:
+                            - "compute_1"
+                            - "os_distro"
+                          os_version:
+                            get_property:
+                            - "compute_1"
+                            - "os_version"
               repository: "https://github.com/QCDIS/ec2_playbooks.git"
           select_instance_type:
             implementation: "info/get_inst_flavors.yaml"
             inputs:
               extra_variables:
-                region: "eu-west-1"
+                region:
+                  get_property:
+                  - "topology"
+                  - "domain"
               inventory:
                 all:
                   hosts:
                     localhost:
                       ansible_connection: "local"
                       credentials:
-                      - cloud_provider_name: "EC2"
-                        keys:
-                          aws_access_key_id: "XXXXXXXXXXXXXXXXXXXXXXXX"
-                        token: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                        token_type: "access_key"
+                        get_attribute:
+                        - "topology"
+                        - "credentials"
                       instances:
                         compute:
-                          disk_size: "40000 MB"
-                          mem_size: "4000 MB"
-                          num_cores: 2
+                          disk_size:
+                            get_property:
+                            - "compute"
+                            - "disk_size"
+                          mem_size:
+                            get_property:
+                            - "compute"
+                            - "mem_size"
+                          num_cores:
+                            get_property:
+                            - "compute"
+                            - "num_cores"
                         compute_1:
-                          disk_size: "40000 MB"
-                          mem_size: "4000 MB"
-                          num_cores: 2
+                          disk_size:
+                            get_property:
+                            - "compute_1"
+                            - "disk_size"
+                          mem_size:
+                            get_property:
+                            - "compute_1"
+                            - "mem_size"
+                          num_cores:
+                            get_property:
+                            - "compute_1"
+                            - "num_cores"
               repository: "https://github.com/QCDIS/ec2_playbooks.git"
           set_attributes:
             implementation: "set_attributes.yaml"
@@ -530,68 +632,81 @@ topology_template:
                       ansible_connection: "local"
               repository: "https://github.com/QCDIS/ec2_playbooks.git"
       type: "tosca.nodes.QC.VM.topology"
-      attributes:
-        credentials:
-        - cloud_provider_name: "EC2"
-          keys:
-            aws_access_key_id: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-          token: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-          token_type: "access_key"
-        desired_state: "RUNNING"
-        current_state: "RUNNING"
-    vialog:
-      properties:
-        credential:
-          get_attribute:
-          - "compute"
-          - "user_key_pair"
-      requirements:
-      - kubernetes:
-          capability: "tosca.capabilities.QC.Kubernetes"
-          node: "kubernetes"
-          relationship: "tosca.relationships.HostedOn"
-      interfaces:
-        Helm:
-          install_chart:
-            implementation: "install_chart.yaml"
-            inputs:
-              extra_variables:
-                chart_name: "qcdis/vialog-helm-dataservice"
-                helm_name: "vialog"
-                namespace: "default"
-                repo_name: "qcdis"
-                repo_url: "https://qcdis.github.io/vialog-helm-dataservice/"
-                values:
-                  service:
-                    type: "NodePort"
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host:
-                        get_attribute:
-                        - "compute"
-                        - "public_ip"
-                      ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
-              repository: "https://github.com/QCDIS/helm_playbooks.git"
-          install_requirements:
-            implementation: "install_requirements.yaml"
-            inputs:
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host:
-                        get_attribute:
-                        - "compute"
-                        - "public_ip"
-                      ansible_python_interpreter: "/usr/bin/python3"
-                      ansible_ssh_user: "vm_user"
-              repository: "https://github.com/QCDIS/helm_playbooks.git"
-      type: "tosca.nodes.QC.Container.Application.Helm"
   workflows:
-    ec2_delete_topology:
+    agilia-deploy_k8s:
+      description: "deploy k8s"
+      preconditions:
+      - condition:
+        - assert:
+          - current_state:
+            - equal: "RUNNING"
+        target: "topology"
+      - condition:
+        - assert:
+          - desired_state:
+            - equal: "RUNNING"
+          - current_state:
+            - equal: "UNDEFINED"
+        target: "kubernetes"
+      steps:
+        agilia_create_k8s_dashboard:
+          activities:
+          - call_operation: "Kubernetes.create_k8s_dashboard"
+            on_success:
+            - "agilia_install_carsharing"
+            - "agilia_install_monitoring"
+          - set_state: "RUNNING"
+          target: "kubernetes"
+        agilia_install_carsharing:
+          activities:
+          - call_operation: "Helm.install_chart"
+            on_success: "agilia_set_k8s_attributes"
+          - set_state: "RUNNING"
+          target: "carsharing"
+        agilia_install_heml_requirements:
+          activities:
+          - call_operation: "Helm.install_requirements"
+            on_success:
+            - "agilia_install_carsharing"
+            - "agilia_install_monitoring"
+          target: "carsharing"
+        agilia_install_k8s:
+          activities:
+          - call_operation: "Kubernetes.install_k8s"
+            on_success: "agilia_set_master"
+          target: "kubernetes"
+        agilia_install_k8s_requirements:
+          activities:
+          - set_state: "CREATING"
+          - call_operation: "Kubernetes.install_requirements"
+            on_success: "agilia_install_k8s"
+          target: "kubernetes"
+        agilia_install_monitoring:
+          activities:
+          - call_operation: "Helm.install_chart"
+            on_success: "agilia_set_k8s_attributes"
+          - set_state: "RUNNING"
+          target: "monitoring"
+        agilia_join_k8s_cluster:
+          activities:
+          - call_operation: "Kubernetes.join_k8s_cluster"
+            on_success:
+            - "agilia_install_carsharing"
+            - "agilia_install_monitoring"
+          target: "kubernetes"
+        agilia_set_k8s_attributes:
+          activities:
+          - call_operation: "Kubernetes.set_attributes"
+          target: "kubernetes"
+        agilia_set_master:
+          activities:
+          - call_operation: "Kubernetes.set_master"
+            on_success:
+            - "agilia_join_k8s_cluster"
+            - "agilia_install_heml_requirements"
+            - "agilia_create_k8s_dashboard"
+          target: "kubernetes"
+    agilia_ec2_delete_topology:
       description: "delete_topology"
       preconditions:
       - condition:
@@ -621,7 +736,7 @@ topology_template:
           activities:
           - call_operation: "EC2.set_attributes"
           target: "topology"
-    ec2_provision:
+    agilia_ec2_provision:
       description: "Workflow to deploy ec2 topology"
       preconditions:
       - condition:
@@ -687,77 +802,6 @@ topology_template:
           activities:
           - call_operation: "EC2.set_attributes"
           target: "topology"
-    vialog-deploy_k8s:
-      description: "deploy k8s"
-      preconditions:
-      - condition:
-        - assert:
-          - current_state:
-            - equal: "RUNNING"
-        target: "topology"
-      - condition:
-        - assert:
-          - desired_state:
-            - equal: "RUNNING"
-          - current_state:
-            - equal: "UNDEFINED"
-        target: "kubernetes"
-      steps:
-        create_k8s_dashboard:
-          activities:
-          - call_operation: "Kubernetes.create_k8s_dashboard"
-            on_success:
-            - "install_chart"
-          - set_state: "RUNNING"
-          target: "kubernetes"
-        install_chart:
-          activities:
-          - call_operation: "Helm.install_chart"
-            on_success: "set_k8s_attributes"
-          - set_state: "RUNNING"
-          target: "monitoring"
-        install_heml_requirements:
-          activities:
-          - call_operation: "Helm.install_requirements"
-            on_success:
-            - "install_chart"
-            - "install_vialog_chart"
-          target: "monitoring"
-        install_k8s:
-          activities:
-          - call_operation: "Kubernetes.install_k8s"
-            on_success: "set_master"
-          target: "kubernetes"
-        install_k8s_requirements:
-          activities:
-          - set_state: "CREATING"
-          - call_operation: "Kubernetes.install_requirements"
-            on_success: "install_k8s"
-          target: "kubernetes"
-        install_vialog_chart:
-          activities:
-          - call_operation: "Helm.install_chart"
-            on_success: "set_k8s_attributes"
-          - set_state: "RUNNING"
-          target: "vialog"
-        join_k8s_cluster:
-          activities:
-          - call_operation: "Kubernetes.join_k8s_cluster"
-            on_success:
-            - "install_chart"
-          target: "kubernetes"
-        set_k8s_attributes:
-          activities:
-          - call_operation: "Kubernetes.set_attributes"
-          target: "kubernetes"
-        set_master:
-          activities:
-          - call_operation: "Kubernetes.set_master"
-            on_success:
-            - "join_k8s_cluster"
-            - "install_heml_requirements"
-            - "create_k8s_dashboard"
-          target: "kubernetes"
 description: "TOSCA example"
 imports:
 - nodes: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/nodes.yaml"

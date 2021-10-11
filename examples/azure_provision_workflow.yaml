@@ -113,6 +113,7 @@ topology_template:
                           os_version: { get_property: [ compute_1, os_version ] }
                           user_name: { get_property: [ compute_1, user_name ] }
                           role: { get_property: [ compute, role ] }
+                          assign_public_ip: { get_property: [ compute, assign_public_ip ] }
               repository: https://github.com/QCDIS/azure_playbooks.git
           create_ssh_key:
             implementation: key/create_keys.yaml
