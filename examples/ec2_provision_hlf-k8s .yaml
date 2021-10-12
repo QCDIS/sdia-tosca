@@ -457,6 +457,76 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
+    hlf_ca:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: owkin/hlf-ca
+                helm_name: hlf-ca
+                namespace: default
+                repo_name: owkin
+                repo_url: https://owkin.github.io/charts
+                values:
+                  service:
+                    type: NodePort
+                  persistence:
+                    storageClass: nfs
+                  adminUsername: admin
+                  adminPassword: password
+                  caName: org1-ca
+                  config:
+                    csr:
+                      names:
+                        c: NL
+                        st: North Holland
+                        o: UvA
+                        ou: qcdis
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
+
 
   workflows:
     deploy_k8s:
@@ -502,16 +572,23 @@ topology_template:
           activities:
           - call_operation: Helm.install_requirements
             on_success:
-            - install_chart
-            - install_vialog_chart
+            - install_monitoring
+            - install_nfs-server-provisioner
+            - install_hlf_ca
           target: monitoring
-        install_nfs-server-provisioner_chart:
+        install_hlf_ca:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: set_k8s_attributes
+          - set_state: RUNNING
+          target: hlf_ca
+        install_nfs-server-provisioner:
           activities:
           - call_operation: Helm.install_chart
             on_success: set_k8s_attributes
           - set_state: RUNNING
           target: nfs-server-provisioner
-        install_chart:
+        install_monitoring:
           activities:
           - call_operation: Helm.install_chart
             on_success: set_k8s_attributes
