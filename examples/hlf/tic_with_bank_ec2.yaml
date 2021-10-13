@@ -5,7 +5,7 @@ topology_template:
       properties:
         role: "master"
         assign_public_ip: "yes"
-        disk_size: "40000 MB"
+        disk_size: "20000 MB"
         mem_size: "2000 MB"
         num_cores: 1
         os_distro: "Ubuntu"
@@ -20,7 +20,7 @@ topology_template:
       properties:
         role: "worker"
         assign_public_ip: "yes"
-        disk_size: "40000 MB"
+        disk_size: "20000 MB"
         mem_size: "2000 MB"
         num_cores: 1
         os_distro: "Ubuntu"
@@ -30,12 +30,25 @@ topology_template:
         Standard:
           create: "dummy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
-
     compute_2:
       properties:
         role: "worker"
         assign_public_ip: "yes"
-        disk_size: "40000 MB"
+        disk_size: "20000 MB"
+        mem_size: "2000 MB"
+        num_cores: 1
+        os_distro: "Ubuntu"
+        os_version: "18.04"
+        user_name: "vm_user"
+      interfaces:
+        Standard:
+          create: "dummy.yaml"
+      type: "tosca.nodes.QC.VM.Compute"
+    compute_3:
+      properties:
+        role: "worker"
+        assign_public_ip: "yes"
+        disk_size: "20000 MB"
         mem_size: "2000 MB"
         num_cores: 1
         os_distro: "Ubuntu"
@@ -90,6 +103,12 @@ topology_template:
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
                           gluster_mount_server: { get_attribute: [ compute,public_ip ] }
+                        gfs4:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
+                          gluster_mount_server: { get_attribute: [ compute,public_ip ] }
           requirements:
             implementation: 001.requirements.yml
             inputs:
@@ -130,6 +149,12 @@ topology_template:
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
                           gluster_mount_server: { get_attribute: [ compute,public_ip ] }
+                        gfs4:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
+                          gluster_mount_server: { get_attribute: [ compute,public_ip ] }
           setup_glusterfs_cluster:
             implementation: 003.setup_glusterfs_cluster.yml
             inputs:
@@ -160,6 +185,12 @@ topology_template:
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                          gluster_mount_server: { get_attribute: [ compute,public_ip ] }
+                        gfs4:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
                           gluster_mount_server: { get_attribute: [ compute,public_ip ] }
 
     tic:
@@ -206,6 +237,12 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute_2,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                        hlf3:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute_3,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
           prepare_docker_images:
             implementation: 012.prepare_docker_images.yml
             inputs:
@@ -244,6 +281,12 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                        hlf3:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute_3,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
           mount_fs:
             implementation: 013.mount_fs.yml
             inputs:
@@ -282,6 +325,12 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                        hlf3:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute_3,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
           purge_swarm:
             implementation: 014.purge_swarm.yml
             inputs:
@@ -320,6 +369,12 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                        hlf3:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute_3,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
           set_attributes:
             implementation: 106.set_attributes.yml
             inputs:
@@ -373,6 +428,12 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                        hlf3:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute_3,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
           deploy_swarm_visualizer:
             implementation: 015.deploy_swarm_visualizer.yml
             inputs:
@@ -411,6 +472,12 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                        hlf3:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute_3,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
           deploy_portainer:
             implementation: 016.deploy_portainer.yml
             inputs:
@@ -449,6 +516,12 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                        hlf3:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute_3,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
           deploy_ca:
             implementation: 100.deploy_ca.yml
             inputs:
@@ -487,6 +560,12 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                        hlf3:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute_3,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
           deploy_orderer:
             implementation: 101.deploy_orderer.yml
             inputs:
@@ -525,6 +604,12 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                        hlf3:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute_3,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
           deploy_peers:
             implementation: 102.deploy_peers.yml
             inputs:
@@ -563,6 +648,12 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                        hlf3:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute_3,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
           deploy_cli:
             implementation: 103.deploy_cli.yml
             inputs:
@@ -601,6 +692,12 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                        hlf3:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute_3,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
           deploy_hlf_explorer:
             implementation: 104.deploy_hlf_explorer.yml
             inputs:
@@ -639,6 +736,12 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                        hlf3:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute_3,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
           deploy_bank_app:
             implementation: 105.deploy_bank_app.yml
             inputs:
@@ -677,6 +780,12 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_2,user_name ] }
+                        hlf3:
+                          ansible_host: { get_attribute: [ compute_3,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute_3,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_3,user_name ] }
 
     topology:
       properties:
@@ -694,6 +803,10 @@ topology_template:
       - vm:
           capability: tosca.capabilities.QC.VM
           node: compute_2
+          relationship: tosca.relationships.DependsOn
+      - vm:
+          capability: tosca.capabilities.QC.VM
+          node: compute_3
           relationship: tosca.relationships.DependsOn
       type: tosca.nodes.QC.VM.topology
       interfaces:
@@ -738,6 +851,15 @@ topology_template:
                           user_name: { get_property: [ compute_2, user_name ] }
                           role: { get_property: [ compute_2, role ] }
                           assign_public_ip: { get_property: [ compute_2, assign_public_ip ] }
+                        compute_3:
+                          disk_size: { get_property: [ compute_3, disk_size ] }
+                          mem_size: { get_property: [ compute_3, mem_size ] }
+                          num_cores: { get_property: [ compute_3, num_cores ] }
+                          os_distro: { get_property: [ compute_3, os_distro ] }
+                          os_version: { get_property: [ compute_3, os_version ] }
+                          user_name: { get_property: [ compute_3, user_name ] }
+                          role: { get_property: [ compute_3, role ] }
+                          assign_public_ip: { get_property: [ compute_3, assign_public_ip ] }
           create_security_group:
             implementation: security_groups.yaml
             inputs:
@@ -795,6 +917,15 @@ topology_template:
                           disk_size: { get_property: [ compute_2, disk_size ] }
                           mem_size: { get_property: [ compute_2, mem_size ] }
                           num_cores: { get_property: [ compute_2, num_cores ] }
+                        compute_3:
+                          disk_size: { get_property: [ compute_3, disk_size ] }
+                          mem_size: { get_property: [ compute_3, mem_size ] }
+                          num_cores: { get_property: [ compute_3, num_cores ] }
+                          os_distro: { get_property: [ compute_3, os_distro ] }
+                          os_version: { get_property: [ compute_3, os_version ] }
+                          user_name: { get_property: [ compute_3, user_name ] }
+                          role: { get_property: [ compute_3, role ] }
+                          assign_public_ip: { get_property: [ compute_3, assign_public_ip ] }
               repository: https://github.com/QCDIS/ec2_playbooks.git
           select_image:
             implementation: info/get_images.yaml
@@ -817,6 +948,15 @@ topology_template:
                         compute_2:
                           os_distro: { get_property: [ compute_2, os_distro ] }
                           os_version: { get_property: [ compute_2, os_version ] }
+                        compute_3:
+                          disk_size: { get_property: [ compute_3, disk_size ] }
+                          mem_size: { get_property: [ compute_3, mem_size ] }
+                          num_cores: { get_property: [ compute_3, num_cores ] }
+                          os_distro: { get_property: [ compute_3, os_distro ] }
+                          os_version: { get_property: [ compute_3, os_version ] }
+                          user_name: { get_property: [ compute_3, user_name ] }
+                          role: { get_property: [ compute_3, role ] }
+                          assign_public_ip: { get_property: [ compute_3, assign_public_ip ] }
           create_ssh_key:
             implementation: key/create_keys.yaml
             inputs:
@@ -834,6 +974,15 @@ topology_template:
                           os_distro : { get_property: [ compute_2, os_distro ]}
                         compute_2:
                           os_distro : { get_property: [ compute_2, os_distro ]}
+                        compute_3:
+                          disk_size: { get_property: [ compute_3, disk_size ] }
+                          mem_size: { get_property: [ compute_3, mem_size ] }
+                          num_cores: { get_property: [ compute_3, num_cores ] }
+                          os_distro: { get_property: [ compute_3, os_distro ] }
+                          os_version: { get_property: [ compute_3, os_version ] }
+                          user_name: { get_property: [ compute_3, user_name ] }
+                          role: { get_property: [ compute_3, role ] }
+                          assign_public_ip: { get_property: [ compute_3, assign_public_ip ] }
               repository: https://github.com/QCDIS/ec2_playbooks.git
           delete_ssh_key:
             implementation: key/delete_key.yaml
@@ -865,6 +1014,8 @@ topology_template:
                           id: { get_attribute: [ compute_1, id ] }
                         compute_2:
                           id: { get_attribute: [ compute_2, id ] }
+                        compute_3:
+                          id: { get_attribute: [ compute_3, id ] }
               repository: https://github.com/QCDIS/ec2_playbooks.git
           install_requirements:
             implementation: install_requirements.yaml
@@ -902,6 +1053,8 @@ topology_template:
                           user_name : { get_property: [ compute_1, user_name ]}
                         compute_2:
                           user_name : { get_property: [ compute_2, user_name ]}
+                        compute_3:
+                          user_name : { get_property: [ compute_3, user_name ]}
           set_attributes:
             implementation: set_attributes.yaml
             inputs:
