@@ -62,12 +62,27 @@
         "password": "{{orderer_password}}",
         "type": "orderer"
     },
+    "peer0": {
+        "switch": "on",
+        "image": "hyperledger/fabric-peer",
+        "tag": "2.2",
+        "replicas": -1,
+        "port": 8050,
+        "caname": "{{orgca.name}}",
+        "path": "/root/{{peer_user}}",
+        "bootstrap": "",
+        "dbtype": "goleveldb",
+        "name": "{{peer_user}}",
+        "password": "{{peer_password}}",
+        "type": "peer",
+        "leader": "{peer_user}}"
+    },
     "peer1": {
         "switch": "on",
         "image": "hyperledger/fabric-peer",
         "tag": "2.2",
         "replicas": -1,
-        "port": 8054,
+        "port": 8051,
         "caname": "{{orgca.name}}",
         "path": "/root/{{peer_user}}",
         "bootstrap": "",
@@ -82,22 +97,7 @@
         "image": "hyperledger/fabric-peer",
         "tag": "2.2",
         "replicas": -1,
-        "port": 8054,
-        "caname": "{{orgca.name}}",
-        "path": "/root/{{peer_user}}",
-        "bootstrap": "",
-        "dbtype": "goleveldb",
-        "name": "{{peer_user}}",
-        "password": "{{peer_password}}",
-        "type": "peer",
-        "leader": "{peer_user}}"
-    },
-    "peer3": {
-        "switch": "on",
-        "image": "hyperledger/fabric-peer",
-        "tag": "2.2",
-        "replicas": -1,
-        "port": 8054,
+        "port": 8052,
         "caname": "{{orgca.name}}",
         "path": "/root/{{peer_user}}",
         "bootstrap": "",
@@ -207,9 +207,9 @@
         "{{orgca}}"
     ],
     "peerservices": [
+        "{{peer0}}",
         "{{peer1}}",
-        "{{peer2}}",
-        "{{peer3}}"
+        "{{peer2}}"
     ],
     "explorerservices": [
         "{{hlf_explorer_db}}",
