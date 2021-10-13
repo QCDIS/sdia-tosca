@@ -15,33 +15,32 @@ h.setFormatter(formatter)
 logger.addHandler(h)
 logger.handler_set = True
 
+
 class TestTosca(unittest.TestCase):
     def test(self):
         cur_dir = os.path.dirname(os.path.realpath(__file__))
 
-        tosca_path =  os.path.join(cur_dir, '../examples')
+        tosca_path = os.path.join(cur_dir, '../examples')
         files = self.get_files(tosca_path)
         for file in files:
-            logger.info('Testing: ' +file)
+            logger.info('Testing: ' + file)
             tosca_template_dict = self.get_tosca_file(file)
             if 'workflows' in tosca_template_dict['topology_template']:
-                workflows= tosca_template_dict['topology_template'].pop('workflows')
+                workflows = tosca_template_dict['topology_template'].pop('workflows')
             tt = ToscaTemplate(yaml_dict_tpl=tosca_template_dict)
 
-
-
-    def get_files(self,dir_mame):
+    def get_files(self, dir_mame):
         listOfFile = os.listdir(dir_mame)
         completeFileList = []
         for file in listOfFile:
-            completePath = os.path.join(dir_mame, file)
-            if os.path.isdir(completePath):
-                completeFileList = completeFileList + self.getFiles(completePath)
-            else:
-                completeFileList.append(completePath)
+            if 'yaml' in file or 'yml' in file:
+                completePath = os.path.join(dir_mame, file)
+                if os.path.isdir(completePath):
+                    completeFileList = completeFileList + self.getFiles(completePath)
+                else:
+                    completeFileList.append(completePath)
 
         return completeFileList
-
 
     def get_tosca_file(self, path):
         input_tosca_file_path = path
