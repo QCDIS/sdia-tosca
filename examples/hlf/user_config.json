@@ -8,7 +8,7 @@
     "image": "bank-app",
     "name": "bank-service",
     "port": 3000,
-    "replicas": -1,
+    "replicas": 1,
     "switch": "on",
     "tag": "latest"
   },
@@ -26,7 +26,7 @@
     "name": "{{couchdb_user}}",
     "password": "{{couchdb_password}}",
     "path": "/opt/couchdb/data",
-    "replicas": -1,
+    "replicas": 1,
     "switch": "on",
     "tag": "2.3"
   },
@@ -44,7 +44,7 @@
     "image": "hyperledger/explorer",
     "name": "hlf_explorer",
     "port": 8090,
-    "replicas": -1,
+    "replicas": 1,
     "switch": "on",
     "tag": "1.1.2",
     "volume": "walletstore"
@@ -58,7 +58,7 @@
     "image": "hyperledger/explorer-db",
     "name": "hlf_explorer_db",
     "port": 5432,
-    "replicas": -1,
+    "replicas": 1,
     "switch": "on",
     "tag": "1.1.2",
     "volume": "pgdata"
@@ -92,7 +92,7 @@
     "password": "{{orgca_password}}",
     "path": "/root/{{orgca_user}}",
     "port": 8052,
-    "replicas": -1,
+    "replicas": 1,
     "switch": "on",
     "tag": "1.4",
     "type": "org"
