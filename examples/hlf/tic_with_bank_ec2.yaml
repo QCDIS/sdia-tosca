@@ -172,7 +172,7 @@ topology_template:
             implementation: 011.initialize_hosts.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/examples/hlf/user_config.json
               inventory:
                 all:
                   children:
@@ -210,7 +210,7 @@ topology_template:
             implementation: 012.prepare_docker_images.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/examples/hlf/user_config.json
               inventory:
                 all:
                   children:
@@ -415,7 +415,7 @@ topology_template:
             implementation: 016.deploy_portainer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/user_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/examples/hlf/user_config.json
               inventory:
                 all:
                   children:
@@ -453,7 +453,7 @@ topology_template:
             implementation: 100.deploy_ca.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/user_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/examples/hlf/user_config.json
               inventory:
                 all:
                   children:
