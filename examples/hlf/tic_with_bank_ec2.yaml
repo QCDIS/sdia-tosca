@@ -529,35 +529,7 @@ topology_template:
             implementation: 102.deploy_peers.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables:
-                peer1:
-                  switch: "on"
-                  image: "hyperledger/fabric-peer"
-                  tag: "2.2"
-                  replicas: -1
-                  port: 8054
-                  caname: "{{orgca.name}}"
-                  path: "/root/peer1"
-                  bootstrap: ""
-                  dbtype: "goleveldb"
-                  name: "peer1"
-                  password: peer1pw
-                  type: "peer"
-                  leader: "peer1"
-                peer2:
-                  switch: "on"
-                  image: "hyperledger/fabric-peer"
-                  tag: "2.2"
-                  replicas: -1
-                  port: 8055
-                  caname: "{{orgca.name}}"
-                  path: "/root/peer1"
-                  bootstrap: ""
-                  dbtype: "goleveldb"
-                  name: "peer1"
-                  password: peer1pw
-                  type: "peer"
-                  leader: "peer1"
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/user_config.json
               inventory:
                 all:
                   children:
@@ -633,9 +605,7 @@ topology_template:
             implementation: 104.deploy_hlf_explorer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables:
-                hlf_explorer_admin_user: "admin"
-                hlf_explorer_admin_password: "password"
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/user_config.json
               inventory:
                 all:
                   children:
