@@ -22,7 +22,6 @@ topology_template:
         Standard:
           create: "dummy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
-
     compute_1:
       properties:
         role: "worker"
@@ -404,52 +403,63 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-    vialog:
-      type: tosca.nodes.QC.Container.Application.Helm
-      properties:
-        credential: { get_attribute: [ compute,user_key_pair ] }
-      requirements:
-      - kubernetes:
-          capability: tosca.capabilities.QC.Kubernetes
-          node: kubernetes
-          relationship: tosca.relationships.HostedOn
+    nfs-server-provisioner:
       interfaces:
         Helm:
-          install_requirements:
-            implementation: install_requirements.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
           install_chart:
             implementation: install_chart.yaml
             inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
               extra_variables:
-                chart_name: qcdis/vialog-helm-dataservice
-                repo_name: qcdis
-                repo_url: 'https://qcdis.github.io/vialog-helm-dataservice/'
-                helm_name: vialog
+                chart_name: kvaps/nfs-server-provisioner
+                helm_name: nfs-server-provisioner
                 namespace: default
-                values:
-                  service:
-                    type: NodePort
+                repo_name: kvaps
+                repo_url: https://kvaps.github.io/charts
               inventory:
                 all:
                   hosts:
                     master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
 
   workflows:
-    vialog-deploy_k8s:
+    deploy_k8s:
       description: deploy k8s
       preconditions:
         - target: topology
@@ -495,12 +505,12 @@ topology_template:
             - install_chart
             - install_vialog_chart
           target: monitoring
-        install_vialog_chart:
+        install_nfs-server-provisioner_chart:
           activities:
           - call_operation: Helm.install_chart
             on_success: set_k8s_attributes
           - set_state: RUNNING
-          target: vialog
+          target: nfs-server-provisioner
         install_chart:
           activities:
           - call_operation: Helm.install_chart
