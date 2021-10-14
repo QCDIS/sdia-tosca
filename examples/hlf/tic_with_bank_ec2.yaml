@@ -934,7 +934,7 @@ topology_template:
           target: hlf
         deploy_hlf-deploy_bank_app:
           activities:
-          - call_operation: hlf.deploy_bank_app
+          - call_operation: TIC.deploy_bank_app
             on_success: deploy_hlf-set_tic_attributes
           - set_state: created
           target: hlf
