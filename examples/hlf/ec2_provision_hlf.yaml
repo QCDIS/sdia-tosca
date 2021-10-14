@@ -717,7 +717,6 @@ topology_template:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - hlf_install_monitoring
               - hlf_install_nfs-server-provisioner
           target: kubernetes
         hlf_install_heml_requirements:
@@ -764,7 +763,7 @@ topology_template:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
-            - hlf_install_monitoring
+            - hlf_install_nfs-server-provisioner
           - set_state: RUNNING
           target: kubernetes
         hlf_set_k8s_attributes:
