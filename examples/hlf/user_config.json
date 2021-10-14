@@ -15,8 +15,10 @@
     "orgca_password": "orgcapw",
     "orderer_user": "orderer",
     "orderer_password": "ordererpw",
-    "peer_user": "peer",
-    "peer_password": "peerpw",
+    "peer1_user": "peer1",
+    "peer1_password": "peer1pw",
+    "peer2_user": "peer2",
+    "peer2_password": "peer2pw",
     "couchdb_user": "couchdb",
     "couchdb_password": "couchdbpw",
     "hlf_explorer_db_user": "hppoc",
@@ -41,7 +43,7 @@
         "image": "hyperledger/fabric-ca",
         "tag": "1.4",
         "replicas": -1,
-        "port": 8050,
+        "port": 8052,
         "path": "/root/{{orgca_user}}",
         "db": "{{sqlite}}",
         "name": "{{orgca_user}}",
@@ -53,7 +55,7 @@
         "image": "hyperledger/fabric-orderer",
         "tag": "2.2",
         "replicas": -1,
-        "port": 8040,
+        "port": 8053,
         "caname": "{{orgca.name}}",
         "anchorpeer": "{{peer1.name}}",
         "anchorport": "{{peer1.port}}",
@@ -62,55 +64,41 @@
         "password": "{{orderer_password}}",
         "type": "orderer"
     },
-    "peer0": {
-        "switch": "on",
-        "image": "hyperledger/fabric-peer",
-        "tag": "2.2",
-        "replicas": -1,
-        "port": 8060,
-        "caname": "{{orgca.name}}",
-        "path": "/root/{{peer_user}}",
-        "bootstrap": "",
-        "dbtype": "goleveldb",
-        "name": "{{peer_user}}",
-        "password": "{{peer_password}}",
-        "type": "peer",
-        "leader": "{peer_user}}"
-    },
     "peer1": {
         "switch": "on",
         "image": "hyperledger/fabric-peer",
         "tag": "2.2",
         "replicas": -1,
-        "port": 8061,
+        "port": 8054,
         "caname": "{{orgca.name}}",
-        "path": "/root/{{peer_user}}",
+        "path": "/root/{{peer1_user}}",
         "bootstrap": "",
         "dbtype": "goleveldb",
-        "name": "{{peer_user}}",
-        "password": "{{peer_password}}",
+        "name": "{{peer1_user}}",
+        "password": "{{peer1_password}}",
         "type": "peer",
-        "leader": "{peer_user}}"
+        "leader": "{peer1_user}}"
     },
     "peer2": {
         "switch": "on",
         "image": "hyperledger/fabric-peer",
         "tag": "2.2",
         "replicas": -1,
-        "port": 8062,
+        "port": 8055,
         "caname": "{{orgca.name}}",
-        "path": "/root/{{peer_user}}",
-        "bootstrap": "",
-        "dbtype": "goleveldb",
-        "name": "{{peer_user}}",
-        "password": "{{peer_password}}",
+        "path": "/root/{{peer2_user}}",
+        "bootstrap": "{{peer1.name}}:7051",
+        "dbtype": "CouchDB",
+        "name": "{{peer2_user}}",
+        "password": "{{peer2_password}}",
         "type": "peer",
-        "leader": "{peer_user}}"
+        "leader": "{{peer1_user}}"
     },
     "cli": {
         "switch": "on",
         "image": "hyperledger/fabric-tools",
-        "tag": "2.2"
+        "tag": "2.2",
+        "port": 3003
     },
     "sqlite": {
         "type": "sqlite3",
@@ -207,7 +195,6 @@
         "{{orgca}}"
     ],
     "peerservices": [
-        "{{peer0}}",
         "{{peer1}}",
         "{{peer2}}"
     ],
