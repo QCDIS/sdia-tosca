@@ -505,8 +505,8 @@ topology_template:
                 repo_name: owkin
                 repo_url: https://owkin.github.io/charts
                 values:
-                  service:
-                    type: NodePort
+#                  service:
+#                    type: NodePort
                   persistence:
                     storageClass: nfs
                   adminUsername: admin
@@ -574,8 +574,8 @@ topology_template:
                 repo_name: owkin
                 repo_url: https://owkin.github.io/charts
                 values:
-                  service:
-                    type: NodePort
+#                  service:
+#                    type: NodePort
                   persistence:
                     storageClass: nfs
               inventory:
@@ -633,8 +633,8 @@ topology_template:
                 repo_name: owkin
                 repo_url: https://owkin.github.io/charts
                 values:
-                  service:
-                    type: NodePort
+#                  service:
+#                    type: NodePort
                   persistence:
                     storageClass: nfs
               inventory:
