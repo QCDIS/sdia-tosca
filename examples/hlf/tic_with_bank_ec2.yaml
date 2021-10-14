@@ -139,7 +139,7 @@ topology_template:
             implementation: 011.initialize_hosts.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/examples/hlf/user_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/hlf_conf.json
               inventory:
                 all:
                   children:
@@ -171,7 +171,7 @@ topology_template:
             implementation: 012.prepare_docker_images.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/examples/hlf/user_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/hlf_conf.json
               inventory:
                 all:
                   children:
@@ -203,7 +203,7 @@ topology_template:
             implementation: 013.mount_fs.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/examples/hlf/user_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/hlf_conf.json
               inventory:
                 all:
                   children:
@@ -235,7 +235,7 @@ topology_template:
             implementation: 014.purge_swarm.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/hlf_conf.json
               inventory:
                 all:
                   children:
@@ -282,7 +282,7 @@ topology_template:
             implementation: 014.spawn_swarm.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/hlf_conf.json
               inventory:
                 all:
                   children:
@@ -314,7 +314,7 @@ topology_template:
             implementation: 015.deploy_swarm_visualizer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/hlf_conf.json
               inventory:
                 all:
                   children:
@@ -346,7 +346,7 @@ topology_template:
             implementation: 016.deploy_portainer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/hlf_conf.json
               inventory:
                 all:
                   children:
@@ -378,7 +378,7 @@ topology_template:
             implementation: 100.deploy_ca.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/hlf_conf.json
               inventory:
                 all:
                   children:
@@ -410,7 +410,7 @@ topology_template:
             implementation: 101.deploy_orderer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/hlf_conf.json
               inventory:
                 all:
                   children:
@@ -442,7 +442,7 @@ topology_template:
             implementation: 102.deploy_peers.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/hlf_conf.json
               inventory:
                 all:
                   children:
@@ -474,7 +474,7 @@ topology_template:
             implementation: 103.deploy_cli.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/hlf_conf.json
               inventory:
                 all:
                   children:
@@ -506,7 +506,7 @@ topology_template:
             implementation: 104.deploy_hlf_explorer.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/hlf_conf.json
               inventory:
                 all:
                   children:
@@ -538,7 +538,7 @@ topology_template:
             implementation: 105.deploy_bank_app.yml
             inputs:
               repository: "https://github.com/bityoga/fabric_as_code.git"
-              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              extra_variables: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/develop/examples/hlf/hlf_conf.json
               inventory:
                 all:
                   children:
