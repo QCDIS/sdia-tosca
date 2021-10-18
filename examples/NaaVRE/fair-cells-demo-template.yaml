@@ -510,6 +510,9 @@ topology_template:
                 namespace: default
                 repo_name: nfs-server-provisioner
                 repo_url: https://kvaps.github.io/charts
+                values:
+                  storageClass:
+                    defaultClass: true
               inventory:
                 all:
                   hosts:
