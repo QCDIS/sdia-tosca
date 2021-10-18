@@ -19,6 +19,8 @@
     "peer1_password": "peer1pw",
     "peer2_user": "peer2",
     "peer2_password": "peer2pw",
+    "peer3_user": "peer3",
+    "peer3_password": "peer3pw",
     "couchdb_user": "couchdb",
     "couchdb_password": "couchdbpw",
     "hlf_explorer_db_user": "hppoc",
@@ -91,6 +93,21 @@
         "dbtype": "CouchDB",
         "name": "{{peer2_user}}",
         "password": "{{peer2_password}}",
+        "type": "peer",
+        "leader": "{{peer1_user}}"
+    },
+    "peer3": {
+        "switch": "on",
+        "image": "hyperledger/fabric-peer",
+        "tag": "2.2",
+        "replicas": -1,
+        "port": 8062,
+        "caname": "{{orgca.name}}",
+        "path": "/root/{{peer3_user}}",
+        "bootstrap": "{{peer1.name}}:7051",
+        "dbtype": "CouchDB",
+        "name": "{{peer3_user}}",
+        "password": "{{peer3_password}}",
         "type": "peer",
         "leader": "{{peer1_user}}"
     },
@@ -196,7 +213,8 @@
     ],
     "peerservices": [
         "{{peer1}}",
-        "{{peer2}}"
+        "{{peer2}}",
+        "{{peer3}}"
     ],
     "explorerservices": [
         "{{hlf_explorer_db}}",
