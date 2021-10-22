@@ -748,6 +748,65 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
+    docker_registry:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: twuni/docker-registry
+                helm_name: docker-registry
+                namespace: default
+                repo_name: twuni
+                repo_url: https://helm.twun.io
+                values:
+                  persistence:
+                    enabled: false
+                  service:
+                    type: NodePort
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
 
   workflows:
 #    fair-cells_deploy_kaniko:
