@@ -765,6 +765,7 @@ topology_template:
                     enabled: false
                   service:
                     type: NodePort
+#                    nodePort: 30500
               inventory:
                 all:
                   hosts:
@@ -1009,3 +1010,5 @@ topology_template:
           activities:
           - call_operation: EC2.set_attributes
           target: topology
+service:
+  nodePort:
