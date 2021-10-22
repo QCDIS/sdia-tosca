@@ -808,6 +808,66 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
+    rclone:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: jmmaloney4/rclone
+                helm_name: rclone
+                namespace: default
+                repo_name: twuni
+                repo_url: https://charts.jmmaloney4.xyz/
+                values:
+                  persistence:
+                    enabled: false
+                  service:
+                    type: NodePort
+              #                    nodePort: 30500
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
 
   workflows:
 #    fair-cells_deploy_kaniko:
@@ -878,6 +938,7 @@ topology_template:
               - fair-cells_install_monitoring
               - fair-cells_install_argowf
               - fair-cells_install_nfs-server-provisioner
+              - fair-cells_install_docker_registry
           target: kubernetes
         fair-cells_install_heml_requirements:
           activities:
@@ -904,6 +965,12 @@ topology_template:
             on_success: fair-cells_set_k8s_attributes
           - set_state: RUNNING
           target: nfs-server-provisioner
+        fair-cells_install_docker_registry:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: fair-cells_set_k8s_attributes
+          - set_state: RUNNING
+          target: docker_registry
         fair-cells_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
@@ -1010,5 +1077,3 @@ topology_template:
           activities:
           - call_operation: EC2.set_attributes
           target: topology
-service:
-  nodePort:
