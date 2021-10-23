@@ -815,7 +815,7 @@ topology_template:
             implementation: install_chart.yaml
             inputs:
               extra_variables:
-                chart_name: jmmaloney4/rclone
+                chart_name: jmmaloney4/rclone --version 1.2.3
                 helm_name: rclone
                 namespace: default
                 repo_name: twuni
