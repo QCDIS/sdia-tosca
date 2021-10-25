@@ -748,24 +748,31 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
-    docker_registry:
+    harbor:
       interfaces:
         Helm:
           install_chart:
             implementation: install_chart.yaml
             inputs:
               extra_variables:
-                chart_name: twuni/docker-registry
+                chart_name: harbor/harbor
                 helm_name: docker-registry
                 namespace: default
-                repo_name: twuni
-                repo_url: https://helm.twun.io
+                repo_name: harbor
+                repo_url: https://helm.goharbor.io
                 values:
+                  expose:
+                    type: nodePort
+                    tls:
+                      enabled: true
+                      auto:
+                        commonName: lw-vlic
+                    nodePort:
+                      ports:
+                        https:
+                          nodePort: 30013
                   persistence:
                     enabled: false
-                  service:
-                    type: NodePort
-#                    nodePort: 30500
               inventory:
                 all:
                   hosts:
@@ -878,7 +885,7 @@ topology_template:
               - fair-cells_install_monitoring
               - fair-cells_install_argowf
               - fair-cells_install_nfs-server-provisioner
-              - fair-cells_install_docker_registry
+              - fair-cells_install_harbor
           target: kubernetes
         fair-cells_install_heml_requirements:
           activities:
@@ -905,12 +912,12 @@ topology_template:
             on_success: fair-cells_set_k8s_attributes
           - set_state: RUNNING
           target: nfs-server-provisioner
-        fair-cells_install_docker_registry:
+        fair-cells_install_harbor:
           activities:
           - call_operation: Helm.install_chart
             on_success: fair-cells_set_k8s_attributes
           - set_state: RUNNING
-          target: docker_registry
+          target: harbor
         fair-cells_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
