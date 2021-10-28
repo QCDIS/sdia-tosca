@@ -374,253 +374,31 @@ topology_template:
             inputs:
               repository: https://github.com/QCDIS/helm_playbooks.git
               extra_variables:
-                chart_name: qcdis/mog-helm-dataservice
-                repo_name: qcdis
-                repo_url: 'https://qcdis.github.io/mog-helm-dataservice/'
-                helm_name: mog
+                chart_name: mogplay/mogplay
+                repo_name: mogplay
+                repo_url: 'https://vfilipe.gitlab.io/articonf-deployment '
+                helm_name: mogplay
                 namespace: default
                 values:
-                  replicas:
-                    controller: 1
-                    database: 1
-                    resourceManager: 1
-                    switcher: 1
-                    recorder: 1
-                    mediaServer: 1
-                    janus: 1
-                    switcherflv: 1
-                    coturn: 1
-                    marketplace: 1
                   features:
                     recorder: false
-                    monitoring: false
                     nfs: false
                     ingress: false
-                    ingressnotls: true
+                    ingressnotls: false
+                  tags:
+                    nginx: false
+                    nfs: false
+                    monitoring: false
                   images:
-                    repository: registry.gitlab.com/vfilipe/articonf-deployment
+                    registry:
+                    repository:
                     token:
-                    tag: "1.1.2"
-                    pullPolicy: IfNotPresent
-                    controller: media-controller
-                    database: database
-                    resourceManager: k8-resource-manager
-                    transcoder: transcoder
-                    switcher: switcher
-                    recorder: media-recorder
-                    mediaServer: media-server
-                    janus: janus
-                    switcherflv: switcher-flv
-                    marketplace: marketplace
-
-                    prometheus: prom/prometheus:v2.4.3
-                    grafana: grafana/grafana:6.7.2
-                    nodeExporter: prom/node-exporter:v0.18.1
-                  imagePullSecrets:
-                    - name: regcred
-                  serviceAccount:
-                    create: true
-                  services:
-                    controller:
-                      type: NodePort
-                      port1: 80
-                      nodeport1: 30003
-                      port2: 443
-
-                    marketplace:
-                      type: ClusterIP
-                      port1: 80
-
-                    resourceManager:
-                      type: ClusterIP
-                      port: 3000
-
-                    controllerDatabase:
-                      type: NodePort
-                      port: 5432
-
-                    switcher:
-                      type: NodePort
-                      port1: 80
-                      nodeport1: 30005
-                      port2: 1935
-                      nodeport2: 30002
-
-                    transcoder:
-                      type: ClusterIP
-                      port1: 3004
-
-                    janus:
-                      type: NodePort
-                      udpPortLowerBound: 30010
-                      udpPortUpperBound: 30050
-
-                    janusrest:
-                      type: NodePort
-                      port1: 8088
-                      nodeport1: 30007
-
-                    recorder:
-                      type: NodePort
-                      port1: 5000
-                      nodeport1: 30008
-
-                    mediaServer:
-                      type: NodePort
-                      port1: 9090
-                      nodeport1: 30006
-
-                    switcherflv:
-                      type: NodePort
-                      port1: 81
-                      port2: 2935
-                      port3: 80
-                      nodeport3: 30004
-                  ingressnotls:
-                    hosts:
-                      - path: /webrtc(/|$)(.*)
-                        envName: webrtc
-                        serviceName: webrtc-internal
-                        servicePort: 8088
-                      - path: /switcher(/|$)(.*)
-                        envName: switcher
-                        serviceName: switcher
-                        servicePort: 80
-                      - path: /switcherflv(/|$)(.*)
-                        envName: switcherflv
-                        serviceName: switcherflv
-                        servicePort: 80
-                      - path: /marketplace(/|$)(.*)
-                        envName: marketplace
-                        serviceName: marketplace
-                        servicePort: 80
-                      - path: /controller(/|$)(.*)
-                        envName: controller
-                        serviceName: controller
-                        servicePort: 80
-                      - path: /*(/|$)(.*)
-                        envName: controller
-                        serviceName: controller
-                        servicePort: 80
-                  ingress:
-                    domain: mogplay.academy.mog.local
-                    hosts:
-                      - host: controller
-                        envName: controller
-                        serviceName: controller
-                        servicePort: 80
-                      - host: resource-manager
-                        envName: resource_manager
-                        serviceName: resource-manager
-                        servicePort: 3000
-                      - host: switcher
-                        envName: switcher
-                        serviceName:  switcher
-                        servicePort:  80
-                      - host: switcherflv
-                        envName: switcherflv
-                        serviceName:  switcherflv
-                        servicePort:  80
-                      - host: webrtc
-                        envName: webrtc
-                        serviceName:  webrtc-internal
-                        servicePort:  8088
-                      - host: media-server
-                        envName: media_server
-                        serviceName:  media-server
-                        servicePort:  9090
-                    tls:
-                      secret: "mogplay-ingress-tls"
+                    tag: "1.1.1"
+                    pullPolicy: Always
                   master_ip: 10.20.40.207
                   fabric:
-                    host: "10.20.155.27"
-                    port: 15030
-                    network:
-                      host: 10.20.40.208
-                      nodes:
-                        - peer1
-                        - peer2
-                        - orgca
-                        - orderer
-                        - tlsca
-                  storage:
-                      janusRecordings:
-                          size: 5Gi
-                          name: janus-recordings
-                      prometheus:
-                          size: 5Gi
-                          name: prometheus-storage
-                      grafana:
-                          size: 1Gi
-                          name: grafana-storage
-                      blockchainCerts:
-                          size: 100Mi
-                          name: blockchain-certs
-                      postgres:
-                          size: 1Gi
-                          name: postgres
-                      config:
-                          size: 100Mi
-                          name: config
-                      nosignal:
-                          size: 2Gi
-                          name: nosignal
-                  nginx-ingress:
-                    controller:
-                      service:
-                        externalIPs:
-                          - "10.20.40.207"
-                          - "10.20.40.208"
-                          - "10.20.40.201"
-                        type: NodePort
-                        nodePorts:
-                          https: 30001
-                        externalTrafficPolicy: Local
-                  nfs-client-provisioner:
-                    nfs:
-                        server: 10.20.40.207
-                        path: /nfs
-                        replicaCount: 1
-                    storageClass:
-                        name: nfs-provisioner
-                  kube-prometheus-stack:
-                    grafana:
-                      adminPassword: admin
-                      ingress:
-                        enabled: false
-                        hosts:
-                          - grafana.mogplay.academy.mog.local
-                        path: /
-                        tls:
-                          - secretName: mogplay-ingress-tls
-                            hosts:
-                            - grafana.mogplay.academy.mog.local
-                      sidecar:
-                        enabled: true
-                      service:
-                        type: NodePort
-                        nodePort: 30009
-                    prometheus:
-                      prometheusSpec:
-                        serviceMonitorSelectorNilUsesHelmValues : false
-                      ingress:
-                        enabled: true
-                        hosts:
-                          - prometheus.mogplay.academy.mog.local
-                        path: /
-                        tls:
-                          - secretName: mogplay-ingress-tls
-                            hosts:
-                            - prometheus.mogplay.academy.mog.local
-                    prometheus-operator:
-                      namespaces:
-                        releaseNamespace: true
-                  prometheus-pushgateway:
-                    serviceMonitor:
-                      enabled: true
-                      namespace: articonf
-                      additionalLabels:
-                        release: articonf
+                    channel: appchannel
+                    org: hlf
               inventory:
                 all:
                   hosts:
