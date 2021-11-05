@@ -701,4 +701,3 @@ topology_template:
           - call_operation: EC2.set_attributes
           target: topology
 
-
