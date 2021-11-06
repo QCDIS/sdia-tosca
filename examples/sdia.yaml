@@ -382,29 +382,199 @@ topology_template:
                       ansible_host: { get_attribute: [ compute_1,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute_1,user_name ] }
-    vault:
+    monitoring:
+      type: tosca.nodes.QC.Container.Application.Helm
+      properties:
+        credential: { get_attribute: [ compute,user_key_pair ] }
+      requirements:
+      - kubernetes:
+          capability: tosca.capabilities.QC.Kubernetes
+          node: kubernetes
+          relationship: tosca.relationships.HostedOn
+      interfaces:
+        Helm:
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              repository: https://github.com/QCDIS/helm_playbooks.git
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              repository: https://github.com/QCDIS/helm_playbooks.git
+              extra_variables:
+                chart_name: prometheus-community/kube-prometheus-stack
+                repo_name: prometheus-community
+                repo_url: 'https://prometheus-community.github.io/helm-charts'
+                helm_name: monitoring
+                namespace: default
+                values:
+                  alertmanager:
+                    enabled: true
+                    service:
+                      type: ClusterIP
+                  prometheusOperator:
+                    enabled: true
+                    service:
+                      type: ClusterIP
+                  prometheus:
+                    enabled: true
+                    service:
+                      type: ClusterIP
+                  grafana:
+                    enabled: true
+                    service:
+                      type: NodePort
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+    kong:
       interfaces:
         Helm:
           install_chart:
             implementation: install_chart.yaml
             inputs:
               extra_variables:
-                chart_name: hashicorp/vault
-                helm_name: vault
+                chart_name: kong/kong
+                helm_name: kong
                 namespace: default
-                repo_name: hashicorp
-                repo_url: https://helm.releases.hashicorp.com
+                repo_name: kong
+                repo_url: https://charts.konghq.com
                 values:
-                  server:
-                    enabled: false
-                  dataStorage:
-                    enabled: false
-                  ui:
+                env:
+                  database: "postgres"
+                  nginx_worker_processes: "2"
+                  proxy_access_log: /dev/stdout
+                  admin_access_log: /dev/stdout
+                  admin_gui_access_log: /dev/stdout
+                  portal_api_access_log: /dev/stdout
+                  proxy_error_log: /dev/stderr
+                  admin_error_log: /dev/stderr
+                  admin_gui_error_log: /dev/stderr
+                  portal_api_error_log: /dev/stderr
+                  prefix: /kong_prefix/
+                  portal: on
+                  upstream_keepalive_idle_timeout: 999999
+                admin:
+                  enabled: true
+                  type: ClusterIP
+                  http:
                     enabled: true
-                    publishNotReadyAddresses: true
-                    # The service should only contain selectors for active Vault pod
-                    activeVaultPodOnly: false
-                    serviceType: "NodePort"
+                    servicePort: 8001
+                  tls:
+                    enabled: false
+                proxy:
+                  enabled: true
+                  type: NodePort
+                  http:
+                    enabled: false
+                  tls:
+                    enabled: true
+                enterprise:
+                  enabled: true
+                  vitals:
+                    enabled: true
+                  portal:
+                    enabled: true
+                manager:
+                  enabled: true
+                  type: ClusterIP
+                  http:
+                    enabled: false
+                  tls:
+                    enabled: true
+                portal:
+                  enabled: true
+                  type: ClusterIP
+                  http:
+                    enabled: false
+                  tls:
+                    enabled: true
+                postgresql:
+                  enabled: true
+                  persistence:
+                    enabled: false
+                  postgresqlUsername: kong
+                  postgresqlDatabase: kong
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                        - compute
+                        - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                        - compute
+                        - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                        - compute
+                        - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                        - compute
+                        - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+          - compute
+          - user_key_pair
+      requirements:
+      - kubernetes:
+          capability: tosca.capabilities.QC.Kubernetes
+          node: kubernetes
+          relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
+    konga:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: konga/konga
+                helm_name: konga
+                namespace: default
+                repo_name: konga
+                repo_url: https://qcdis.github.io/konga-helm/
+                values:
+                  service:
+                    type: NodePort
+                    port: 80
+#                  ingress:
+#                    enabled: true
+#                    annotations:
+#                       kubernetes.io/ingress.class: nginx
+#                       kubernetes.io/tls-acme: "true"
+#                    hosts:
+#                      - paths:
+#                        - path: /konga
+#                          backend:
+#                            serviceName: konga
+#                            servicePort: 80
               inventory:
                 all:
                   hosts:
@@ -562,9 +732,151 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
+    awx:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: adwerx/awx
+                helm_name: awx
+                namespace: default
+                repo_name: adwerx
+                repo_url: https://adwerx.github.io/charts
+                values:
+                  secretKey: secret
+                  secret_key: secret
+                  defaultAdminUser: admin
+                  default_admin_user: admin
+                  defaultAdminPassword: password
+                  default_admin_password: password
+                  service:
+                    type: ClusterIP
+                    port: 80
+                  postgresql:
+                    enabled: true
+                    persistence:
+                      enabled: false
+                    postgresqlUsername: awx
+                    postgresqlDatabase: awx
+                    postgresqlPassword: awx
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
+    mongo-express:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: cowboysysop/mongo-express
+                helm_name: mongo-express
+                namespace: default
+                repo_name: cowboysysop
+                repo_url: https://cowboysysop.github.io/charts/
+                values:
+                  secretKey: secret
+                  secret_key: secret
+                  defaultAdminUser: admin
+                  default_admin_user: admin
+                  defaultAdminPassword: password
+                  default_admin_password: password
+                  service:
+                    type: ClusterIP
+                    port: 80
+                  postgresql:
+                    enabled: true
+                    persistence:
+                      enabled: false
+                    postgresqlUsername: awx
+                    postgresqlDatabase: awx
+                    postgresqlPassword: awx
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
 
   workflows:
-    fair-cells-deploy:
+    sdia-deploy:
       description: deploy all
       preconditions:
         - target: topology
@@ -577,60 +889,92 @@ topology_template:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        fair-cells_install_k8s_requirements:
+        sdia_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
-            on_success: fair-cells_install_k8s
+            on_success: sdia_install_k8s
           target: kubernetes
-        fair-cells_install_k8s:
+        sdia_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: fair-cells_set_master
+            on_success: sdia_set_master
           target: kubernetes
-        fair-cells_set_master:
+        sdia_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
-            - fair-cells_join_k8s_cluster
-            - fair-cells_install_heml_requirements
-            - fair-cells_create_k8s_dashboard
+            - sdia_join_k8s_cluster
+            - sdia_install_heml_requirements
+            - sdia_create_k8s_dashboard
           target: kubernetes
-        fair-cells_join_k8s_cluster:
+        sdia_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - fair-cells_install_vault
-              - fair-cells_install_nfs-server-provisioner
+              - sdia_install_monitoring
+              - sdia_install_kong
+              - sdia_install_konga
+              - sdia_install_nfs-server-provisioner
+              - sdia_install_awx
+              - sdia_install_mongo-express
           target: kubernetes
-        fair-cells_install_heml_requirements:
+        sdia_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success:
-              - fair-cells_install_vault
-              - fair-cells_install_nfs-server-provisioner
-          target:  vault
-        fair-cells_install_vault:
+              - sdia_install_monitoring
+              - sdia_install_kong
+              - sdia_install_konga
+              - sdia_install_nfs-server-provisioner
+              - sdia_install_awx
+              - sdia_install_mongo-express
+          target:  monitoring
+        sdia_install_monitoring:
           activities:
           - call_operation: Helm.install_chart
-            on_success: fair-cells_set_k8s_attributes
+            on_success: sdia_set_k8s_attributes
           - set_state: RUNNING
-          target: vault
-        fair-cells_install_nfs-server-provisioner:
+          target:  monitoring
+        sdia_install_kong:
           activities:
           - call_operation: Helm.install_chart
-            on_success: fair-cells_set_k8s_attributes
+            on_success: sdia_set_k8s_attributes
+          - set_state: RUNNING
+          target: kong
+        sdia_install_konga:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: sdia_set_k8s_attributes
+          - set_state: RUNNING
+          target: konga
+        sdia_install_awx:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: sdia_set_k8s_attributes
+          - set_state: RUNNING
+          target: awx
+        sdia_install_mongo-express:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: sdia_set_k8s_attributes
+          - set_state: RUNNING
+          target: mongo-express
+        sdia_install_nfs-server-provisioner:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: sdia_set_k8s_attributes
           - set_state: RUNNING
           target: nfs-server-provisioner
-        fair-cells_create_k8s_dashboard:
+        sdia_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
-            - fair-cells_install_nfs-server-provisioner
-            - fair-cells_install_vault
+            - sdia_install_monitoring
+            - sdia_install_kong
           - set_state: RUNNING
           target: kubernetes
-        fair-cells_set_k8s_attributes:
+        sdia_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
