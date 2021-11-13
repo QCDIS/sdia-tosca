@@ -415,6 +415,9 @@ topology_template:
                 namespace: default
                 repo_name: kvaps
                 repo_url: https://kvaps.github.io/charts
+                values:
+                  storageClass:
+                    defaultClass: true
               inventory:
                 all:
                   hosts:
@@ -697,5 +700,4 @@ topology_template:
           activities:
           - call_operation: EC2.set_attributes
           target: topology
-
 
