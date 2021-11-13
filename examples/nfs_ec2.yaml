@@ -412,7 +412,7 @@ topology_template:
           target: nfs
         deploy_nfs-set-attributes:
           activities:
-          - call_operation: TIC.set_attributes
+          - call_operation: NFS.set_attributes
           - set_state: created
           target: nfs
 
