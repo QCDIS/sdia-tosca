@@ -9,33 +9,33 @@ imports:
 topology_template:
   node_templates:
     compute:
+      interfaces:
+        Standard:
+          create: dummy.yaml
       properties:
         role: master
         assign_public_ip: "yes"
-        disk_size: "40000 MB"
-        mem_size: "4000 MB"
-        num_cores: 2
-        os_distro: "Ubuntu"
-        os_version: "18.04"
-        user_name: "vm_user"
+        disk_size: 50000 MB
+        mem_size: 2000 MB
+        num_cores: 1
+        os_distro: Ubuntu
+        os_version: 18.04
+        user_name: vm_user
+      type: tosca.nodes.QC.VM.Compute
+    compute_1:
       interfaces:
         Standard:
-          create: "dummy.yaml"
-      type: "tosca.nodes.QC.VM.Compute"
-    compute_1:
+          create: dummy.yaml
       properties:
         role: worker
         assign_public_ip: "yes"
-        disk_size: "40000 MB"
-        mem_size: "4000 MB"
-        num_cores: 2
-        os_distro: "Ubuntu"
-        os_version: "18.04"
-        user_name: "vm_user"
-      interfaces:
-        Standard:
-          create: "dummy.yaml"
-      type: "tosca.nodes.QC.VM.Compute"
+        disk_size: 50000 MB
+        mem_size: 2000 MB
+        num_cores: 1
+        os_distro: Ubuntu
+        os_version: 18.04
+        user_name: vm_user
+      type: tosca.nodes.QC.VM.Compute
     topology:
       properties:
         domain: eu-west-1
@@ -243,7 +243,6 @@ topology_template:
                     localhost:
                       ansible_connection: local
               repository: https://github.com/QCDIS/ec2_playbooks.git
-
     kubernetes:
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
       requirements:
@@ -347,21 +346,13 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-    mog:
-      type: tosca.nodes.QC.Container.Application.Helm
-      properties:
-        credential: { get_attribute: [ compute,user_key_pair ] }
-      requirements:
-        - kubernetes:
-            capability: tosca.capabilities.QC.Kubernetes
-            node: kubernetes
-            relationship: tosca.relationships.HostedOn
-      interfaces:
-        Helm:
-          install_requirements:
-            implementation: install_requirements.yaml
+          create_persistent_volume:
+            implementation: create_persistent_volume.yaml
             inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
+              extra_variables:
+                storage_capacity: 10Gi
+                local_path: /mnt/disk/vol1
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
               inventory:
                 all:
                   hosts:
@@ -369,270 +360,98 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          reset_k8s_cluster:
+            implementation: create_persistent_volume.yaml
+            inputs:
+              extra_variables:
+                storage_capacity: 10Gi
+                local_path: /mnt/disk/vol1
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+    keycloak:
+      interfaces:
+        Helm:
           install_chart:
             implementation: install_chart.yaml
             inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
               extra_variables:
-                chart_name: qcdis/mog-helm-dataservice
-                repo_name: qcdis
-                repo_url: 'https://qcdis.github.io/mog-helm-dataservice/'
-                helm_name: mog
+                chart_name: bitnami/keycloak
+                helm_name: keycloak
                 namespace: default
+                repo_name: keycloak
+                repo_url: https://charts.bitnami.com/bitnami
                 values:
-                  replicas:
-                    controller: 1
-                    database: 1
-                    resourceManager: 1
-                    switcher: 1
-                    recorder: 1
-                    mediaServer: 1
-                    janus: 1
-                    switcherflv: 1
-                    coturn: 1
-                    marketplace: 1
-                  features:
-                    recorder: false
-                    monitoring: false
-                    nfs: false
-                    ingress: false
-                    ingressnotls: true
-                  images:
-                    repository: registry.gitlab.com/vfilipe/articonf-deployment
-                    token:
-                    tag: "1.1.2"
-                    pullPolicy: IfNotPresent
-                    controller: media-controller
-                    database: database
-                    resourceManager: k8-resource-manager
-                    transcoder: transcoder
-                    switcher: switcher
-                    recorder: media-recorder
-                    mediaServer: media-server
-                    janus: janus
-                    switcherflv: switcher-flv
-                    marketplace: marketplace
-
-                    prometheus: prom/prometheus:v2.4.3
-                    grafana: grafana/grafana:6.7.2
-                    nodeExporter: prom/node-exporter:v0.18.1
-                  imagePullSecrets:
-                    - name: regcred
-                  serviceAccount:
-                    create: true
-                  services:
-                    controller:
-                      type: NodePort
-                      port1: 80
-                      nodeport1: 30003
-                      port2: 443
-
-                    marketplace:
-                      type: ClusterIP
-                      port1: 80
-
-                    resourceManager:
-                      type: ClusterIP
-                      port: 3000
-
-                    controllerDatabase:
-                      type: NodePort
-                      port: 5432
-
-                    switcher:
-                      type: NodePort
-                      port1: 80
-                      nodeport1: 30005
-                      port2: 1935
-                      nodeport2: 30002
-
-                    transcoder:
-                      type: ClusterIP
-                      port1: 3004
-
-                    janus:
-                      type: NodePort
-                      udpPortLowerBound: 30010
-                      udpPortUpperBound: 30050
-
-                    janusrest:
-                      type: NodePort
-                      port1: 8088
-                      nodeport1: 30007
-
-                    recorder:
-                      type: NodePort
-                      port1: 5000
-                      nodeport1: 30008
-
-                    mediaServer:
-                      type: NodePort
-                      port1: 9090
-                      nodeport1: 30006
-
-                    switcherflv:
-                      type: NodePort
-                      port1: 81
-                      port2: 2935
-                      port3: 80
-                      nodeport3: 30004
-                  ingressnotls:
-                    hosts:
-                      - path: /webrtc(/|$)(.*)
-                        envName: webrtc
-                        serviceName: webrtc-internal
-                        servicePort: 8088
-                      - path: /switcher(/|$)(.*)
-                        envName: switcher
-                        serviceName: switcher
-                        servicePort: 80
-                      - path: /switcherflv(/|$)(.*)
-                        envName: switcherflv
-                        serviceName: switcherflv
-                        servicePort: 80
-                      - path: /marketplace(/|$)(.*)
-                        envName: marketplace
-                        serviceName: marketplace
-                        servicePort: 80
-                      - path: /controller(/|$)(.*)
-                        envName: controller
-                        serviceName: controller
-                        servicePort: 80
-                      - path: /*(/|$)(.*)
-                        envName: controller
-                        serviceName: controller
-                        servicePort: 80
-                  ingress:
-                    domain: mogplay.academy.mog.local
-                    hosts:
-                      - host: controller
-                        envName: controller
-                        serviceName: controller
-                        servicePort: 80
-                      - host: resource-manager
-                        envName: resource_manager
-                        serviceName: resource-manager
-                        servicePort: 3000
-                      - host: switcher
-                        envName: switcher
-                        serviceName:  switcher
-                        servicePort:  80
-                      - host: switcherflv
-                        envName: switcherflv
-                        serviceName:  switcherflv
-                        servicePort:  80
-                      - host: webrtc
-                        envName: webrtc
-                        serviceName:  webrtc-internal
-                        servicePort:  8088
-                      - host: media-server
-                        envName: media_server
-                        serviceName:  media-server
-                        servicePort:  9090
+                  auth:
+                    adminPassword: password
+                    managementPassword: password
                     tls:
-                      secret: "mogplay-ingress-tls"
-                  master_ip: 10.20.40.207
-                  fabric:
-                    host: "10.20.155.27"
-                    port: 15030
-                    network:
-                      host: 10.20.40.208
-                      nodes:
-                        - peer1
-                        - peer2
-                        - orgca
-                        - orderer
-                        - tlsca
-                  storage:
-                      janusRecordings:
-                          size: 5Gi
-                          name: janus-recordings
-                      prometheus:
-                          size: 5Gi
-                          name: prometheus-storage
-                      grafana:
-                          size: 1Gi
-                          name: grafana-storage
-                      blockchainCerts:
-                          size: 100Mi
-                          name: blockchain-certs
-                      postgres:
-                          size: 1Gi
-                          name: postgres
-                      config:
-                          size: 100Mi
-                          name: config
-                      nosignal:
-                          size: 2Gi
-                          name: nosignal
-                  nginx-ingress:
-                    controller:
-                      service:
-                        externalIPs:
-                          - "10.20.40.207"
-                          - "10.20.40.208"
-                          - "10.20.40.201"
-                        type: NodePort
-                        nodePorts:
-                          https: 30001
-                        externalTrafficPolicy: Local
-                  nfs-client-provisioner:
-                    nfs:
-                        server: 10.20.40.207
-                        path: /nfs
-                        replicaCount: 1
-                    storageClass:
-                        name: nfs-provisioner
-                  kube-prometheus-stack:
-                    grafana:
-                      adminPassword: admin
-                      ingress:
-                        enabled: false
-                        hosts:
-                          - grafana.mogplay.academy.mog.local
-                        path: /
-                        tls:
-                          - secretName: mogplay-ingress-tls
-                            hosts:
-                            - grafana.mogplay.academy.mog.local
-                      sidecar:
-                        enabled: true
-                      service:
-                        type: NodePort
-                        nodePort: 30009
-                    prometheus:
-                      prometheusSpec:
-                        serviceMonitorSelectorNilUsesHelmValues : false
-                      ingress:
-                        enabled: true
-                        hosts:
-                          - prometheus.mogplay.academy.mog.local
-                        path: /
-                        tls:
-                          - secretName: mogplay-ingress-tls
-                            hosts:
-                            - prometheus.mogplay.academy.mog.local
-                    prometheus-operator:
-                      namespaces:
-                        releaseNamespace: true
-                  prometheus-pushgateway:
-                    serviceMonitor:
                       enabled: true
-                      namespace: articonf
-                      additionalLabels:
-                        release: articonf
+                      autoGenerated: true
+                  service:
+                    type: NodePort
+                  postgresql:
+                    persistence:
+                      enabled: false
               inventory:
                 all:
                   hosts:
                     master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_host:
+                        get_attribute:
+                        - compute
+                        - public_ip
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-
+                      ansible_ssh_user:
+                        get_property:
+                        - compute
+                        - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                        - compute
+                        - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                        - compute
+                        - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+          - compute
+          - user_key_pair
+      requirements:
+      - kubernetes:
+          capability: tosca.capabilities.QC.Kubernetes
+          node: kubernetes
+          relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
 
   workflows:
-    mog-deploy_k8s:
-      description: deploy k8s
+    kong-deploy:
+      description: deploy all
       preconditions:
         - target: topology
           condition:
@@ -644,55 +463,56 @@ topology_template:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        mog_install_k8s_requirements:
+        kong_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
-            on_success: mog_install_k8s
+            on_success: kong_install_k8s
           target: kubernetes
-        mog_install_k8s:
+        kong_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: mog_set_master
+            on_success: kong_set_master
           target: kubernetes
-        mog_set_master:
+        kong_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
-            - mog_join_k8s_cluster
-            - mog_install_heml_requirements
-            - mog_create_k8s_dashboard
+            - kong_join_k8s_cluster
+            - kong_install_heml_requirements
+            - kong_create_k8s_dashboard
           target: kubernetes
-        mog_join_k8s_cluster:
+        kong_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - mog_install_mog
+              - kong_install_keycloak
           target: kubernetes
-        mog_install_heml_requirements:
+        kong_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success:
-            - mog_install_mog
-          target:  mog
-        mog_install_mog:
+              - kong_install_keycloak
+          target:  keycloak
+        kong_install_keycloak:
           activities:
           - call_operation: Helm.install_chart
-            on_success: mog_set_k8s_attributes
+            on_success: kong_set_k8s_attributes
           - set_state: RUNNING
-          target:  mog
-        mog_create_k8s_dashboard:
+          target: keycloak
+        kong_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
-            - mog_install_mog
+            - kong_install_keycloak
           - set_state: RUNNING
           target: kubernetes
-        mog_set_k8s_attributes:
+        kong_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
-    mog_ec2_provision:
+
+    ec2_provision:
       description: Workflow to deploy ec2 topology
       preconditions:
         - target: topology
@@ -756,7 +576,8 @@ topology_template:
               on_success:
               - ec2_set_attributes
             target: topology
-    mog_ec2_delete_topology:
+
+    ec2_delete_topology:
       description: delete_topology
       preconditions:
         - target: topology

@@ -9,33 +9,33 @@ imports:
 topology_template:
   node_templates:
     compute:
-      properties:
-        role: "master"
-        assign_public_ip: "yes"
-        disk_size: "40000 MB"
-        mem_size: "4000 MB"
-        num_cores: 2
-        os_distro: "Ubuntu"
-        os_version: "18.04"
-        user_name: "vm_user"
       interfaces:
         Standard:
-          create: "dummy.yaml"
-      type: "tosca.nodes.QC.VM.Compute"
+          create: dummy.yaml
+      properties:
+        role: master
+        assign_public_ip: "yes"
+        disk_size: 50000 MB
+        mem_size: 2000 MB
+        num_cores: 1
+        os_distro: Ubuntu
+        os_version: 18.04
+        user_name: vm_user
+      type: tosca.nodes.QC.VM.Compute
     compute_1:
-      properties:
-        role: "worker"
-        assign_public_ip: "yes"
-        disk_size: "40000 MB"
-        mem_size: "4000 MB"
-        num_cores: 2
-        os_distro: "Ubuntu"
-        os_version: "18.04"
-        user_name: "vm_user"
       interfaces:
         Standard:
-          create: "dummy.yaml"
-      type: "tosca.nodes.QC.VM.Compute"
+          create: dummy.yaml
+      properties:
+        role: worker
+        assign_public_ip: "yes"
+        disk_size: 50000 MB
+        mem_size: 2000 MB
+        num_cores: 1
+        os_distro: Ubuntu
+        os_version: 18.04
+        user_name: vm_user
+      type: tosca.nodes.QC.VM.Compute
     topology:
       properties:
         domain: eu-west-1
@@ -346,6 +346,42 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
+          create_persistent_volume:
+            implementation: create_persistent_volume.yaml
+            inputs:
+              extra_variables:
+                storage_capacity: 10Gi
+                local_path: /mnt/disk/vol1
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          reset_k8s_cluster:
+            implementation: create_persistent_volume.yaml
+            inputs:
+              extra_variables:
+                storage_capacity: 10Gi
+                local_path: /mnt/disk/vol1
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
     monitoring:
       type: tosca.nodes.QC.Container.Application.Helm
       properties:
@@ -376,7 +412,6 @@ topology_template:
                 chart_name: prometheus-community/kube-prometheus-stack
                 repo_name: prometheus-community
                 repo_url: 'https://prometheus-community.github.io/helm-charts'
-                name: monitoring
                 helm_name: monitoring
                 namespace: default
                 values:
@@ -387,11 +422,11 @@ topology_template:
                   prometheusOperator:
                     enabled: true
                     service:
-                      type: NodePort
+                      type: ClusterIP
                   prometheus:
                     enabled: true
                     service:
-                      type: NodePort
+                      type: ClusterIP
                   grafana:
                     enabled: true
                     service:
@@ -403,6 +438,243 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
+    kong:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: kong/kong
+                helm_name: kong
+                namespace: default
+                repo_name: kong
+                repo_url: https://charts.konghq.com
+                values:
+                env:
+                  database: "postgres"
+                  nginx_worker_processes: "2"
+                  proxy_access_log: /dev/stdout
+                  admin_access_log: /dev/stdout
+                  admin_gui_access_log: /dev/stdout
+                  portal_api_access_log: /dev/stdout
+                  proxy_error_log: /dev/stderr
+                  admin_error_log: /dev/stderr
+                  admin_gui_error_log: /dev/stderr
+                  portal_api_error_log: /dev/stderr
+                  prefix: /kong_prefix/
+                  portal: on
+                  upstream_keepalive_idle_timeout: 999999
+                admin:
+                  enabled: true
+                  type: ClusterIP
+                  http:
+                    enabled: true
+                    servicePort: 8001
+                  tls:
+                    enabled: false
+                proxy:
+                  enabled: true
+                  type: NodePort
+                  http:
+                    enabled: false
+                  tls:
+                    enabled: true
+                enterprise:
+                  enabled: true
+                  vitals:
+                    enabled: true
+                  portal:
+                    enabled: true
+                manager:
+                  enabled: true
+                  type: ClusterIP
+                  http:
+                    enabled: false
+                  tls:
+                    enabled: true
+                portal:
+                  enabled: true
+                  type: ClusterIP
+                  http:
+                    enabled: false
+                  tls:
+                    enabled: true
+                postgresql:
+                  enabled: true
+                  persistence:
+                    enabled: false
+                  postgresqlUsername: kong
+                  postgresqlDatabase: kong
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                        - compute
+                        - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                        - compute
+                        - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                        - compute
+                        - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                        - compute
+                        - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+          - compute
+          - user_key_pair
+      requirements:
+      - kubernetes:
+          capability: tosca.capabilities.QC.Kubernetes
+          node: kubernetes
+          relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
+    konga:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: konga/konga
+                helm_name: konga
+                namespace: default
+                repo_name: konga
+                repo_url: https://qcdis.github.io/konga-helm/
+                values:
+                  service:
+                    type: NodePort
+                    port: 80
+#                  ingress:
+#                    enabled: true
+#                    annotations:
+#                       kubernetes.io/ingress.class: nginx
+#                       kubernetes.io/tls-acme: "true"
+#                    hosts:
+#                      - paths:
+#                        - path: /konga
+#                          backend:
+#                            serviceName: konga
+#                            servicePort: 80
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                        - compute
+                        - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                        - compute
+                        - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                        - compute
+                        - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                        - compute
+                        - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+          - compute
+          - user_key_pair
+      requirements:
+      - kubernetes:
+          capability: tosca.capabilities.QC.Kubernetes
+          node: kubernetes
+          relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
+    ingress:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: ingress-nginx/ingress-nginx
+                helm_name: ingress-nginx
+                namespace: default
+                repo_name: ingress-nginx
+                repo_url: https://helm.nginx.com/stable
+                values:
+                  controller:
+                    service:
+                      type: NodePort
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                        - compute
+                        - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                        - compute
+                        - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                        - compute
+                        - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                        - compute
+                        - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+          - compute
+          - user_key_pair
+      requirements:
+      - kubernetes:
+          capability: tosca.capabilities.QC.Kubernetes
+          node: kubernetes
+          relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
     nfs-server-provisioner:
       interfaces:
         Helm:
@@ -460,77 +732,253 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
+    awx:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: adwerx/awx
+                helm_name: awx
+                namespace: default
+                repo_name: adwerx
+                repo_url: https://adwerx.github.io/charts
+                values:
+                  secretKey: secret
+                  secret_key: secret
+                  defaultAdminUser: admin
+                  default_admin_user: admin
+                  defaultAdminPassword: password
+                  default_admin_password: password
+                  service:
+                    type: ClusterIP
+                    port: 80
+                  postgresql:
+                    enabled: true
+                    persistence:
+                      enabled: false
+                    postgresqlUsername: awx
+                    postgresqlDatabase: awx
+                    postgresqlPassword: awx
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
+    mongo-express:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: cowboysysop/mongo-express
+                helm_name: mongo-express
+                namespace: default
+                repo_name: cowboysysop
+                repo_url: https://cowboysysop.github.io/charts/
+                values:
+                  secretKey: secret
+                  secret_key: secret
+                  defaultAdminUser: admin
+                  default_admin_user: admin
+                  defaultAdminPassword: password
+                  default_admin_password: password
+                  service:
+                    type: ClusterIP
+                    port: 80
+                  postgresql:
+                    enabled: true
+                    persistence:
+                      enabled: false
+                    postgresqlUsername: awx
+                    postgresqlDatabase: awx
+                    postgresqlPassword: awx
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
 
   workflows:
-    deploy_k8s:
-      description: deploy k8s
+    sdia-deploy:
+      description: deploy all
       preconditions:
         - target: topology
           condition:
             - assert:
               - current_state: [{equal: RUNNING }]
-
         - target: kubernetes
           condition:
             - assert:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        install_k8s_requirements:
+        sdia_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
-            on_success: install_k8s
+            on_success: sdia_install_k8s
           target: kubernetes
-        install_k8s:
+        sdia_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: set_master
+            on_success: sdia_set_master
           target: kubernetes
-        set_master:
+        sdia_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
-            - join_k8s_cluster
-            - install_heml_requirements
-            - create_k8s_dashboard
+            - sdia_join_k8s_cluster
+            - sdia_install_heml_requirements
+            - sdia_create_k8s_dashboard
           target: kubernetes
-        join_k8s_cluster:
+        sdia_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - install_chart
+              - sdia_install_monitoring
+              - sdia_install_kong
+              - sdia_install_konga
+              - sdia_install_nfs-server-provisioner
+              - sdia_install_awx
+              - sdia_install_mongo-express
           target: kubernetes
-        install_heml_requirements:
+        sdia_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success:
-            - install_chart
-            - install_vialog_chart
-          target: monitoring
-        install_nfs-server-provisioner_chart:
+              - sdia_install_monitoring
+              - sdia_install_kong
+              - sdia_install_konga
+              - sdia_install_nfs-server-provisioner
+              - sdia_install_awx
+              - sdia_install_mongo-express
+          target:  monitoring
+        sdia_install_monitoring:
           activities:
           - call_operation: Helm.install_chart
-            on_success: set_k8s_attributes
+            on_success: sdia_set_k8s_attributes
+          - set_state: RUNNING
+          target:  monitoring
+        sdia_install_kong:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: sdia_set_k8s_attributes
+          - set_state: RUNNING
+          target: kong
+        sdia_install_konga:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: sdia_set_k8s_attributes
+          - set_state: RUNNING
+          target: konga
+        sdia_install_awx:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: sdia_set_k8s_attributes
+          - set_state: RUNNING
+          target: awx
+        sdia_install_mongo-express:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: sdia_set_k8s_attributes
+          - set_state: RUNNING
+          target: mongo-express
+        sdia_install_nfs-server-provisioner:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: sdia_set_k8s_attributes
           - set_state: RUNNING
           target: nfs-server-provisioner
-        install_chart:
-          activities:
-          - call_operation: Helm.install_chart
-            on_success: set_k8s_attributes
-          - set_state: RUNNING
-          target: monitoring
-        create_k8s_dashboard:
+        sdia_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
-            - install_chart
+            - sdia_install_monitoring
+            - sdia_install_kong
           - set_state: RUNNING
           target: kubernetes
-        set_k8s_attributes:
+        sdia_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
+
     ec2_provision:
       description: Workflow to deploy ec2 topology
       preconditions:
@@ -595,6 +1043,7 @@ topology_template:
               on_success:
               - ec2_set_attributes
             target: topology
+
     ec2_delete_topology:
       description: delete_topology
       preconditions:
@@ -623,6 +1072,5 @@ topology_template:
           activities:
           - call_operation: EC2.set_attributes
           target: topology
-
 
 
