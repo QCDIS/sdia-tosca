@@ -382,121 +382,8 @@ topology_template:
                       ansible_host: { get_attribute: [ compute_1,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute_1,user_name ] }
-    monitoring:
-      type: tosca.nodes.QC.Container.Application.Helm
-      properties:
-        credential: { get_attribute: [ compute,user_key_pair ] }
-      requirements:
-      - kubernetes:
-          capability: tosca.capabilities.QC.Kubernetes
-          node: kubernetes
-          relationship: tosca.relationships.HostedOn
-      interfaces:
-        Helm:
-          install_requirements:
-            implementation: install_requirements.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-          install_chart:
-            implementation: install_chart.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              extra_variables:
-                chart_name: prometheus-community/kube-prometheus-stack
-                repo_name: prometheus-community
-                repo_url: 'https://prometheus-community.github.io/helm-charts'
-                helm_name: monitoring
-                namespace: default
-                values:
-                  alertmanager:
-                    enabled: true
-                    service:
-                      type: ClusterIP
-                  prometheusOperator:
-                    enabled: true
-                    service:
-                      type: ClusterIP
-                  prometheus:
-                    enabled: true
-                    service:
-                      type: ClusterIP
-                  grafana:
-                    enabled: true
-                    service:
-                      type: NodePort
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-    kaniko:
-      type: tosca.nodes.QC.Container.Application.Helm
-      properties:
-        credential: { get_attribute: [ compute,user_key_pair ] }
-      requirements:
-      - kubernetes:
-          capability: tosca.capabilities.QC.Kubernetes
-          node: kubernetes
-          relationship: tosca.relationships.HostedOn
-      interfaces:
-        Helm:
-          install_requirements:
-            implementation: install_requirements.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-          install_chart:
-            implementation: install_chart.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              extra_variables:
-                chart_name: vrecharts/kaniko-chart
-                repo_name: vrecharts
-                repo_url: 'https://r-whites.github.io/vrecharts/'
-                helm_name: kaniko
-                namespace: default
-                status: Succeeded
-                values:
-                  dockerhub_auth: "dnJlX3VzZXI6c2VjcmV0X3Rva2VuCg=="
-                  dockerfile: "https://{ get_attribute: [ compute,public_ip ] }/docker-context/dockerfiles/Dockerfile"
-                  context: "https://{ get_attribute: [ compute,public_ip ] }/docker-context/archive/context.tar.gz"
-                  destination: "cloudcells/cell_name"
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-          uninstall_chart:
-            implementation: uninstall_chart.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              extra_variables:
-                name: kaniko
-                namespace: default
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+
+
     argowf:
       interfaces:
         Helm:
@@ -817,35 +704,6 @@ topology_template:
       type: tosca.nodes.QC.Container.Application.Helm
 
   workflows:
-#    fair-cells_deploy_kaniko:
-#      description: deploy kaniko
-#      preconditions:
-#        - target: kubernetes
-#          condition:
-#            - assert:
-#              - current_state: [{equal: RUNNING }]
-#        - target: kaniko
-#          condition:
-#            - assert:
-#              - desired_state: [{equal: RUNNING }]
-#              - current_state: [{equal: UNDEFINED }]
-#      steps:
-#        fair-cells_install_kaniko:
-#          activities:
-#          - call_operation: Helm.install_chart
-#            on_success: fair-cells_uninstall_kaniko
-#          target:  kaniko
-#        fair-cells_uninstall_kaniko:
-#          activities:
-#          - call_operation: Helm.uninstall_chart
-#            on_success: fair-cells_set_k8s_attributes
-#          - set_state: UNDEFINED
-#          target:  kaniko
-#        fair-cells_set_k8s_attributes:
-#          activities:
-#          - call_operation: Kubernetes.set_attributes
-#          target: kubernetes
-
     fair-cells-deploy:
       description: deploy all
       preconditions:
