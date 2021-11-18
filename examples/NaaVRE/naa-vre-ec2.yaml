@@ -243,6 +243,58 @@ topology_template:
                     localhost:
                       ansible_connection: local
               repository: https://github.com/QCDIS/ec2_playbooks.git
+    nfs:
+      requirements:
+        - host:
+            capability: "tosca.capabilities.QC.VM.topology"
+            node: "topology"
+            relationship: "tosca.relationships.HostedOn"
+      properties:
+        credential: { get_attribute: [ compute,user_key_pair ] }
+      type: "tosca.nodes.QC.Application.NFS"
+      interfaces:
+        NFS:
+          requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/nfs_playbooks.git"
+              inventory:
+                all:
+                  children:
+                    nfs-server:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+          install:
+            implementation: install_nfs.yaml
+            inputs:
+              repository: "https://github.com/QCDIS/nfs_playbooks.git"
+              extra_variables:
+                mount_path: /data/nfs-data
+              inventory:
+                all:
+                  children:
+                    nfs-server:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+          set_attributes:
+            implementation: set_attributes.yml
+            inputs:
+              repository: "https://github.com/QCDIS/nfs_playbooks.git"
+              inventory:
+                all:
+                  children:
+                    nfs-server:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
     kubernetes:
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
       requirements:
@@ -382,7 +434,127 @@ topology_template:
                       ansible_host: { get_attribute: [ compute_1,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute_1,user_name ] }
-
+    ingress:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: ingress-nginx/nginx-ingress
+                helm_name: ingress-nginx
+                namespace: default
+                repo_name: ingress-nginx
+                repo_url: https://charts.okteto.com
+                values:
+                  controller:
+                    service:
+                      type: NodePort
+                  ingressClassResource:
+                    default: true
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
+    nfs-server-provisioner:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: nfs-subdir-external-provisioner/nfs-subdir-external-provisioner
+                helm_name: nfs-server-provisioner
+                namespace: default
+                repo_name: kvaps
+                repo_url: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+                values:
+                  nfs:
+                   server:  { get_attribute: [ compute, public_ip ] }
+                   path: /data/nfs-data
+                  storageClass:
+                   name: nfs
+                   defaultClass: true
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
 
     argowf:
       interfaces:
@@ -397,9 +569,26 @@ topology_template:
                 repo_name: argo
                 repo_url: https://argoproj.github.io/argo-helm
                 values:
-                  containerRuntimeExecutor: k8sapi
+                  controller:
+                    containerRuntimeExecutor: k8sapi
                   server:
+                    enabled: true
+                    baseHref: /argowf/
                     serviceType: NodePort
+                    ingress:
+                      enabled: true
+                      ingressClassName: "nginx"
+                      annotations:
+                        nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+                        nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+                        nginx.ingress.kubernetes.io/rewrite-target: /$2
+                        nginx.ingress.kubernetes.io/add-base-url : "true"
+                        nginx.ingress.kubernetes.io/configuration-snippet: |
+                          proxy_set_header Accept-Encoding "";
+                          sub_filter '<base href="/">' '<base href="/argowf/">';
+                          sub_filter_once on;
+                      paths:
+                      - /argowf(/|$)(.*)
               inventory:
                 all:
                   hosts:
@@ -442,126 +631,6 @@ topology_template:
           node: kubernetes
           relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
-    nfs-server-provisioner:
-      interfaces:
-        Helm:
-          install_chart:
-            implementation: install_chart.yaml
-            inputs:
-              extra_variables:
-                chart_name: kvaps/nfs-server-provisioner
-                helm_name: nfs-server-provisioner
-                namespace: default
-                repo_name: kvaps
-                repo_url: https://kvaps.github.io/charts
-                values:
-                  storageClass:
-                    defaultClass: true
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host:
-                        get_attribute:
-                          - compute
-                          - public_ip
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:
-                        get_property:
-                          - compute
-                          - user_name
-              repository: https://github.com/QCDIS/helm_playbooks.git
-          install_requirements:
-            implementation: install_requirements.yaml
-            inputs:
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host:
-                        get_attribute:
-                          - compute
-                          - public_ip
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:
-                        get_property:
-                          - compute
-                          - user_name
-              repository: https://github.com/QCDIS/helm_playbooks.git
-      properties:
-        credential:
-          get_attribute:
-            - compute
-            - user_key_pair
-      requirements:
-        - kubernetes:
-            capability: tosca.capabilities.QC.Kubernetes
-            node: kubernetes
-            relationship: tosca.relationships.HostedOn
-      type: tosca.nodes.QC.Container.Application.Helm
-    git-postgresql:
-      interfaces:
-        Helm:
-          install_chart:
-            implementation: install_chart.yaml
-            inputs:
-              extra_variables:
-                chart_name: bitnami/postgresql
-                helm_name: git-postgresql
-                namespace: default
-                repo_name: bitnami
-                repo_url: https://charts.bitnami.com/bitnami
-                values:
-                  global:
-                    postgresql:
-                      postgresqlDatabase: "gogs"
-                      postgresqlUsername: "gogs"
-                      postgresqlPassword: "gogs"
-                  persistence:
-                    enabled: false
-                  postgresqlPassword: "gogs"
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host:
-                        get_attribute:
-                          - compute
-                          - public_ip
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:
-                        get_property:
-                          - compute
-                          - user_name
-              repository: https://github.com/QCDIS/helm_playbooks.git
-          install_requirements:
-            implementation: install_requirements.yaml
-            inputs:
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host:
-                        get_attribute:
-                          - compute
-                          - public_ip
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:
-                        get_property:
-                          - compute
-                          - user_name
-              repository: https://github.com/QCDIS/helm_playbooks.git
-      properties:
-        credential:
-          get_attribute:
-            - compute
-            - user_key_pair
-      requirements:
-        - kubernetes:
-            capability: tosca.capabilities.QC.Kubernetes
-            node: kubernetes
-            relationship: tosca.relationships.HostedOn
-      type: tosca.nodes.QC.Container.Application.Helm
     gogs:
       interfaces:
         Helm:
@@ -569,97 +638,49 @@ topology_template:
             implementation: install_chart.yaml
             inputs:
               extra_variables:
-                chart_name: keyporttech/gogs
+                chart_name: gogs/gogs
                 helm_name: gogs
                 namespace: default
-                repo_name: keyporttech
-                repo_url: https://keyporttech.github.io/helm-charts/
+                repo_name: gogs
+                repo_url: https://qcdis.github.io/gogs-helm/
                 values:
+                  serviceType: NodePort
                   service:
-                    http:
-                      serviceType: NodePort
-                      port: 3000
-                    ssh:
-                      serviceType: ClusterIP
-                      port: 22
-                  dbType: "postgres"
-                  useInPodPostgres: false
-                  externalDB:
-                    dbUser: "gogs"
-                    dbPassword: "gogs"
-                    dbHost: "git-postgresql"
-                    dbPort: 5432
-                    dbDatabase: "gogs"
-                  config:
-                    disableInstaller: true
-                    secretKey: define_your_secret
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host:
-                        get_attribute:
-                          - compute
-                          - public_ip
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:
-                        get_property:
-                          - compute
-                          - user_name
-              repository: https://github.com/QCDIS/helm_playbooks.git
-          install_requirements:
-            implementation: install_requirements.yaml
-            inputs:
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host:
-                        get_attribute:
-                          - compute
-                          - public_ip
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:
-                        get_property:
-                          - compute
-                          - user_name
-              repository: https://github.com/QCDIS/helm_playbooks.git
-      properties:
-        credential:
-          get_attribute:
-            - compute
-            - user_key_pair
-      requirements:
-        - kubernetes:
-            capability: tosca.capabilities.QC.Kubernetes
-            node: kubernetes
-            relationship: tosca.relationships.HostedOn
-      type: tosca.nodes.QC.Container.Application.Helm
-    harbor:
-      interfaces:
-        Helm:
-          install_chart:
-            implementation: install_chart.yaml
-            inputs:
-              extra_variables:
-                chart_name: harbor/harbor
-                helm_name: docker-registry
-                namespace: default
-                repo_name: harbor
-                repo_url: https://helm.goharbor.io
-                values:
-                  expose:
-                    type: nodePort
-                    tls:
+                    gogs:
+                      server:
+                        external_url: "http://localhost:3000/gogs/"
+                        offline_mode: "true"
+                      database:
+                        type: "sqlite3"
+                        host: "127.0.0.1:5432"
+                        name: "gogs"
+                        user: "gogs"
+                        ssl_mode: "disable"
+                        path: "data/gogs.db"
+                      security:
+                        install_lock: "true"
+                        secret_key: "pc8kVDNO6ShVqBO"
+                      auth:
+                        enable_registration_captcha: "false"
+                        enable_reverse_proxy_authentication: "false"
+                        enable_reverse_proxy_auto_registration: "false"
+                        reverse_proxy_authentication_header: "x-webauth-user"
+                    ingress:
                       enabled: true
-                      auto:
-                        commonName: lw-vlic
-                    nodePort:
-                      ports:
-                        https:
-                          nodePort: 30013
+                      ingressClassName: "nginx"
+                      annotations:
+                        nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+                        nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+                        nginx.ingress.kubernetes.io/rewrite-target: /$2
+                        nginx.ingress.kubernetes.io/add-base-url : "true"
+                      paths:
+                      - /gogs(/|$)(.*)
                   persistence:
                     enabled: false
+                  postgresql:
+                    install: false
+                    persistence:
+                      enabled: false
               inventory:
                 all:
                   hosts:
@@ -703,8 +724,9 @@ topology_template:
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
 
+
   workflows:
-    fair-cells-deploy:
+    naa-vre-deploy:
       description: deploy all
       preconditions:
         - target: topology
@@ -717,76 +739,96 @@ topology_template:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        fair-cells_install_k8s_requirements:
+        deploy_nfs-requirements:
+          activities:
+          - call_operation: NFS.requirements
+            on_success: deploy_nfs-install
+          target: nfs
+        deploy_nfs-install:
+          activities:
+          - call_operation: NFS.install
+            on_success:
+            - naa-vre_install_ingress
+            - naa-vre_install_nfs-server-provisioner
+            - naa-vre_install_argowf
+            - naa-vre_install_gogs
+            - deploy_nfs-set-attributes
+          target: nfs
+        deploy_nfs-set-attributes:
+          activities:
+          - call_operation: NFS.set_attributes
+          - set_state: created
+          target: nfs
+        naa-vre_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
-            on_success: fair-cells_install_k8s
+            on_success:
+            - naa-vre_install_k8s
           target: kubernetes
-        fair-cells_install_k8s:
+        naa-vre_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: fair-cells_set_master
+            on_success: naa-vre_set_master
           target: kubernetes
-        fair-cells_set_master:
+        naa-vre_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
-            - fair-cells_join_k8s_cluster
-            - fair-cells_install_heml_requirements
-            - fair-cells_create_k8s_dashboard
+            - deploy_nfs-requirements
+            - naa-vre_join_k8s_cluster
+            - naa-vre_install_heml_requirements
+            - naa-vre_create_k8s_dashboard
           target: kubernetes
-        fair-cells_join_k8s_cluster:
+        naa-vre_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - fair-cells_install_monitoring
-              - fair-cells_install_argowf
-              - fair-cells_install_nfs-server-provisioner
-              - fair-cells_install_harbor
+              - naa-vre_install_ingress
+              - naa-vre_install_nfs-server-provisioner
+              - naa-vre_install_argowf
+              - naa-vre_install_gogs
           target: kubernetes
-        fair-cells_install_heml_requirements:
+        naa-vre_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success:
-            - fair-cells_install_monitoring
-            - fair-cells_install_argowf
-          target:  monitoring
-        fair-cells_install_monitoring:
+              - naa-vre_install_ingress
+              - naa-vre_install_nfs-server-provisioner
+              - naa-vre_install_argowf
+              - naa-vre_install_gogs
+          target:  argowf
+        naa-vre_install_argowf:
           activities:
           - call_operation: Helm.install_chart
-            on_success: fair-cells_set_k8s_attributes
-          - set_state: RUNNING
-          target:  monitoring
-        fair-cells_install_argowf:
-          activities:
-          - call_operation: Helm.install_chart
-            on_success: fair-cells_set_k8s_attributes
+            on_success: naa-vre_set_k8s_attributes
           - set_state: RUNNING
           target: argowf
-        fair-cells_install_nfs-server-provisioner:
+        naa-vre_install_gogs:
           activities:
           - call_operation: Helm.install_chart
-            on_success: fair-cells_set_k8s_attributes
+            on_success: naa-vre_set_k8s_attributes
+          - set_state: RUNNING
+          target: gogs
+        naa-vre_install_nfs-server-provisioner:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: naa-vre_set_k8s_attributes
           - set_state: RUNNING
           target: nfs-server-provisioner
-        fair-cells_install_harbor:
+        naa-vre_install_ingress:
           activities:
           - call_operation: Helm.install_chart
-            on_success: fair-cells_set_k8s_attributes
+            on_success: naa-vre_set_k8s_attributes
           - set_state: RUNNING
-          target: harbor
-        fair-cells_create_k8s_dashboard:
-          activities:
-          - call_operation: Kubernetes.create_k8s_dashboard
-            on_success:
-            - fair-cells_install_monitoring
-            - fair-cells_install_argowf
-          - set_state: RUNNING
-          target: kubernetes
-        fair-cells_set_k8s_attributes:
+          target: ingress
+        naa-vre_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
+          target: kubernetes
+        naa-vre_create_k8s_dashboard:
+          activities:
+          - call_operation: Kubernetes.create_k8s_dashboard
           target: kubernetes
 
     ec2_provision:

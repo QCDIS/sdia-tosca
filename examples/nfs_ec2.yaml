@@ -272,7 +272,8 @@ topology_template:
             implementation: install_nfs.yaml
             inputs:
               repository: "https://github.com/QCDIS/nfs_playbooks.git"
-              extra_variables: /mnt/nfs
+              extra_variables:
+                mount_path: /mnt/nfs
               inventory:
                 all:
                   children:
@@ -412,7 +413,7 @@ topology_template:
           target: nfs
         deploy_nfs-set-attributes:
           activities:
-          - call_operation: TIC.set_attributes
+          - call_operation: NFS.set_attributes
           - set_state: created
           target: nfs
 
