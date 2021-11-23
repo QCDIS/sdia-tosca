@@ -598,9 +598,9 @@ topology_template:
                       nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
                       nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
                       nginx.ingress.kubernetes.io/add-base-url: "true"
-                      nginx.ingress.kubernetes.io/auth-type: "basic"
-                      nginx.ingress.kubernetes.io/auth-realm: "Authentication Required - NaaVRE"
-                      nginx.ingress.kubernetes.io/auth-secret: "basic-auth"
+#                      nginx.ingress.kubernetes.io/auth-type: "basic"
+#                      nginx.ingress.kubernetes.io/auth-realm: "Authentication Required - NaaVRE"
+#                      nginx.ingress.kubernetes.io/auth-secret: "basic-auth"
                   proxy:
                     service:
                       type: ClusterIP
