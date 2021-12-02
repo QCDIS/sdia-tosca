@@ -590,7 +590,30 @@ topology_template:
                 repo_url: https://jupyterhub.github.io/helm-chart/
                 values:
                   hub:
+                    extraEnv:
+                      OAUTH2_TLS_VERIFY: 'false'
                     baseUrl: /naa-vre
+                    config:
+                      GenericOAuthenticator:
+                        client_id: naa-vre
+                        client_secret: XXXXXXXXXXXXXXXXXX
+                        oauth_callback_url: https://{ get_attribute[compute, public_ip}:{ get_attribute[jupyterhub, port}/naa-vre/hub/oauth_callback
+                        authorize_url: https://{ get_attribute[compute, public_ip}:{ get_attribute[keycloak, port}/auth/realms/naa-vre/protocol/openid-connect/auth
+                        token_url: https://{ get_attribute[compute, public_ip}:{ get_attribute[keycloak, port}/auth/realms/naa-vre/protocol/openid-connect/token
+                        userdata_url: https://{ get_attribute[compute, public_ip}:{ get_attribute[keycloak, port}/auth/realms/naa-vre/protocol/openid-connect/userinfo
+                        login_service: keycloak
+                        username_key: preferred_username
+                        userdata_params:
+                          state: state
+                      JupyterHub:
+                        authenticator_class: generic-oauth
+                        tornado_settings:
+                          headers:
+                            Content-Security-Policy: "frame-ancestors 'self' *"
+                          cookie_options:
+                            SameSite: "None"
+                            Secure: "True"
+                        tls_verify: false
                   ingress:
                     enabled: true
                     annotations:
@@ -598,9 +621,6 @@ topology_template:
                       nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
                       nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
                       nginx.ingress.kubernetes.io/add-base-url: "true"
-#                      nginx.ingress.kubernetes.io/auth-type: "basic"
-#                      nginx.ingress.kubernetes.io/auth-realm: "Authentication Required - NaaVRE"
-#                      nginx.ingress.kubernetes.io/auth-secret: "basic-auth"
                   proxy:
                     service:
                       type: ClusterIP
@@ -610,7 +630,86 @@ topology_template:
                       JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
                     image:
                       name: qcdis/naa-vre
-                      tag: 0.1.0
+                      tag: latest
+                      pullPolicy: Always
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
+    keycloak:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: bitnami/keycloak
+                helm_name: keycloak
+                namespace: default
+                repo_name: bitnami
+                repo_url: https://charts.bitnami.com/bitnami
+                values:
+                  auth:
+                    createAdminUser: true
+                    adminPassword: password
+                    managementPassword: password
+                  service:
+                    type: NodePort
+                  ingress:
+                    enabled: true
+                    ingressClassName: nginx
+                    path: /keycloak/
+                    pathType: Prefix
+                  annotations:
+                    nginx.ingress.kubernetes.io/add-base-url: 'true'
+                    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+                    nginx.ingress.kubernetes.io/configuration-snippet: |
+                      proxy_set_header Accept-Encoding "";
+                      sub_filter '<base href="/">' '<base href="/keycloak/">';
+                      sub_filter_once on;
+                    nginx.ingress.kubernetes.io/force-ssl-redirect: 'false'
+                    nginx.ingress.kubernetes.io/rewrite-target: /$2
+                  postgresql:
+                    persistence:
+                      enabled: false
               inventory:
                 all:
                   hosts:
@@ -713,6 +812,7 @@ topology_template:
               - naa-vre_jupyterhub_install_ingress
               - naa-vre_jupyterhub_install_nfs-provisioner
               - naa-vre_jupyterhub_install_jupyterhub
+              - naa-vre_jupyterhub_install_keycloak
           target: kubernetes
         naa-vre_jupyterhub_install_heml_requirements:
           activities:
@@ -721,6 +821,7 @@ topology_template:
               - naa-vre_jupyterhub_install_ingress
               - naa-vre_jupyterhub_install_nfs-provisioner
               - naa-vre_jupyterhub_install_jupyterhub
+              - naa-vre_jupyterhub_install_keycloak
           target:  jupyterhub
         naa-vre_jupyterhub_install_jupyterhub:
           activities:
@@ -728,6 +829,12 @@ topology_template:
             on_success: naa-vre_jupyterhub_set_k8s_attributes
           - set_state: RUNNING
           target: jupyterhub
+        naa-vre_jupyterhub_install_keycloak:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: naa-vre_jupyterhub_set_k8s_attributes
+          - set_state: RUNNING
+          target: keycloak
         naa-vre_jupyterhub_install_nfs-provisioner:
           activities:
           - call_operation: Helm.install_chart
