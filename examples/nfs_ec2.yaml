@@ -22,7 +22,6 @@ topology_template:
         Standard:
           create: "dummy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
-
     compute_1:
       properties:
         role: worker
@@ -296,11 +295,7 @@ topology_template:
                           ansible_host: { get_attribute: [ compute,public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_user: { get_property: [ compute,user_name ] }
-
-
-
   workflows:
-
     ec2_provision:
       description: Workflow to deploy ec2 topology
       preconditions:

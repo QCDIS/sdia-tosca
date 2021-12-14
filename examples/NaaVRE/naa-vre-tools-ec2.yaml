@@ -30,8 +30,8 @@ topology_template:
         role: worker
         assign_public_ip: "yes"
         disk_size: 50000 MB
-        mem_size: 2000 MB
-        num_cores: 1
+        mem_size: 4000 MB
+        num_cores: 2
         os_distro: Ubuntu
         os_version: 18.04
         user_name: vm_user
@@ -244,57 +244,78 @@ topology_template:
                       ansible_connection: local
               repository: https://github.com/QCDIS/ec2_playbooks.git
     nfs:
+      properties:
+        credential:
+          get_attribute:
+            - "compute"
+            - "user_key_pair"
       requirements:
         - host:
             capability: "tosca.capabilities.QC.VM.topology"
             node: "topology"
             relationship: "tosca.relationships.HostedOn"
-      properties:
-        credential: { get_attribute: [ compute,user_key_pair ] }
-      type: "tosca.nodes.QC.Application.NFS"
       interfaces:
         NFS:
-          requirements:
-            implementation: install_requirements.yaml
-            inputs:
-              repository: "https://github.com/QCDIS/nfs_playbooks.git"
-              inventory:
-                all:
-                  children:
-                    nfs-server:
-                      hosts:
-                        hlf0:
-                          ansible_host: { get_attribute: [ compute,public_ip ] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_user: { get_property: [ compute,user_name ] }
           install:
-            implementation: install_nfs.yaml
+            implementation: "install_nfs.yaml"
             inputs:
-              repository: "https://github.com/QCDIS/nfs_playbooks.git"
               extra_variables:
-                mount_path: /data/nfs-data
+                mount_path: "/data/nfs-data"
               inventory:
                 all:
                   children:
                     nfs-server:
                       hosts:
                         hlf0:
-                          ansible_host: { get_attribute: [ compute,public_ip ] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_user: { get_property: [ compute,user_name ] }
-          set_attributes:
-            implementation: set_attributes.yml
-            inputs:
+                          ansible_host:
+                            get_attribute:
+                              - "compute"
+                              - "public_ip"
+                          ansible_python_interpreter: "/usr/bin/python3"
+                          ansible_ssh_user: "vm_user"
               repository: "https://github.com/QCDIS/nfs_playbooks.git"
+          requirements:
+            implementation: "install_requirements.yaml"
+            inputs:
+              inventory:
+                all:
+                  children:
+                    nodes:
+                      hosts:
+                        hlf1:
+                          ansible_host:
+                            get_attribute:
+                              - "compute_1"
+                              - "public_ip"
+                          ansible_python_interpreter: "/usr/bin/python3"
+                          ansible_ssh_user: "vm_user"
+                    nfs-server:
+                      hosts:
+                        hlf0:
+                          ansible_host:
+                            get_attribute:
+                              - "compute"
+                              - "public_ip"
+                          ansible_python_interpreter: "/usr/bin/python3"
+                          ansible_ssh_user: "vm_user"
+              repository: "https://github.com/QCDIS/nfs_playbooks.git"
+          set_attributes:
+            implementation: "set_attributes.yml"
+            inputs:
               inventory:
                 all:
                   children:
                     nfs-server:
                       hosts:
                         hlf0:
-                          ansible_host: { get_attribute: [ compute,public_ip ] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                          ansible_host:
+                            get_attribute:
+                              - "compute"
+                              - "public_ip"
+                          ansible_python_interpreter: "/usr/bin/python3"
+                          ansible_ssh_user: "vm_user"
+              repository: "https://github.com/QCDIS/nfs_playbooks.git"
+      type: "tosca.nodes.QC.Application.NFS"
     kubernetes:
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
       requirements:
@@ -494,7 +515,7 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
-    nfs-server-provisioner:
+    nfs-provisioner:
       interfaces:
         Helm:
           install_chart:
@@ -502,9 +523,9 @@ topology_template:
             inputs:
               extra_variables:
                 chart_name: nfs-subdir-external-provisioner/nfs-subdir-external-provisioner
-                helm_name: nfs-server-provisioner
+                helm_name: nfs-provisioner
                 namespace: default
-                repo_name: kvaps
+                repo_name: nfs-subdir-external-provisioner
                 repo_url: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
                 values:
                   nfs:
@@ -555,7 +576,6 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
-
     argowf:
       interfaces:
         Helm:
@@ -572,9 +592,36 @@ topology_template:
                   controller:
                     containerRuntimeExecutor: k8sapi
                   server:
+                    volumeMounts:
+                      - name: ssh-key
+                        mountPath: /etc/ssl/certs/ca.crt
+                        readOnly: true
+                    volumes:
+                      - name: ssh-key
+                        secret:
+                          secretName: keycloak-token-tw8px
+                          items:
+                            - key: ca.crt
+                              path: ca.crt
+                    extraArgs:
+                      - --auth-mode=sso
                     enabled: true
                     baseHref: /argowf/
                     serviceType: NodePort
+                    #https://github.com/argoproj/argo-workflows/blob/master/docs/argo-server-sso.md
+                    sso:
+                      issuer: https://lifewatch.lab.uvalight.net:32444/auth/realms/n-a-a-vre
+                      sessionExpiry: 240h
+                      clientId:
+                        name: client-id-secret
+                        key: client-id-key
+                      clientSecret:
+                        name: client-secret-secret
+                        key: client-secret-key
+                      redirectUrl: https://lifewatch.lab.uvalight.net:32443/argowf/oauth2/callback
+                      rbac:
+                        enabled: false
+                      insecureSkipVerify: false
                     ingress:
                       enabled: true
                       ingressClassName: "nginx"
@@ -631,6 +678,83 @@ topology_template:
           node: kubernetes
           relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
+    argocd:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: argo/argo-cd
+                helm_name: argo-cd
+                namespace: default
+                repo_name: argo
+                repo_url: https://argoproj.github.io/argo-helm
+                values:
+                  configs:
+                    secret:
+                      argocdServerAdminPassword: $2a$10$ZD3jP8Bvvr6pxzwN3UMQzOPvxfjYxLcMsng40t0FsO7Ex7VfN2I4W
+                  server:
+                    config:
+                      url: https://localhost/argo-cd/
+                    service:
+                      type: NodePort
+                      ingress:
+                        enabled: true
+                        ingressClassName: "nginx"
+                        annotations:
+                          nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+                          nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+                          nginx.ingress.kubernetes.io/rewrite-target: /$2
+                          nginx.ingress.kubernetes.io/add-base-url: "true"
+                          nginx.ingress.kubernetes.io/configuration-snippet: |
+                            proxy_set_header Accept-Encoding "";
+                            sub_filter '<base argo-cd="/">' '<base href="/argo-cd/">';
+                            sub_filter_once on;
+                        paths:
+                          - /argo-cd(/|$)(.*)
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
     gogs:
       interfaces:
         Helm:
@@ -642,45 +766,47 @@ topology_template:
                 helm_name: gogs
                 namespace: default
                 repo_name: gogs
-                repo_url: https://qcdis.github.io/gogs-helm/
+                repo_url: https://qcdis.github.io/gogs-helm-chart/
                 values:
-                  serviceType: NodePort
-                  service:
-                    gogs:
-                      server:
-                        external_url: "http://localhost:3000/gogs/"
-                        offline_mode: "true"
-                      database:
-                        type: "sqlite3"
-                        host: "127.0.0.1:5432"
-                        name: "gogs"
-                        user: "gogs"
-                        ssl_mode: "disable"
-                        path: "data/gogs.db"
-                      security:
-                        install_lock: "true"
-                        secret_key: "pc8kVDNO6ShVqBO"
-                      auth:
-                        enable_registration_captcha: "false"
-                        enable_reverse_proxy_authentication: "false"
-                        enable_reverse_proxy_auto_registration: "false"
-                        reverse_proxy_authentication_header: "x-webauth-user"
-                    ingress:
-                      enabled: true
-                      ingressClassName: "nginx"
-                      annotations:
-                        nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-                        nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-                        nginx.ingress.kubernetes.io/rewrite-target: /$2
-                        nginx.ingress.kubernetes.io/add-base-url : "true"
-                      paths:
+                  ingress:
+                    enabled: true
+                    annotations:
+                      nginx.ingress.kubernetes.io/add-base-url: 'true'
+                      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+                      nginx.ingress.kubernetes.io/configuration-snippet: |
+                        proxy_set_header Accept-Encoding "";
+                        sub_filter '<base href="/">' '<base href="/gogs/">';
+                        sub_filter_once on;
+                      nginx.ingress.kubernetes.io/force-ssl-redirect: 'false'
+                      nginx.ingress.kubernetes.io/rewrite-target: /$2
+                    paths:
                       - /gogs(/|$)(.*)
-                  persistence:
-                    enabled: false
-                  postgresql:
-                    install: false
-                    persistence:
-                      enabled: false
+                  service:
+                    http:
+                      externalHost: localhost
+                      baseHref: /gogs/
+                      serviceType: NodePort
+                  extra_config: |
+                    [ mailer ]
+                    ENABLED = false
+                    [ auth ]
+                    REQUIRE_EMAIL_CONFIRMATION  = false
+                    DISABLE_REGISTRATION        = false
+                    ENABLE_REGISTRATION_CAPTCHA = false
+                    REQUIRE_SIGNIN_VIEW         = false
+                    [ user ]
+                    ENABLE_EMAIL_NOTIFICATION = false
+                    [ picture ]
+                    DISABLE_GRAVATAR        = false
+                    ENABLE_FEDERATED_AVATAR = false
+                    [ security ]
+                    INSTALL_LOCK = true
+                    [ cache ]
+                    ENABLED = true
+                    ADAPTER = memcache
+                    INTERVAL = 60
+                    HOST = 127.0.0.1:11211
+                    ITEM_TTL = 16h
               inventory:
                 all:
                   hosts:
@@ -725,6 +851,7 @@ topology_template:
       type: tosca.nodes.QC.Container.Application.Helm
 
 
+
   workflows:
     naa-vre-deploy:
       description: deploy all
@@ -748,10 +875,7 @@ topology_template:
           activities:
           - call_operation: NFS.install
             on_success:
-            - naa-vre_install_ingress
-            - naa-vre_install_nfs-server-provisioner
-            - naa-vre_install_argowf
-            - naa-vre_install_gogs
+            - naa-vre_install_heml_requirements
             - deploy_nfs-set-attributes
           target: nfs
         deploy_nfs-set-attributes:
@@ -777,7 +901,6 @@ topology_template:
             on_success:
             - deploy_nfs-requirements
             - naa-vre_join_k8s_cluster
-            - naa-vre_install_heml_requirements
             - naa-vre_create_k8s_dashboard
           target: kubernetes
         naa-vre_join_k8s_cluster:
@@ -785,8 +908,9 @@ topology_template:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
               - naa-vre_install_ingress
-              - naa-vre_install_nfs-server-provisioner
+              - naa-vre_install_nfs-provisioner
               - naa-vre_install_argowf
+              - naa-vre_install_argocd
               - naa-vre_install_gogs
           target: kubernetes
         naa-vre_install_heml_requirements:
@@ -794,8 +918,9 @@ topology_template:
           - call_operation: Helm.install_requirements
             on_success:
               - naa-vre_install_ingress
-              - naa-vre_install_nfs-server-provisioner
+              - naa-vre_install_nfs-provisioner
               - naa-vre_install_argowf
+              - naa-vre_install_argocd
               - naa-vre_install_gogs
           target:  argowf
         naa-vre_install_argowf:
@@ -804,18 +929,24 @@ topology_template:
             on_success: naa-vre_set_k8s_attributes
           - set_state: RUNNING
           target: argowf
+        naa-vre_install_argocd:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: naa-vre_set_k8s_attributes
+          - set_state: RUNNING
+          target: argocd
         naa-vre_install_gogs:
           activities:
           - call_operation: Helm.install_chart
             on_success: naa-vre_set_k8s_attributes
           - set_state: RUNNING
           target: gogs
-        naa-vre_install_nfs-server-provisioner:
+        naa-vre_install_nfs-provisioner:
           activities:
           - call_operation: Helm.install_chart
             on_success: naa-vre_set_k8s_attributes
           - set_state: RUNNING
-          target: nfs-server-provisioner
+          target: nfs-provisioner
         naa-vre_install_ingress:
           activities:
           - call_operation: Helm.install_chart

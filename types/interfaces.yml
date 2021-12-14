@@ -285,6 +285,8 @@ interface_types:
       description: deploy_bank_app
     set_attributes:
       description: get keys, ports, urls.
+    deploy_rest_api:
+      description: deploy_rest_api
 
 
   tosca.interfaces.QC.Glusterfs:
