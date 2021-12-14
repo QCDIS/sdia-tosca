@@ -592,9 +592,36 @@ topology_template:
                   controller:
                     containerRuntimeExecutor: k8sapi
                   server:
+                    volumeMounts:
+                      - name: ssh-key
+                        mountPath: /etc/ssl/certs/ca.crt
+                        readOnly: true
+                    volumes:
+                      - name: ssh-key
+                        secret:
+                          secretName: keycloak-token-tw8px
+                          items:
+                            - key: ca.crt
+                              path: ca.crt
+                    extraArgs:
+                      - --auth-mode=sso
                     enabled: true
                     baseHref: /argowf/
                     serviceType: NodePort
+                    #https://github.com/argoproj/argo-workflows/blob/master/docs/argo-server-sso.md
+                    sso:
+                      issuer: https://lifewatch.lab.uvalight.net:32444/auth/realms/n-a-a-vre
+                      sessionExpiry: 240h
+                      clientId:
+                        name: client-id-secret
+                        key: client-id-key
+                      clientSecret:
+                        name: client-secret-secret
+                        key: client-secret-key
+                      redirectUrl: https://lifewatch.lab.uvalight.net:32443/argowf/oauth2/callback
+                      rbac:
+                        enabled: false
+                      insecureSkipVerify: false
                     ingress:
                       enabled: true
                       ingressClassName: "nginx"
@@ -758,6 +785,7 @@ topology_template:
                     http:
                       externalHost: localhost
                       baseHref: /gogs/
+                      serviceType: NodePort
                   extra_config: |
                     [ mailer ]
                     ENABLED = false
@@ -821,6 +849,7 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
+
 
 
   workflows:

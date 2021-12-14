@@ -471,6 +471,11 @@ topology_template:
                   controller:
                     service:
                       type: NodePort
+                      nodePorts:
+                        http: 32080
+                        https: 32443
+                        tcp:
+                          8080: 32808
                   ingressClassResource:
                     default: true
               inventory:
@@ -590,17 +595,22 @@ topology_template:
                 repo_url: https://jupyterhub.github.io/helm-chart/
                 values:
                   hub:
+                    concurrentSpawnLimit: 10
+                    consecutiveFailureLimit: 3
+                    activeServerLimit: 5
+                    namedServerLimitPerUser: 1
+                    shutdownOnLogout: true
                     extraEnv:
                       OAUTH2_TLS_VERIFY: 'false'
-                    baseUrl: /naa-vre
+                    baseUrl: /n-a-a-vre
                     config:
                       GenericOAuthenticator:
-                        client_id: naa-vre
-                        client_secret: XXXXXXXXXXXXXXXXXX
-                        oauth_callback_url: https://{ get_attribute[compute, public_ip}:{ get_attribute[jupyterhub, port}/naa-vre/hub/oauth_callback
-                        authorize_url: https://{ get_attribute[compute, public_ip}:{ get_attribute[keycloak, port}/auth/realms/naa-vre/protocol/openid-connect/auth
-                        token_url: https://{ get_attribute[compute, public_ip}:{ get_attribute[keycloak, port}/auth/realms/naa-vre/protocol/openid-connect/token
-                        userdata_url: https://{ get_attribute[compute, public_ip}:{ get_attribute[keycloak, port}/auth/realms/naa-vre/protocol/openid-connect/userinfo
+                        client_id: n-a-a-vre
+                        client_secret: 809a27f1-efa8-4faa-8fe6-08bb78df1e6b
+                        oauth_callback_url: https://lifewatch.lab.uvalight.net:32443/n-a-a-vre/hub/oauth_callback
+                        authorize_url: https://lifewatch.lab.uvalight.net:32444/auth/realms/n-a-a-vre/protocol/openid-connect/auth
+                        token_url: https://lifewatch.lab.uvalight.net:32444/auth/realms/n-a-a-vre/protocol/openid-connect/token
+                        userdata_url: https://lifewatch.lab.uvalight.net:32444/auth/realms/n-a-a-vre/protocol/openid-connect/userinfo
                         login_service: keycloak
                         username_key: preferred_username
                         userdata_params:
@@ -621,15 +631,24 @@ topology_template:
                       nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
                       nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
                       nginx.ingress.kubernetes.io/add-base-url: "true"
+                      cert-manager.io/cluster-issuer: letsencrypt-staging
+                    tls:
+                      - hosts:
+                          - lifewatch.lab.uvalight.net
                   proxy:
                     service:
                       type: ClusterIP
                   singleuser:
+                    cpu:
+                      limit: 0.5
+                    memory:
+                      limit: 2G
+                      guarantee: 1G
                     defaultUrl: "/lab"
                     extraEnv:
                       JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
                     image:
-                      name: qcdis/naa-vre
+                      name: qcdis/n-a-a-vre
                       tag: latest
                       pullPolicy: Always
               inventory:
@@ -689,24 +708,28 @@ topology_template:
                 values:
                   auth:
                     createAdminUser: true
-                    adminPassword: password
-                    managementPassword: password
+                    adminPassword: XXXXXX
+                    managementPassword: XXXXXX
                   service:
                     type: NodePort
-                  ingress:
-                    enabled: true
-                    ingressClassName: nginx
-                    path: /keycloak/
-                    pathType: Prefix
-                  annotations:
-                    nginx.ingress.kubernetes.io/add-base-url: 'true'
-                    nginx.ingress.kubernetes.io/backend-protocol: HTTP
-                    nginx.ingress.kubernetes.io/configuration-snippet: |
-                      proxy_set_header Accept-Encoding "";
-                      sub_filter '<base href="/">' '<base href="/keycloak/">';
-                      sub_filter_once on;
-                    nginx.ingress.kubernetes.io/force-ssl-redirect: 'false'
-                    nginx.ingress.kubernetes.io/rewrite-target: /$2
+                    nodePorts:
+                      http: 32081
+                      https: 32444
+#                  ingress:
+#                    enabled: true
+#                    hostname: lifewatch.lab.uvalight.net
+#                    ingressClassName: nginx
+#                    path: /keycloak/
+#                    pathType: Prefix
+#                  annotations:
+#                    nginx.ingress.kubernetes.io/add-base-url: 'true'
+#                    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+#                    nginx.ingress.kubernetes.io/configuration-snippet: |
+#                      proxy_set_header Accept-Encoding "";
+#                      sub_filter '<base href="/">' '<base href="/keycloak/">';
+#                      sub_filter_once on;
+#                    nginx.ingress.kubernetes.io/force-ssl-redirect: 'false'
+#                    nginx.ingress.kubernetes.io/rewrite-target: /$2
                   postgresql:
                     persistence:
                       enabled: false
@@ -752,10 +775,68 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
+    jetstack:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              extra_variables:
+                chart_name: jetstack/cert-manager
+                helm_name: jetstack
+                namespace: default
+                repo_name: jetstack
+                repo_url: https://charts.jetstack.io
+                values:
+                  ingress:
+                    installCRDs: true
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
+
 
 
   workflows:
-    naa-vre-deploy:
+    NaaVRE-deploy:
       description: deploy all
       preconditions:
         - target: topology
@@ -777,7 +858,7 @@ topology_template:
           activities:
           - call_operation: NFS.install
             on_success:
-            - naa-vre_jupyterhub_install_heml_requirements
+            - NaaVRE_jupyterhub_install_heml_requirements
             - deploy_nfs-set-attributes
           target: nfs
         deploy_nfs-set-attributes:
@@ -785,73 +866,73 @@ topology_template:
           - call_operation: NFS.set_attributes
           - set_state: created
           target: nfs
-        naa-vre_jupyterhub_install_k8s_requirements:
+        NaaVRE_jupyterhub_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
             on_success:
-            - naa-vre_jupyterhub_install_k8s
+            - NaaVRE_jupyterhub_install_k8s
           target: kubernetes
-        naa-vre_jupyterhub_install_k8s:
+        NaaVRE_jupyterhub_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: naa-vre_jupyterhub_set_master
+            on_success: NaaVRE_jupyterhub_set_master
           target: kubernetes
-        naa-vre_jupyterhub_set_master:
+        NaaVRE_jupyterhub_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
             - deploy_nfs-requirements
-            - naa-vre_jupyterhub_join_k8s_cluster
-            - naa-vre_jupyterhub_create_k8s_dashboard
+            - NaaVRE_jupyterhub_join_k8s_cluster
+            - NaaVRE_jupyterhub_create_k8s_dashboard
           target: kubernetes
-        naa-vre_jupyterhub_join_k8s_cluster:
+        NaaVRE_jupyterhub_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - naa-vre_jupyterhub_install_ingress
-              - naa-vre_jupyterhub_install_nfs-provisioner
-              - naa-vre_jupyterhub_install_jupyterhub
-              - naa-vre_jupyterhub_install_keycloak
+              - NaaVRE_jupyterhub_install_ingress
+              - NaaVRE_jupyterhub_install_nfs-provisioner
+              - NaaVRE_jupyterhub_install_jupyterhub
+              - NaaVRE_jupyterhub_install_keycloak
           target: kubernetes
-        naa-vre_jupyterhub_install_heml_requirements:
+        NaaVRE_jupyterhub_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success:
-              - naa-vre_jupyterhub_install_ingress
-              - naa-vre_jupyterhub_install_nfs-provisioner
-              - naa-vre_jupyterhub_install_jupyterhub
-              - naa-vre_jupyterhub_install_keycloak
+              - NaaVRE_jupyterhub_install_ingress
+              - NaaVRE_jupyterhub_install_nfs-provisioner
+              - NaaVRE_jupyterhub_install_jupyterhub
+              - NaaVRE_jupyterhub_install_keycloak
           target:  jupyterhub
-        naa-vre_jupyterhub_install_jupyterhub:
+        NaaVRE_jupyterhub_install_jupyterhub:
           activities:
           - call_operation: Helm.install_chart
-            on_success: naa-vre_jupyterhub_set_k8s_attributes
+            on_success: NaaVRE_jupyterhub_set_k8s_attributes
           - set_state: RUNNING
           target: jupyterhub
-        naa-vre_jupyterhub_install_keycloak:
+        NaaVRE_jupyterhub_install_keycloak:
           activities:
           - call_operation: Helm.install_chart
-            on_success: naa-vre_jupyterhub_set_k8s_attributes
+            on_success: NaaVRE_jupyterhub_set_k8s_attributes
           - set_state: RUNNING
           target: keycloak
-        naa-vre_jupyterhub_install_nfs-provisioner:
+        NaaVRE_jupyterhub_install_nfs-provisioner:
           activities:
           - call_operation: Helm.install_chart
-            on_success: naa-vre_jupyterhub_set_k8s_attributes
+            on_success: NaaVRE_jupyterhub_set_k8s_attributes
           - set_state: RUNNING
           target: nfs-provisioner
-        naa-vre_jupyterhub_install_ingress:
+        NaaVRE_jupyterhub_install_ingress:
           activities:
           - call_operation: Helm.install_chart
-            on_success: naa-vre_jupyterhub_set_k8s_attributes
+            on_success: NaaVRE_jupyterhub_set_k8s_attributes
           - set_state: RUNNING
           target: ingress
-        naa-vre_jupyterhub_set_k8s_attributes:
+        NaaVRE_jupyterhub_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
-        naa-vre_jupyterhub_create_k8s_dashboard:
+        NaaVRE_jupyterhub_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
           target: kubernetes
