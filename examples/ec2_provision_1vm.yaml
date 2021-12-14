@@ -22,20 +22,6 @@ topology_template:
         Standard:
           create: "dummy.yaml"
       type: "tosca.nodes.QC.VM.Compute"
-    compute_1:
-      properties:
-        role: worker
-        assign_public_ip: "yes"
-        disk_size: "40000 MB"
-        mem_size: "4000 MB"
-        num_cores: 2
-        os_distro: "Ubuntu"
-        os_version: "18.04"
-        user_name: "vm_user"
-      interfaces:
-        Standard:
-          create: "dummy.yaml"
-      type: "tosca.nodes.QC.VM.Compute"
     topology:
       properties:
         domain: eu-west-1
@@ -44,10 +30,6 @@ topology_template:
       - vm:
           capability: tosca.capabilities.QC.VM
           node: compute
-          relationship: tosca.relationships.DependsOn
-      - vm:
-          capability: tosca.capabilities.QC.VM
-          node: compute_1
           relationship: tosca.relationships.DependsOn
       type: tosca.nodes.QC.VM.topology
       interfaces:
@@ -74,15 +56,6 @@ topology_template:
                           user_name: { get_property: [ compute, user_name ] }
                           role: { get_property: [ compute, role ] }
                           assign_public_ip: { get_property: [ compute, assign_public_ip ] }
-                        compute_1:
-                          disk_size: { get_property: [ compute_1, disk_size ] }
-                          mem_size: { get_property: [ compute_1, mem_size ] }
-                          num_cores: { get_property: [ compute_1, num_cores ] }
-                          os_distro: { get_property: [ compute_1, os_distro ] }
-                          os_version: { get_property: [ compute_1, os_version ] }
-                          user_name: { get_property: [ compute_1, user_name ] }
-                          role: { get_property: [ compute_1, role ] }
-                          assign_public_ip: { get_property: [ compute_1, assign_public_ip ] }
           create_security_group:
             implementation: security_groups.yaml
             inputs:
@@ -132,10 +105,6 @@ topology_template:
                           disk_size: { get_property: [ compute, disk_size ] }
                           mem_size: { get_property: [ compute, mem_size ] }
                           num_cores: { get_property: [ compute, num_cores ] }
-                        compute_1:
-                          disk_size: { get_property: [ compute_1, disk_size ] }
-                          mem_size: { get_property: [ compute_1, mem_size ] }
-                          num_cores: { get_property: [ compute_1, num_cores ] }
               repository: https://github.com/QCDIS/ec2_playbooks.git
           select_image:
             implementation: info/get_images.yaml
@@ -152,9 +121,6 @@ topology_template:
                         compute:
                           os_distro: { get_property: [ compute, os_distro ] }
                           os_version: { get_property: [ compute, os_version ] }
-                        compute_1:
-                          os_distro: { get_property: [ compute_1, os_distro ] }
-                          os_version: { get_property: [ compute_1, os_version ] }
           create_ssh_key:
             implementation: key/create_keys.yaml
             inputs:
@@ -168,8 +134,6 @@ topology_template:
                       instances:
                         compute:
                           os_distro : { get_property: [ compute, os_distro ]}
-                        compute_1:
-                          os_distro : { get_property: [ compute_1, os_distro ]}
               repository: https://github.com/QCDIS/ec2_playbooks.git
           delete_ssh_key:
             implementation: key/delete_key.yaml
@@ -197,8 +161,6 @@ topology_template:
                       instances:
                         compute:
                           id: { get_attribute: [ compute, id ] }
-                        compute_1:
-                          id: { get_attribute: [ compute_1, id ] }
               repository: https://github.com/QCDIS/ec2_playbooks.git
           install_requirements:
             implementation: install_requirements.yaml
@@ -232,8 +194,6 @@ topology_template:
                       instances:
                         compute:
                           user_name : { get_property: [ compute, user_name ]}
-                        compute_1:
-                          user_name : { get_property: [ compute_1, user_name ]}
           set_attributes:
             implementation: set_attributes.yaml
             inputs:
@@ -243,7 +203,6 @@ topology_template:
                     localhost:
                       ansible_connection: local
               repository: https://github.com/QCDIS/ec2_playbooks.git
-
     kubernetes:
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
       requirements:
@@ -266,10 +225,6 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-                    worker:
-                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           install_k8s:
             implementation: install_k8s.yaml
             inputs:
@@ -281,10 +236,6 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-                    worker:
-                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           set_master:
             implementation: set_master_k8s_cluster.yaml
             inputs:
@@ -307,10 +258,6 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-                    worker:
-                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           create_k8s_dashboard:
             implementation: create_k8s_dashboard.yaml
             inputs:
@@ -347,53 +294,13 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-    wordpress:
-      type: tosca.nodes.QC.Container.Application.Helm
-      properties:
-        credential: { get_attribute: [ compute,user_key_pair ] }
-      requirements:
-        - kubernetes:
-            capability: tosca.capabilities.QC.Kubernetes
-            node: kubernetes
-            relationship: tosca.relationships.HostedOn
-      interfaces:
-        Helm:
-          install_requirements:
-            implementation: install_requirements.yaml
+          create_persistent_volume:
+            implementation: create_persistent_volume.yaml
             inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-          install_chart:
-            implementation: install_chart.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
               extra_variables:
-                chart_name: bitnami/wordpress
-                repo_name: bitnami
-                repo_url: 'https://charts.bitnami.com/bitnami'
-                helm_name: wordpress
-                namespace: default
-                values:
-                  ingress:
-                  wordpressScheme: https
-                  service:
-                    type: NodePort
-                  persistence:
-                    enabled: false
-                  mariadb:
-                    primary:
-                      persistence:
-                        enabled: false
-                  livenessProbe:
-                    enabled: false
-                  readinessProbe:
-                    enabled: false
+                storage_capacity: 10Gi
+                local_path: /mnt/disk/vol1
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
               inventory:
                 all:
                   hosts:
@@ -401,55 +308,13 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-    monitoring:
-      type: tosca.nodes.QC.Container.Application.Helm
-      properties:
-        credential: { get_attribute: [ compute,user_key_pair ] }
-      requirements:
-      - kubernetes:
-          capability: tosca.capabilities.QC.Kubernetes
-          node: kubernetes
-          relationship: tosca.relationships.HostedOn
-      interfaces:
-        Helm:
-          install_requirements:
-            implementation: install_requirements.yaml
+          reset_k8s_cluster:
+            implementation: create_persistent_volume.yaml
             inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-          install_chart:
-            implementation: install_chart.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
               extra_variables:
-                chart_name: prometheus-community/kube-prometheus-stack
-                repo_name: prometheus-community
-                repo_url: 'https://prometheus-community.github.io/helm-charts'
-                helm_name: monitoring
-                namespace: default
-                values:
-                  alertmanager:
-                    enabled: true
-                    service:
-                      type: ClusterIP
-                  prometheusOperator:
-                    enabled: true
-                    service:
-                      type: ClusterIP
-                  prometheus:
-                    enabled: true
-                    service:
-                      type: ClusterIP
-                  grafana:
-                    enabled: true
-                    service:
-                      type: NodePort
+                storage_capacity: 10Gi
+                local_path: /mnt/disk/vol1
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
               inventory:
                 all:
                   hosts:
@@ -457,80 +322,12 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
+
+
 
 
   workflows:
-    wordpress-deploy_k8s:
-      description: deploy k8s
-      preconditions:
-        - target: topology
-          condition:
-            - assert:
-              - current_state: [{equal: RUNNING }]
-        - target: kubernetes
-          condition:
-            - assert:
-              - desired_state: [{equal: RUNNING }]
-              - current_state: [{equal: UNDEFINED }]
-      steps:
-        wordpress_install_k8s_requirements:
-          activities:
-          - set_state: CREATING
-          - call_operation: Kubernetes.install_requirements
-            on_success: wordpress_install_k8s
-          target: kubernetes
-        wordpress_install_k8s:
-          activities:
-          - call_operation: Kubernetes.install_k8s
-            on_success: wordpress_set_master
-          target: kubernetes
-        wordpress_set_master:
-          activities:
-          - call_operation: Kubernetes.set_master
-            on_success:
-            - wordpress_join_k8s_cluster
-            - wordpress_install_heml_requirements
-            - wordpress_create_k8s_dashboard
-          target: kubernetes
-        wordpress_join_k8s_cluster:
-          activities:
-          - call_operation: Kubernetes.join_k8s_cluster
-            on_success:
-              - wordpress_install_wordpress
-              - wordpress_install_monitoring
-          target: kubernetes
-        wordpress_install_heml_requirements:
-          activities:
-          - call_operation: Helm.install_requirements
-            on_success:
-            - wordpress_install_wordpress
-            - wordpress_install_monitoring
-          target:  wordpress
-        wordpress_install_wordpress:
-          activities:
-          - call_operation: Helm.install_chart
-            on_success: wordpress_set_k8s_attributes
-          - set_state: RUNNING
-          target:  wordpress
-        wordpress_install_monitoring:
-          activities:
-          - call_operation: Helm.install_chart
-            on_success: wordpress_set_k8s_attributes
-          - set_state: RUNNING
-          target:  monitoring
-        wordpress_create_k8s_dashboard:
-          activities:
-          - call_operation: Kubernetes.create_k8s_dashboard
-            on_success:
-            - wordpress_install_wordpress
-            - wordpress_install_monitoring
-          - set_state: RUNNING
-          target: kubernetes
-        wordpress_set_k8s_attributes:
-          activities:
-          - call_operation: Kubernetes.set_attributes
-          target: kubernetes
-    wordpress_ec2_provision:
+    ec2_provision:
       description: Workflow to deploy ec2 topology
       preconditions:
         - target: topology
@@ -580,8 +377,6 @@ topology_template:
           ec2_create:
             activities:
             - call_operation: EC2.create
-              on_failure:
-                - failure
               on_success:
               - ec2_create_user
             - set_state: RUNNING
@@ -596,11 +391,7 @@ topology_template:
               on_success:
               - ec2_set_attributes
             target: topology
-          failure:
-            activities:
-            - set_state: FAILED
-            target: topology
-    wordpress_ec2_delete_topology:
+    ec2_delete_topology:
       description: delete_topology
       preconditions:
         - target: topology
@@ -628,3 +419,24 @@ topology_template:
           activities:
           - call_operation: EC2.set_attributes
           target: topology
+    install_docker:
+      description: deploy all
+      preconditions:
+        - target: topology
+          condition:
+            - assert:
+                - current_state: [ { equal: RUNNING } ]
+        - target: kubernetes
+          condition:
+            - assert:
+                - desired_state: [ { equal: RUNNING } ]
+                - current_state: [ { equal: UNDEFINED } ]
+      steps:
+        install_k8s_requirements:
+          activities:
+            - set_state: CREATING
+            - call_operation: Kubernetes.install_requirements
+          target: kubernetes
+
+
+
