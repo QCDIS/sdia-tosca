@@ -380,6 +380,7 @@ topology_template:
                 helm_name: wordpress
                 namespace: default
                 values:
+                  ingress:
                   wordpressScheme: https
                   service:
                     type: NodePort
