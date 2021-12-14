@@ -17,7 +17,19 @@ logger.handler_set = True
 
 
 class TestTosca(unittest.TestCase):
-    def test(self):
+    def test_articonf(self):
+        cur_dir = os.path.dirname(os.path.realpath(__file__))
+
+        tosca_path = os.path.join(cur_dir, '../examples/articonf')
+        files = self.get_files(tosca_path)
+        for file in files:
+            logger.info('Testing: ' + file)
+            tosca_template_dict = self.get_tosca_file(file)
+            if 'workflows' in tosca_template_dict['topology_template']:
+                workflows = tosca_template_dict['topology_template'].pop('workflows')
+            tt = ToscaTemplate(yaml_dict_tpl=tosca_template_dict)
+
+    def test_examples(self):
         cur_dir = os.path.dirname(os.path.realpath(__file__))
 
         tosca_path = os.path.join(cur_dir, '../examples')
