@@ -984,7 +984,6 @@ topology_template:
           - set_state: created
           target: tic
 
-
 description: "TOSCA example"
 imports:
 - nodes: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/nodes.yaml"
