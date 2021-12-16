@@ -90,7 +90,7 @@ topology_template:
                   prometheus:
                     enabled: true
                     service:
-                      type: ClusterIP
+                      type: NodePort
                   grafana:
                     enabled: true
                     service:
