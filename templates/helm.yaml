@@ -51,10 +51,10 @@ topology_template:
       properties:
         credential: { get_attribute: [ compute,user_key_pair ] }
       requirements:
-      - kubernetes:
-          capability: tosca.capabilities.QC.Kubernetes
-          node: kubernetes
-          relationship: tosca.relationships.HostedOn
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
       interfaces:
         Helm:
           install_requirements:
@@ -84,13 +84,13 @@ topology_template:
                     service:
                       type: ClusterIP
                   prometheusOperator:
-                    enabled: false
+                    enabled: true
                     service:
-                      type: NodePort
+                      type: ClusterIP
                   prometheus:
                     enabled: true
                     service:
-                      type: NodePort
+                      type: ClusterIP
                   grafana:
                     enabled: true
                     service:
