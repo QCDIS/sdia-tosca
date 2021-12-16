@@ -287,6 +287,8 @@ interface_types:
       description: get keys, ports, urls.
     deploy_rest_api:
       description: deploy_rest_api
+    deploy_tic_smart_api:
+      description: deploy_tic_smart_api
 
 
   tosca.interfaces.QC.Glusterfs:

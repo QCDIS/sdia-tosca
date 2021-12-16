@@ -438,6 +438,38 @@ topology_template:
                           gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
                           gluster_cluster_volume: gfs0
                           ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          deploy_tic_smart_api:
+            implementation: 107.deploy_tic_smart_api.yml
+            inputs:
+              repository: "https://github.com/bityoga/fabric_as_code.git"
+              extra_variables: https://articonf2.firebaseio.com/user_profile/4NaSde0roaggoel4x0gC9p78czv1/tosca_config.json
+              inventory:
+                all:
+                  children:
+                    swarm_manager_prime:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_managers:
+                      hosts:
+                        hlf0:
+                          ansible_host: { get_attribute: [ compute,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    swarm_workers:
+                      hosts:
+                        hlf1:
+                          ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                          ansible_python_interpreter: /usr/bin/python3
+                          gluster_cluster_host0: { get_attribute: [ compute,public_ip ] }
+                          gluster_cluster_volume: gfs0
+                          ansible_ssh_user: { get_property: [ compute_1,user_name ] }
           deploy_orderer:
             implementation: 101.deploy_orderer.yml
             inputs:
@@ -960,6 +992,7 @@ topology_template:
             on_success:
               - deploy_tic-bank-deploy_bank_app
               - deploy_tic-bank-deploy_rest_api
+              - deploy_tic-bank-deploy_tic_smart_api
           target: tic
         deploy_tic-bank-deploy_hlf_explorer:
           activities:
@@ -977,6 +1010,11 @@ topology_template:
           - call_operation: TIC.deploy_rest_api
             on_success: deploy_tic-bank-set_tic_attributes
           - set_state: created
+          target: tic
+        deploy_tic-bank-deploy_tic_smart_api:
+          activities:
+          - call_operation: TIC.deploy_tic_smart_api
+            on_success: deploy_tic-bank-set_tic_attributes
           target: tic
         deploy_tic-bank-set_tic_attributes:
           activities:
