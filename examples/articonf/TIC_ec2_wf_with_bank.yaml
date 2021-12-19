@@ -939,6 +939,11 @@ topology_template:
           condition:
             - assert:
               - current_state: [{equal: RUNNING }]
+        - target: tic
+          condition:
+            - assert:
+              - desired_state: [ { equal: RUNNING } ]
+              - current_state: [{equal: UNDEFINED }]
       steps:
         deploy_tic-bank-requirements:
           activities:
