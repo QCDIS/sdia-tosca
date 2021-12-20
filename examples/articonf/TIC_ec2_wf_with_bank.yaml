@@ -772,6 +772,7 @@ topology_template:
               extra_variables:
                 user_key_pair: { get_attributes: [ compute, user_key_pair ] }
                 random_name: { get_attribute: [ compute, random_name ] }
+                region: { get_property: [ topology, domain ] }
               inventory:
                 all:
                   hosts:
@@ -788,9 +789,8 @@ topology_template:
                       ansible_connection: local
               repository: https://github.com/QCDIS/ec2_playbooks.git
           delete:
-            implementation: vm/create_vms.yaml
+            implementation: vm/delete_vms.yaml
             inputs:
-              repository: https://github.com/QCDIS/ec2_playbooks.git
               extra_variables:
                 region: { get_property: [ topology, domain ] }
                 random_name: { get_attribute: [ compute, random_name ] }
@@ -801,9 +801,10 @@ topology_template:
                       ansible_connection: local
                       instances:
                         compute:
-                          id: { get_attributes: [ compute, id ] }
+                          id: { get_attribute: [ compute, id ] }
                         compute_1:
-                          id: { get_attributes: [ compute_1, id ] }
+                          id: { get_attribute: [ compute_1, id ] }
+              repository: https://github.com/QCDIS/ec2_playbooks.git
           create_random_name:
             implementation: random_name.yaml
             inputs:
