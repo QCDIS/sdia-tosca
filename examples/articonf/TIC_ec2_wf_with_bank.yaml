@@ -771,6 +771,7 @@ topology_template:
             inputs:
               extra_variables:
                 user_key_pair: { get_attributes: [ compute, user_key_pair ] }
+                random_name: { get_attribute: [ compute, random_name ] }
               inventory:
                 all:
                   hosts:
@@ -792,7 +793,7 @@ topology_template:
               repository: https://github.com/QCDIS/ec2_playbooks.git
               extra_variables:
                 region: { get_property: [ topology, domain ] }
-                availability_zone: "eu-west-1b"
+                random_name: { get_attribute: [ compute, random_name ] }
               inventory:
                 all:
                   hosts:
@@ -904,6 +905,34 @@ topology_template:
               on_success:
               - ec2_set_attributes
             target: topology
+    ec2_delete_topology:
+      description: delete_topology
+      preconditions:
+        - target: topology
+          condition:
+            - assert:
+                - desired_state: [ { equal: DELETED } ]
+                - current_state: [ { equal: RUNNING } ]
+      steps:
+        delete:
+          activities:
+            - set_state: DELETING
+            - call_operation: EC2.delete
+              on_success:
+                - set_attributes
+            - set_state: DELETED
+          target: topology
+        delete_ssh:
+          activities:
+            - set_state: DELETING
+            - call_operation: EC2.delete_ssh_key
+              on_success:
+                - set_attributes
+          target: topology
+        set_attributes:
+          activities:
+            - call_operation: EC2.set_attributes
+          target: topology
     deploy_tic_with-bank:
       description: Workflow to deploy TIC
       preconditions:
@@ -911,6 +940,11 @@ topology_template:
           condition:
             - assert:
               - current_state: [{equal: RUNNING }]
+        - target: tic
+          condition:
+            - assert:
+              - desired_state: [ { equal: RUNNING } ]
+              - current_state: [{equal: UNDEFINED }]
       steps:
         deploy_tic-bank-requirements:
           activities:
