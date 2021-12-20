@@ -772,6 +772,7 @@ topology_template:
               extra_variables:
                 user_key_pair: { get_attributes: [ compute, user_key_pair ] }
                 random_name: { get_attribute: [ compute, random_name ] }
+                region: { get_property: [ topology, domain ] }
               inventory:
                 all:
                   hosts:
