@@ -373,12 +373,12 @@ topology_template:
             inputs:
               repository: https://github.com/QCDIS/helm_playbooks.git
               extra_variables:
-                chart_name: {.chart_name}
-                repo_name: {.repo_name}
-                repo_url: {.repo_url}
-                helm_name: {.helm_name}
-                namespace: {.namespace}
-                values: {.values}
+                chart_name: { .chart_name }
+                repo_name: { .repo_name }
+                repo_url: { .repo_url }
+                helm_name: { .helm_name }
+                namespace: { .namespace }
+                values: { .values }
               inventory:
                 all:
                   hosts:
@@ -430,7 +430,7 @@ topology_template:
                   prometheus:
                     enabled: true
                     service:
-                      type: NodePort
+                      type: ClusterIP
                   grafana:
                     enabled: true
                     service:
@@ -481,29 +481,29 @@ topology_template:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - template_install_helm
-              - template_install_monitoring
+              - agilia_install_helm
+              - agilia_install_monitoring
           target: kubernetes
-        template_install_heml_requirements:
+        agilia_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success:
-            - template_install_helm
-            - template_install_monitoring
+            - agilia_install_helm
+            - agilia_install_monitoring
           target:  helm
-        template_install_helm:
+        agilia_install_helm:
           activities:
           - call_operation: Helm.install_chart
-            on_success: template_set_k8s_attributes
+            on_success: agilia_set_k8s_attributes
           - set_state: RUNNING
           target:  helm
-        template_install_monitoring:
+        agilia_install_monitoring:
           activities:
           - call_operation: Helm.install_chart
-            on_success: template_set_k8s_attributes
+            on_success: agilia_set_k8s_attributes
           - set_state: RUNNING
           target:  monitoring
-        template_create_k8s_dashboard:
+        agilia_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
