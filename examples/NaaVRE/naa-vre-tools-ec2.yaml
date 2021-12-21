@@ -592,21 +592,10 @@ topology_template:
                   controller:
                     containerRuntimeExecutor: k8sapi
                   server:
-                    volumeMounts:
-                      - name: ssh-key
-                        mountPath: /etc/ssl/certs/ca.crt
-                        readOnly: true
-                    volumes:
-                      - name: ssh-key
-                        secret:
-                          secretName: keycloak-token-tw8px
-                          items:
-                            - key: ca.crt
-                              path: ca.crt
                     extraArgs:
                       - --auth-mode=sso
                     enabled: true
-                    baseHref: /argowf/
+                    baseHref: /test-cert/
                     serviceType: NodePort
                     #https://github.com/argoproj/argo-workflows/blob/master/docs/argo-server-sso.md
                     sso:
@@ -618,11 +607,15 @@ topology_template:
                       clientSecret:
                         name: client-secret-secret
                         key: client-secret-key
-                      redirectUrl: https://lifewatch.lab.uvalight.net:32443/argowf/oauth2/callback
+                      redirectUrl: https://lifewatch.lab.uvalight.net:32443/test-cert/oauth2/callback
                       rbac:
                         enabled: false
                       insecureSkipVerify: false
                     ingress:
+                      tls:
+                        - secretName: letsencrypt
+                          hosts:
+                            - argoworkflows.example.com
                       enabled: true
                       ingressClassName: "nginx"
                       annotations:
@@ -632,10 +625,10 @@ topology_template:
                         nginx.ingress.kubernetes.io/add-base-url : "true"
                         nginx.ingress.kubernetes.io/configuration-snippet: |
                           proxy_set_header Accept-Encoding "";
-                          sub_filter '<base href="/">' '<base href="/argowf/">';
+                          sub_filter '<base href="/">' '<base href="/test-cert/">';
                           sub_filter_once on;
                       paths:
-                      - /argowf(/|$)(.*)
+                      - /test-cert(/|$)(.*)
               inventory:
                 all:
                   hosts:
