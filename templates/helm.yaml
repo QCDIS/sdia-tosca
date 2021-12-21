@@ -445,7 +445,7 @@ topology_template:
 
 
   workflows:
-    agilia-deploy_k8s:
+    template-deploy_k8s:
       description: deploy k8s
       preconditions:
         - target: topology
@@ -458,52 +458,52 @@ topology_template:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        agilia_install_k8s_requirements:
+        template_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
-            on_success: agilia_install_k8s
+            on_success: template_install_k8s
           target: kubernetes
-        agilia_install_k8s:
+        template_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: agilia_set_master
+            on_success: template_set_master
           target: kubernetes
-        agilia_set_master:
+        template_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
-            - agilia_join_k8s_cluster
-            - agilia_install_heml_requirements
-            - agilia_create_k8s_dashboard
+            - template_join_k8s_cluster
+            - template_install_heml_requirements
+            - template_create_k8s_dashboard
           target: kubernetes
-        agilia_join_k8s_cluster:
+        template_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - agilia_install_helm
-              - agilia_install_monitoring
+              - template_install_helm
+              - template_install_monitoring
           target: kubernetes
-        agilia_install_heml_requirements:
+        template_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success:
-            - agilia_install_helm
-            - agilia_install_monitoring
+            - template_install_helm
+            - template_install_monitoring
           target:  helm
-        agilia_install_helm:
+        template_install_helm:
           activities:
           - call_operation: Helm.install_chart
-            on_success: agilia_set_k8s_attributes
+            on_success: template_set_k8s_attributes
           - set_state: RUNNING
           target:  helm
-        agilia_install_monitoring:
+        template_install_monitoring:
           activities:
           - call_operation: Helm.install_chart
-            on_success: agilia_set_k8s_attributes
+            on_success: template_set_k8s_attributes
           - set_state: RUNNING
           target:  monitoring
-        agilia_create_k8s_dashboard:
+        template_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
