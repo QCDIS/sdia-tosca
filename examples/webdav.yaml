@@ -347,7 +347,7 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-    mog:
+    webdav:
       type: tosca.nodes.QC.Container.Application.Helm
       properties:
         credential: { get_attribute: [ compute,user_key_pair ] }
@@ -374,31 +374,22 @@ topology_template:
             inputs:
               repository: https://github.com/QCDIS/helm_playbooks.git
               extra_variables:
-                chart_name: articonf-deployment/mogplay
-                repo_name: mogplay
-                repo_url: 'https://vfilipe.gitlab.io/articonf-deployment'
-                helm_name: mogplay
+                chart_name: k8s-webdav/webdav
+                repo_name: k8s-webdav
+                repo_url: 'https://danuk.github.io/k8s-webdav/'
+                helm_name: webdav
                 namespace: default
                 values:
-                  features:
-                    recorder: false
-                    nfs: false
-                    ingress: false
-                    ingressnotls: false
-                  tags:
-                    nginx: false
-                    nfs: false
-                    monitoring: false
-                  images:
-                    registry:
-                    repository:
-                    token:
-                    tag: "1.1.1"
-                    pullPolicy: Always
-                  master_ip: { get_attribute: [ compute,public_ip ] }
-                  fabric:
-                    channel: appchannel
-                    org: hlf
+                  urls:
+                    /webdav:
+                    - user: user3
+                      password: password3
+                  ingress:
+                    host: lifewatch.lab.uvalight.net
+                    annotations:
+                      kubernetes.io/ingress.class: nginx
+                  persistence:
+                    enabled: false
               inventory:
                 all:
                   hosts:
@@ -409,7 +400,7 @@ topology_template:
 
 
   workflows:
-    mog-deploy_k8s:
+    webdav-deploy_k8s:
       description: deploy k8s
       preconditions:
         - target: topology
@@ -422,55 +413,55 @@ topology_template:
               - desired_state: [{equal: RUNNING }]
               - current_state: [{equal: UNDEFINED }]
       steps:
-        mog_install_k8s_requirements:
+        webdav_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
-            on_success: mog_install_k8s
+            on_success: webdav_install_k8s
           target: kubernetes
-        mog_install_k8s:
+        webdav_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: mog_set_master
+            on_success: webdav_set_master
           target: kubernetes
-        mog_set_master:
+        webdav_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
-            - mog_join_k8s_cluster
-            - mog_install_heml_requirements
-            - mog_create_k8s_dashboard
+            - webdav_join_k8s_cluster
+            - webdav_install_heml_requirements
+            - webdav_create_k8s_dashboard
           target: kubernetes
-        mog_join_k8s_cluster:
+        webdav_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - mog_install_mog
+              - webdav_install_webdav
           target: kubernetes
-        mog_install_heml_requirements:
+        webdav_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success:
-            - mog_install_mog
-          target:  mog
-        mog_install_mog:
+            - webdav_install_webdav
+          target:  webdav
+        webdav_install_webdav:
           activities:
           - call_operation: Helm.install_chart
-            on_success: mog_set_k8s_attributes
+            on_success: webdav_set_k8s_attributes
           - set_state: RUNNING
-          target:  mog
-        mog_create_k8s_dashboard:
+          target:  webdav
+        webdav_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
             on_success:
-            - mog_install_mog
+            - webdav_install_webdav
           - set_state: RUNNING
           target: kubernetes
-        mog_set_k8s_attributes:
+        webdav_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
-    mog_ec2_provision:
+    webdav_ec2_provision:
       description: Workflow to deploy ec2 topology
       preconditions:
         - target: topology
@@ -520,6 +511,8 @@ topology_template:
           ec2_create:
             activities:
             - call_operation: EC2.create
+              on_failure:
+                - failure
               on_success:
               - ec2_create_user
             - set_state: RUNNING
@@ -534,7 +527,11 @@ topology_template:
               on_success:
               - ec2_set_attributes
             target: topology
-    mog_ec2_delete_topology:
+          failure:
+            activities:
+            - set_state: FAILED
+            target: topology
+    webdav_ec2_delete_topology:
       description: delete_topology
       preconditions:
         - target: topology
