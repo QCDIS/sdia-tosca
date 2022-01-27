@@ -376,7 +376,7 @@ topology_template:
               extra_variables:
                 chart_name: articonf-deployment/mogplay
                 repo_name: mogplay
-                repo_url: 'https://vfilipe.gitlab.io/articonf-deployment '
+                repo_url: 'https://vfilipe.gitlab.io/articonf-deployment'
                 helm_name: mogplay
                 namespace: default
                 values:
