@@ -601,7 +601,7 @@ topology_template:
                         args:
                           - clone
                           - --single-branch
-                          - --branch=master
+                          - --branch=lifeWatch
                           - --depth=1
                           - --
                           - https://github.com/QCDIS/k8s-jhub.git
