@@ -538,18 +538,12 @@ topology_template:
                       type: ClusterIP
                   prometheusOperator:
                     enabled: true
-                    admissionWebhooks:
-                      enabled: false
-                      patch:
-                        enabled: false
-                    tlsProxy:
-                      enabled: false
                     service:
                       type: ClusterIP
                   prometheus:
                     enabled: true
                     service:
-                      type: NodePort
+                      type: ClusterIP
                   grafana:
                     enabled: true
                     service:
