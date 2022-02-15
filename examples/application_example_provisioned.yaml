@@ -273,21 +273,19 @@ topology_template:
                   alertmanager:
                     enabled: true
                     service:
-                      type: ClusterIP
-                  prometheusOperator:
-                    enabled: true
-                    tlsProxy:
-                      enabled: false
-                    service:
-                      type: ClusterIP
-                  prometheus:
-                    enabled: true
-                    service:
-                      type: ClusterIP
+                      type: "ClusterIP"
                   grafana:
                     enabled: true
                     service:
-                      type: NodePort
+                      type: "NodePort"
+                  prometheus:
+                    enabled: true
+                    service:
+                      type: "NodePort"
+                  prometheusOperator:
+                    enabled: true
+                    service:
+                      type: "NodePort"
               inventory:
                 all:
                   hosts:
