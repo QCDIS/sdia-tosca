@@ -516,13 +516,13 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
-    helm:
+    mog:
       interfaces:
         Helm:
           install_chart:
             implementation: install_chart.yaml
             inputs:
-              extra_variables: {.values}
+              extra_variables: {.Values}
           install_requirements:
             implementation: install_requirements.yaml
             inputs:
@@ -611,7 +611,7 @@ topology_template:
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
 
   workflows:
-    helm-deploy:
+    mog-deploy:
       description: deploy all
       preconditions:
         - target: topology
@@ -633,7 +633,7 @@ topology_template:
           activities:
           - call_operation: NFS.install
             on_success:
-            - helm_install_heml_requirements
+            - mog_install_heml_requirements
             - deploy_nfs-set-attributes
           target: nfs
         deploy_nfs-set-attributes:
@@ -641,65 +641,65 @@ topology_template:
           - call_operation: NFS.set_attributes
           - set_state: created
           target: nfs
-        helm_install_k8s_requirements:
+        mog_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
             on_success:
-            - helm_install_k8s
+            - mog_install_k8s
           target: kubernetes
-        helm_install_k8s:
+        mog_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: helm_set_master
+            on_success: mog_set_master
           target: kubernetes
-        helm_set_master:
+        mog_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
             - deploy_nfs-requirements
-            - helm_join_k8s_cluster
-            - helm_create_k8s_dashboard
+            - mog_join_k8s_cluster
+            - mog_create_k8s_dashboard
           target: kubernetes
-        helm_join_k8s_cluster:
+        mog_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - helm_install_nfs-provisioner
-              - helm_install_helm
+              - mog_install_nfs-provisioner
+              - mog_install_mog
           target: kubernetes
-        helm_install_heml_requirements:
+        mog_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success:
-              - helm_install_nfs-provisioner
-              - helm_install_helm
-              - helm_install_monitoring
-          target:  helm
-        helm_install_helm:
+              - mog_install_nfs-provisioner
+              - mog_install_mog
+              - mog_install_monitoring
+          target:  mog
+        mog_install_mog:
           activities:
           - call_operation: Helm.install_chart
-            on_success: helm_set_k8s_attributes
+            on_success: mog_set_k8s_attributes
           - set_state: RUNNING
-          target: helm
-        helm_install_monitoring:
+          target: mog
+        mog_install_monitoring:
           activities:
             - call_operation: Helm.install_chart
-              on_success: helm_set_k8s_attributes
+              on_success: mog_set_k8s_attributes
             - set_state: RUNNING
           target: monitoring
 
-        helm_install_nfs-provisioner:
+        mog_install_nfs-provisioner:
           activities:
           - call_operation: Helm.install_chart
-            on_success: helm_set_k8s_attributes
+            on_success: mog_set_k8s_attributes
           - set_state: RUNNING
           target: nfs-provisioner
-        helm_set_k8s_attributes:
+        mog_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
-        helm_create_k8s_dashboard:
+        mog_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
           target: kubernetes
