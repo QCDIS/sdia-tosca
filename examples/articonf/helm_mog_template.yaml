@@ -9,33 +9,33 @@ imports:
 topology_template:
   node_templates:
     compute:
+      interfaces:
+        Standard:
+          create: dummy.yaml
       properties:
         role: master
         assign_public_ip: "yes"
-        disk_size: "40000 MB"
-        mem_size: "4000 MB"
+        disk_size: 50000 MB
+        mem_size: 4000 MB
         num_cores: 2
-        os_distro: "Ubuntu"
-        os_version: "18.04"
-        user_name: "vm_user"
+        os_distro: Ubuntu
+        os_version: 18.04
+        user_name: vm_user
+      type: tosca.nodes.QC.VM.Compute
+    compute_1:
       interfaces:
         Standard:
-          create: "dummy.yaml"
-      type: "tosca.nodes.QC.VM.Compute"
-    compute_1:
+          create: dummy.yaml
       properties:
         role: worker
         assign_public_ip: "yes"
-        disk_size: "40000 MB"
-        mem_size: "4000 MB"
-        num_cores: 2
-        os_distro: "Ubuntu"
-        os_version: "18.04"
-        user_name: "vm_user"
-      interfaces:
-        Standard:
-          create: "dummy.yaml"
-      type: "tosca.nodes.QC.VM.Compute"
+        disk_size: 50000 MB
+        mem_size: 2000 MB
+        num_cores: 1
+        os_distro: Ubuntu
+        os_version: 18.04
+        user_name: vm_user
+      type: tosca.nodes.QC.VM.Compute
     topology:
       properties:
         domain: eu-west-1
@@ -243,6 +243,79 @@ topology_template:
                     localhost:
                       ansible_connection: local
               repository: https://github.com/QCDIS/ec2_playbooks.git
+    nfs:
+      properties:
+        credential:
+          get_attribute:
+            - "compute"
+            - "user_key_pair"
+      requirements:
+        - host:
+            capability: "tosca.capabilities.QC.VM.topology"
+            node: "topology"
+            relationship: "tosca.relationships.HostedOn"
+      interfaces:
+        NFS:
+          install:
+            implementation: "install_nfs.yaml"
+            inputs:
+              extra_variables:
+                mount_path: "/data/nfs-data"
+              inventory:
+                all:
+                  children:
+                    nfs-server:
+                      hosts:
+                        hlf0:
+                          ansible_host:
+                            get_attribute:
+                              - "compute"
+                              - "public_ip"
+                          ansible_python_interpreter: "/usr/bin/python3"
+                          ansible_ssh_user: "vm_user"
+              repository: "https://github.com/QCDIS/nfs_playbooks.git"
+          requirements:
+            implementation: "install_requirements.yaml"
+            inputs:
+              inventory:
+                all:
+                  children:
+                    nodes:
+                      hosts:
+                        hlf1:
+                          ansible_host:
+                            get_attribute:
+                              - "compute_1"
+                              - "public_ip"
+                          ansible_python_interpreter: "/usr/bin/python3"
+                          ansible_ssh_user: "vm_user"
+                    nfs-server:
+                      hosts:
+                        hlf0:
+                          ansible_host:
+                            get_attribute:
+                              - "compute"
+                              - "public_ip"
+                          ansible_python_interpreter: "/usr/bin/python3"
+                          ansible_ssh_user: "vm_user"
+              repository: "https://github.com/QCDIS/nfs_playbooks.git"
+          set_attributes:
+            implementation: "set_attributes.yml"
+            inputs:
+              inventory:
+                all:
+                  children:
+                    nfs-server:
+                      hosts:
+                        hlf0:
+                          ansible_host:
+                            get_attribute:
+                              - "compute"
+                              - "public_ip"
+                          ansible_python_interpreter: "/usr/bin/python3"
+                          ansible_ssh_user: "vm_user"
+              repository: "https://github.com/QCDIS/nfs_playbooks.git"
+      type: "tosca.nodes.QC.Application.NFS"
     kubernetes:
       type: "tosca.nodes.QC.docker.Orchestrator.Kubernetes"
       requirements:
@@ -346,58 +419,42 @@ topology_template:
                       ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
-    nfs:
-      requirements:
-      - host:
-          capability: "tosca.capabilities.QC.VM.topology"
-          node: "topology"
-          relationship: "tosca.relationships.HostedOn"
-      properties:
-        credential: { get_attribute: [ compute,user_key_pair ] }
-      type: "tosca.nodes.QC.Application.NFS"
-      interfaces:
-        NFS:
-          requirements:
-            implementation: install_requirements.yaml
+          create_persistent_volume:
+            implementation: create_persistent_volume.yaml
             inputs:
-              repository: "https://github.com/QCDIS/nfs_playbooks.git"
-              inventory:
-                all:
-                  children:
-                    nfs-server:
-                      hosts:
-                        hlf0:
-                          ansible_host: { get_attribute: [ compute,public_ip ] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_user: { get_property: [ compute,user_name ] }
-          install:
-            implementation: install_nfs.yaml
-            inputs:
-              repository: "https://github.com/QCDIS/nfs_playbooks.git"
               extra_variables:
-                mount_path: /mnt/nfs
+                storage_capacity: 10Gi
+                local_path: /mnt/disk/vol1
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
               inventory:
                 all:
-                  children:
-                    nfs-server:
-                      hosts:
-                        hlf0:
-                          ansible_host: { get_attribute: [ compute,public_ip ] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_user: { get_property: [ compute,user_name ] }
-          set_attributes:
-            implementation: set_attributes.yml
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
+          reset_k8s_cluster:
+            implementation: create_persistent_volume.yaml
             inputs:
-              repository: "https://github.com/QCDIS/nfs_playbooks.git"
+              extra_variables:
+                storage_capacity: 10Gi
+                local_path: /mnt/disk/vol1
+              repository: "https://github.com/QCDIS/k8s_playbooks.git"
               inventory:
                 all:
-                  children:
-                    nfs-server:
-                      hosts:
-                        hlf0:
-                          ansible_host: { get_attribute: [ compute,public_ip ] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_user: { get_property: [ compute,user_name ] }
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+                    worker:
+                      ansible_host: { get_attribute: [ compute_1,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute_1,user_name ] }
     nfs-provisioner:
       interfaces:
         Helm:
@@ -459,7 +516,41 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
-    mog:
+    helm:
+      interfaces:
+        Helm:
+          install_chart:
+            implementation: install_chart.yaml
+            inputs: {.values}
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host:
+                        get_attribute:
+                          - compute
+                          - public_ip
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user:
+                        get_property:
+                          - compute
+                          - user_name
+              repository: https://github.com/QCDIS/helm_playbooks.git
+      properties:
+        credential:
+          get_attribute:
+            - compute
+            - user_key_pair
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      type: tosca.nodes.QC.Container.Application.Helm
+    monitoring:
       type: tosca.nodes.QC.Container.Application.Helm
       properties:
         credential: { get_attribute: [ compute,user_key_pair ] }
@@ -468,65 +559,6 @@ topology_template:
             capability: tosca.capabilities.QC.Kubernetes
             node: kubernetes
             relationship: tosca.relationships.HostedOn
-      interfaces:
-        Helm:
-          install_requirements:
-            implementation: install_requirements.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-          install_chart:
-            implementation: install_chart.yaml
-            inputs:
-              repository: https://github.com/QCDIS/helm_playbooks.git
-              extra_variables:
-                chart_name: mogplay/mogplay
-                repo_name: mogplay
-                repo_url: 'https://vfilipe.gitlab.io/articonf-deployment'
-                helm_name: mogplay
-                namespace: default
-                values:
-                  features:
-                    recorder: false
-                    nfs: false
-                    ingress: false
-                    ingressnotls: false
-                  tags:
-                    nginx: false
-                    nfs: false
-                    monitoring: false
-                  images:
-                    registry: registry.gitlab.com
-                    repository: registry.gitlab.com/vfilipe/articonf-deployment
-                    token: Z2l0bGFiK2RlcGxveS10b2tlbi01OTg1MDQ6YW1mcVY3c1E0U3k0WjVwYkZLQTI=
-                    tag: "1.1.1"
-                    pullPolicy: Always
-                  master_ip: { get_attribute: [ compute,public_ip ] }
-                  fabric:
-                    channel: appchannel
-                    org: hlf
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host: { get_attribute: [ compute,public_ip ] }
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: { get_property: [ compute,user_name ] }
-    monitoring:
-      type: tosca.nodes.QC.Container.Application.Helm
-      properties:
-        credential: { get_attribute: [ compute,user_key_pair ] }
-      requirements:
-      - kubernetes:
-          capability: tosca.capabilities.QC.Kubernetes
-          node: kubernetes
-          relationship: tosca.relationships.HostedOn
       interfaces:
         Helm:
           install_requirements:
@@ -557,10 +589,6 @@ topology_template:
                       type: ClusterIP
                   prometheusOperator:
                     enabled: true
-                    admissionWebhooks:
-                      enabled: false
-                      patch:
-                        enabled: false
                     tlsProxy:
                       enabled: false
                     service:
@@ -568,7 +596,7 @@ topology_template:
                   prometheus:
                     enabled: true
                     service:
-                      type: NodePort
+                      type: ClusterIP
                   grafana:
                     enabled: true
                     service:
@@ -582,8 +610,8 @@ topology_template:
                       ansible_ssh_user: { get_property: [ compute,user_name ] }
 
   workflows:
-    mog-deploy_k8s:
-      description: deploy k8s
+    helm-deploy:
+      description: deploy all
       preconditions:
         - target: topology
           condition:
@@ -603,71 +631,79 @@ topology_template:
         deploy_nfs-install:
           activities:
           - call_operation: NFS.install
-            on_success: deploy_nfs-set-attributes
+            on_success:
+            - helm_install_heml_requirements
+            - deploy_nfs-set-attributes
           target: nfs
         deploy_nfs-set-attributes:
           activities:
           - call_operation: NFS.set_attributes
           - set_state: created
           target: nfs
-        mog_install_k8s_requirements:
+        helm_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
-            on_success: mog_install_k8s
+            on_success:
+            - helm_install_k8s
           target: kubernetes
-        mog_install_k8s:
+        helm_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: mog_set_master
+            on_success: helm_set_master
           target: kubernetes
-        mog_set_master:
+        helm_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
             - deploy_nfs-requirements
-            - mog_join_k8s_cluster
-            - mog_install_heml_requirements
-            - mog_create_k8s_dashboard
+            - helm_join_k8s_cluster
+            - helm_create_k8s_dashboard
           target: kubernetes
-        mog_join_k8s_cluster:
+        helm_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - mog_install_mog
-              - mog_jupyterhub_install_nfs-provisioner
+              - helm_install_nfs-provisioner
+              - helm_install_helm
           target: kubernetes
-        mog_install_heml_requirements:
+        helm_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success:
-            - mog_install_mog
-            - mog_jupyterhub_install_nfs-provisioner
-          target:  mog
-        mog_jupyterhub_install_nfs-provisioner:
+              - helm_install_nfs-provisioner
+              - helm_install_helm
+              - helm_install_monitoring
+          target:  helm
+        helm_install_helm:
           activities:
           - call_operation: Helm.install_chart
-            on_success: mog_set_k8s_attributes
+            on_success: helm_set_k8s_attributes
+          - set_state: RUNNING
+          target: helm
+        helm_install_monitoring:
+          activities:
+            - call_operation: Helm.install_chart
+              on_success: helm_set_k8s_attributes
+            - set_state: RUNNING
+          target: monitoring
+
+        helm_install_nfs-provisioner:
+          activities:
+          - call_operation: Helm.install_chart
+            on_success: helm_set_k8s_attributes
           - set_state: RUNNING
           target: nfs-provisioner
-        mog_install_mog:
-          activities:
-          - call_operation: Helm.install_chart
-            on_success: mog_set_k8s_attributes
-          - set_state: RUNNING
-          target:  mog
-        mog_create_k8s_dashboard:
-          activities:
-          - call_operation: Kubernetes.create_k8s_dashboard
-            on_success:
-            - mog_install_mog
-          - set_state: RUNNING
-          target: kubernetes
-        mog_set_k8s_attributes:
+        helm_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
-    mog_ec2_provision:
+        helm_create_k8s_dashboard:
+          activities:
+          - call_operation: Kubernetes.create_k8s_dashboard
+          target: kubernetes
+
+    ec2_provision:
       description: Workflow to deploy ec2 topology
       preconditions:
         - target: topology
@@ -731,7 +767,8 @@ topology_template:
               on_success:
               - ec2_set_attributes
             target: topology
-    mog_ec2_delete_topology:
+
+    ec2_delete_topology:
       description: delete_topology
       preconditions:
         - target: topology
