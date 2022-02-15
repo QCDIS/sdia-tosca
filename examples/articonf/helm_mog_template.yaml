@@ -521,7 +521,8 @@ topology_template:
         Helm:
           install_chart:
             implementation: install_chart.yaml
-            inputs: {.values}
+            inputs:
+              extra_variables: {.values}
           install_requirements:
             implementation: install_requirements.yaml
             inputs:
