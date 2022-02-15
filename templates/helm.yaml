@@ -516,38 +516,13 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
-    mog:
+    helm:
       interfaces:
         Helm:
           install_chart:
             implementation: install_chart.yaml
             inputs:
-              extra_variables:
-                chart_name: mogplay/mogplay
-                repo_name: mogplay
-                repo_url: 'https://vfilipe.gitlab.io/articonf-deployment'
-                helm_name: mogplay
-                namespace: default
-                values:
-                  features:
-                    recorder: false
-                    nfs: false
-                    ingress: false
-                    ingressnotls: false
-                  tags:
-                    nginx: false
-                    nfs: false
-                    monitoring: false
-                  images:
-                    registry: registry.gitlab.com
-                    repository: registry.gitlab.com/vfilipe/articonf-deployment
-                    token: Z2l0bGFiK2RlcGxveS10b2tlbi01OTg1MDQ6YW1mcVY3c1E0U3k0WjVwYkZLQTI=
-                    tag: "1.1.1"
-                    pullPolicy: Always
-                  master_ip: { get_attribute: [ compute,public_ip ] }
-                  fabric:
-                    channel: appchannel
-                    org: hlf
+              extra_variables: {.Values}
               inventory:
                 all:
                   hosts:
@@ -592,7 +567,7 @@ topology_template:
       type: tosca.nodes.QC.Container.Application.Helm
 
   workflows:
-    mog-deploy:
+    helm-deploy:
       description: deploy all
       preconditions:
         - target: topology
@@ -614,7 +589,7 @@ topology_template:
           activities:
           - call_operation: NFS.install
             on_success:
-            - mog_install_heml_requirements
+            - helm_install_heml_requirements
             - deploy_nfs-set-attributes
           target: nfs
         deploy_nfs-set-attributes:
@@ -622,57 +597,57 @@ topology_template:
           - call_operation: NFS.set_attributes
           - set_state: created
           target: nfs
-        mog_install_k8s_requirements:
+        helm_install_k8s_requirements:
           activities:
           - set_state: CREATING
           - call_operation: Kubernetes.install_requirements
             on_success:
-            - mog_install_k8s
+            - helm_install_k8s
           target: kubernetes
-        mog_install_k8s:
+        helm_install_k8s:
           activities:
           - call_operation: Kubernetes.install_k8s
-            on_success: mog_set_master
+            on_success: helm_set_master
           target: kubernetes
-        mog_set_master:
+        helm_set_master:
           activities:
           - call_operation: Kubernetes.set_master
             on_success:
             - deploy_nfs-requirements
-            - mog_join_k8s_cluster
-            - mog_create_k8s_dashboard
+            - helm_join_k8s_cluster
+            - helm_create_k8s_dashboard
           target: kubernetes
-        mog_join_k8s_cluster:
+        helm_join_k8s_cluster:
           activities:
           - call_operation: Kubernetes.join_k8s_cluster
             on_success:
-              - mog_install_nfs-provisioner
-              - mog_install_mog
+              - helm_install_nfs-provisioner
+              - helm_install_helm
           target: kubernetes
-        mog_install_heml_requirements:
+        helm_install_heml_requirements:
           activities:
           - call_operation: Helm.install_requirements
             on_success:
-              - mog_install_nfs-provisioner
-              - mog_install_mog
-          target:  mog
-        mog_install_mog:
+              - helm_install_nfs-provisioner
+              - helm_install_helm
+          target:  helm
+        helm_install_helm:
           activities:
           - call_operation: Helm.install_chart
-            on_success: mog_set_k8s_attributes
+            on_success: helm_set_k8s_attributes
           - set_state: RUNNING
-          target: mog
-        mog_install_nfs-provisioner:
+          target: helm
+        helm_install_nfs-provisioner:
           activities:
           - call_operation: Helm.install_chart
-            on_success: mog_set_k8s_attributes
+            on_success: helm_set_k8s_attributes
           - set_state: RUNNING
           target: nfs-provisioner
-        mog_set_k8s_attributes:
+        helm_set_k8s_attributes:
           activities:
           - call_operation: Kubernetes.set_attributes
           target: kubernetes
-        mog_create_k8s_dashboard:
+        helm_create_k8s_dashboard:
           activities:
           - call_operation: Kubernetes.create_k8s_dashboard
           target: kubernetes
