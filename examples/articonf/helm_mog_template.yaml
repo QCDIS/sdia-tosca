@@ -522,7 +522,32 @@ topology_template:
           install_chart:
             implementation: install_chart.yaml
             inputs:
-              extra_variables: {.Values}
+              extra_variables:
+                chart_name: mogplay/mogplay
+                repo_name: mogplay
+                repo_url: 'https://vfilipe.gitlab.io/articonf-deployment'
+                helm_name: mogplay
+                namespace: default
+                values:
+                  features:
+                    recorder: false
+                    nfs: false
+                    ingress: false
+                    ingressnotls: false
+                  tags:
+                    nginx: false
+                    nfs: false
+                    monitoring: false
+                  images:
+                    registry:
+                    repository:
+                    token:
+                    tag: "1.1.1"
+                    pullPolicy: Always
+                  master_ip: { get_attribute: [ compute,public_ip ] }
+                  fabric:
+                    channel: appchannel
+                    org: hlf
           install_requirements:
             implementation: install_requirements.yaml
             inputs:
