@@ -519,9 +519,21 @@ topology_template:
     mog:
       interfaces:
         Helm:
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              repository: https://github.com/QCDIS/helm_playbooks.git
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
           install_chart:
             implementation: install_chart.yaml
             inputs:
+              repository: https://github.com/QCDIS/helm_playbooks.git
               extra_variables:
                 chart_name: mogplay/mogplay
                 repo_name: mogplay
@@ -548,23 +560,13 @@ topology_template:
                   fabric:
                     channel: appchannel
                     org: hlf
-          install_requirements:
-            implementation: install_requirements.yaml
-            inputs:
               inventory:
                 all:
                   hosts:
                     master:
-                      ansible_host:
-                        get_attribute:
-                          - compute
-                          - public_ip
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:
-                        get_property:
-                          - compute
-                          - user_name
-              repository: https://github.com/QCDIS/helm_playbooks.git
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
       properties:
         credential:
           get_attribute:
