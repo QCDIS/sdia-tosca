@@ -590,7 +590,7 @@ topology_template:
                 repo_url: https://argoproj.github.io/argo-helm
                 values:
                   controller:
-                    containerRuntimeExecutor: k8sapi
+                    containerRuntimeExecutor: emissary
                   server:
 #                    extraArgs:
 #                      - --auth-mode=sso
