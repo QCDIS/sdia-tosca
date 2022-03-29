@@ -16,8 +16,8 @@ topology_template:
         role: master
         assign_public_ip: "yes"
         disk_size: 50000 MB
-        mem_size: 4000 MB
-        num_cores: 2
+        mem_size: 8000 MB
+        num_cores: 4
         os_distro: Ubuntu
         os_version: 18.04
         user_name: vm_user
@@ -30,8 +30,8 @@ topology_template:
         role: worker
         assign_public_ip: "yes"
         disk_size: 50000 MB
-        mem_size: 4000 MB
-        num_cores: 2
+        mem_size: 8000 MB
+        num_cores: 4
         os_distro: Ubuntu
         os_version: 18.04
         user_name: vm_user
@@ -592,50 +592,44 @@ topology_template:
                   controller:
                     containerRuntimeExecutor: k8sapi
                   server:
-                    volumeMounts:
-                      - name: ssh-key
-                        mountPath: /etc/ssl/certs/ca.crt
-                        readOnly: true
-                    volumes:
-                      - name: ssh-key
-                        secret:
-                          secretName: keycloak-token-tw8px
-                          items:
-                            - key: ca.crt
-                              path: ca.crt
-                    extraArgs:
-                      - --auth-mode=sso
+#                    extraArgs:
+#                      - --auth-mode=sso
                     enabled: true
-                    baseHref: /argowf/
+#                    baseHref: /argowf/
                     serviceType: NodePort
-                    #https://github.com/argoproj/argo-workflows/blob/master/docs/argo-server-sso.md
-                    sso:
-                      issuer: https://lifewatch.lab.uvalight.net:32444/auth/realms/n-a-a-vre
-                      sessionExpiry: 240h
-                      clientId:
-                        name: client-id-secret
-                        key: client-id-key
-                      clientSecret:
-                        name: client-secret-secret
-                        key: client-secret-key
-                      redirectUrl: https://lifewatch.lab.uvalight.net:32443/argowf/oauth2/callback
-                      rbac:
-                        enabled: false
-                      insecureSkipVerify: false
                     ingress:
-                      enabled: true
+                      enabled: false
                       ingressClassName: "nginx"
                       annotations:
                         nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
                         nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
                         nginx.ingress.kubernetes.io/rewrite-target: /$2
-                        nginx.ingress.kubernetes.io/add-base-url : "true"
+                        nginx.ingress.kubernetes.io/add-base-url: "true"
                         nginx.ingress.kubernetes.io/configuration-snippet: |
                           proxy_set_header Accept-Encoding "";
                           sub_filter '<base href="/">' '<base href="/argowf/">';
                           sub_filter_once on;
+                      hosts:
+                        - lifewatch.lab.uvalight.net
                       paths:
-                      - /argowf(/|$)(.*)
+                        - /argowf(/|$)(.*)
+                      tls:
+                        - hosts:
+                            - lifewatch.lab.uvalight.net
+                          secretName: lifewatch.lab.uvalight.net-tls
+                    sso:
+                      issuer: https://lifewatch.lab.uvalight.net:32443/auth/realms/n-a-a-vre
+                      sessionExpiry: 240h
+                      clientId:
+                        name: argo-sso
+                        key: client-id-key
+                      clientSecret:
+                        name: argo-sso
+                        key: client-secret-key
+                      redirectUrl: https://lifewatch.lab.uvalight.net:32443/argowf/oauth2/callback
+                      rbac:
+                        enabled: false
+                      insecureSkipVerify: false
               inventory:
                 all:
                   hosts:
@@ -677,83 +671,6 @@ topology_template:
           capability: tosca.capabilities.QC.Kubernetes
           node: kubernetes
           relationship: tosca.relationships.HostedOn
-      type: tosca.nodes.QC.Container.Application.Helm
-    argocd:
-      interfaces:
-        Helm:
-          install_chart:
-            implementation: install_chart.yaml
-            inputs:
-              extra_variables:
-                chart_name: argo/argo-cd
-                helm_name: argo-cd
-                namespace: default
-                repo_name: argo
-                repo_url: https://argoproj.github.io/argo-helm
-                values:
-                  configs:
-                    secret:
-                      argocdServerAdminPassword: $2a$10$ZD3jP8Bvvr6pxzwN3UMQzOPvxfjYxLcMsng40t0FsO7Ex7VfN2I4W
-                  server:
-                    config:
-                      url: https://localhost/argo-cd/
-                    service:
-                      type: NodePort
-                      ingress:
-                        enabled: true
-                        ingressClassName: "nginx"
-                        annotations:
-                          nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-                          nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-                          nginx.ingress.kubernetes.io/rewrite-target: /$2
-                          nginx.ingress.kubernetes.io/add-base-url: "true"
-                          nginx.ingress.kubernetes.io/configuration-snippet: |
-                            proxy_set_header Accept-Encoding "";
-                            sub_filter '<base argo-cd="/">' '<base href="/argo-cd/">';
-                            sub_filter_once on;
-                        paths:
-                          - /argo-cd(/|$)(.*)
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host:
-                        get_attribute:
-                          - compute
-                          - public_ip
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:
-                        get_property:
-                          - compute
-                          - user_name
-              repository: https://github.com/QCDIS/helm_playbooks.git
-          install_requirements:
-            implementation: install_requirements.yaml
-            inputs:
-              inventory:
-                all:
-                  hosts:
-                    master:
-                      ansible_host:
-                        get_attribute:
-                          - compute
-                          - public_ip
-                      ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:
-                        get_property:
-                          - compute
-                          - user_name
-              repository: https://github.com/QCDIS/helm_playbooks.git
-      properties:
-        credential:
-          get_attribute:
-            - compute
-            - user_key_pair
-      requirements:
-        - kubernetes:
-            capability: tosca.capabilities.QC.Kubernetes
-            node: kubernetes
-            relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
     gogs:
       interfaces:
@@ -849,8 +766,125 @@ topology_template:
             node: kubernetes
             relationship: tosca.relationships.HostedOn
       type: tosca.nodes.QC.Container.Application.Helm
-
-
+    monitoring:
+      type: tosca.nodes.QC.Container.Application.Helm
+      properties:
+        credential: { get_attribute: [ compute,user_key_pair ] }
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      interfaces:
+        Helm:
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              repository: https://github.com/QCDIS/helm_playbooks.git
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              repository: https://github.com/QCDIS/helm_playbooks.git
+              extra_variables:
+                chart_name: prometheus-community/kube-prometheus-stack
+                repo_name: prometheus-community
+                repo_url: 'https://prometheus-community.github.io/helm-charts'
+                helm_name: monitoring
+                namespace: default
+                values:
+                  alertmanager:
+                    enabled: true
+                  prometheusOperator:
+                    enabled: true
+                    tlsProxy:
+                      enabled: false
+                  prometheus:
+                    enabled: true
+                  grafana:
+                    enabled: true
+#                    service:
+#                      type: NodePort
+                    ingress:
+                      enabled: true
+                      ingressClassName: "nginx"
+                      annotations:
+                        nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+                        nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+                        nginx.ingress.kubernetes.io/rewrite-target: /$2
+                        nginx.ingress.kubernetes.io/add-base-url: "true"
+                        nginx.ingress.kubernetes.io/configuration-snippet: |
+                          proxy_set_header Accept-Encoding "";
+                          sub_filter '<base href="/">' '<base href="/monitor/">';
+                          sub_filter_once on;
+                      hosts:
+                        - lifewatch.lab.uvalight.net
+                      path: /monitor(/|$)(.*)
+                      tls:
+                        - hosts:
+                            - lifewatch.lab.uvalight.net
+                          secretName: lifewatch.lab.uvalight.net-tls
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+    webdav:
+      type: tosca.nodes.QC.Container.Application.Helm
+      properties:
+        credential: { get_attribute: [ compute,user_key_pair ] }
+      requirements:
+        - kubernetes:
+            capability: tosca.capabilities.QC.Kubernetes
+            node: kubernetes
+            relationship: tosca.relationships.HostedOn
+      interfaces:
+        Helm:
+          install_requirements:
+            implementation: install_requirements.yaml
+            inputs:
+              repository: https://github.com/QCDIS/helm_playbooks.git
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
+          install_chart:
+            implementation: install_chart.yaml
+            inputs:
+              repository: https://github.com/QCDIS/helm_playbooks.git
+              extra_variables:
+                chart_name: k8s-webdav/webdav
+                repo_name: k8s-webdav
+                repo_url: 'https://qcdis.github.io/k8s-webdav/'
+                helm_name: webdav
+                namespace: default
+                values:
+                  urls:
+                    /webdav:
+                      - user: ZDFmNDg0Nzk0ZTJi
+                        password: NDBjMmMzODJkYTBh
+                  persistence:
+                    enabled: false
+                  ingress:
+                    host: lifewatch.lab.uvalight.net
+              inventory:
+                all:
+                  hosts:
+                    master:
+                      ansible_host: { get_attribute: [ compute,public_ip ] }
+                      ansible_python_interpreter: /usr/bin/python3
+                      ansible_ssh_user: { get_property: [ compute,user_name ] }
 
   workflows:
     naa-vre-deploy:
@@ -910,8 +944,7 @@ topology_template:
               - naa-vre_install_ingress
               - naa-vre_install_nfs-provisioner
               - naa-vre_install_argowf
-              - naa-vre_install_argocd
-              - naa-vre_install_gogs
+#              - naa-vre_install_gogs
           target: kubernetes
         naa-vre_install_heml_requirements:
           activities:
@@ -920,8 +953,8 @@ topology_template:
               - naa-vre_install_ingress
               - naa-vre_install_nfs-provisioner
               - naa-vre_install_argowf
-              - naa-vre_install_argocd
-              - naa-vre_install_gogs
+              - naa-vre_install_monitoring
+#              - naa-vre_install_gogs
           target:  argowf
         naa-vre_install_argowf:
           activities:
@@ -929,18 +962,18 @@ topology_template:
             on_success: naa-vre_set_k8s_attributes
           - set_state: RUNNING
           target: argowf
-        naa-vre_install_argocd:
+        naa-vre_install_monitoring:
           activities:
           - call_operation: Helm.install_chart
             on_success: naa-vre_set_k8s_attributes
           - set_state: RUNNING
-          target: argocd
-        naa-vre_install_gogs:
-          activities:
-          - call_operation: Helm.install_chart
-            on_success: naa-vre_set_k8s_attributes
-          - set_state: RUNNING
-          target: gogs
+          target: monitoring
+#        naa-vre_install_gogs:
+#          activities:
+#          - call_operation: Helm.install_chart
+#            on_success: naa-vre_set_k8s_attributes
+#          - set_state: RUNNING
+#          target: gogs
         naa-vre_install_nfs-provisioner:
           activities:
           - call_operation: Helm.install_chart
