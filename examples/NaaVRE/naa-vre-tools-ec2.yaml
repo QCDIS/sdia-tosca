@@ -590,21 +590,34 @@ topology_template:
                 repo_url: https://argoproj.github.io/argo-helm
                 values:
                   controller:
+                    metricsConfig:
+                      enabled: true
+                      port: 9091
+                      servicePort: 8090
+                    telemetryConfig:
+                      enabled: true
+                      port: 8091
+                      servicePort: 8092
+                    serviceMonitor:
+                      enabled: true
                     containerRuntimeExecutor: emissary
+                    parallelism: 10
+                    resourceRateLimit:
+                      limit: 10
+                      burst: 2
                   server:
-#                    extraArgs:
-#                      - --auth-mode=sso
+                    extraArgs:
+                      - --auth-mode=sso
                     enabled: true
-#                    baseHref: /argowf/
-                    serviceType: NodePort
+                    baseHref: /argowf/
                     ingress:
-                      enabled: false
+                      enabled: true
                       ingressClassName: "nginx"
                       annotations:
                         nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
                         nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
                         nginx.ingress.kubernetes.io/rewrite-target: /$2
-                        nginx.ingress.kubernetes.io/add-base-url: "true"
+                        nginx.ingress.kubernetes.io/add-base-url : "true"
                         nginx.ingress.kubernetes.io/configuration-snippet: |
                           proxy_set_header Accept-Encoding "";
                           sub_filter '<base href="/">' '<base href="/argowf/">';
@@ -612,7 +625,7 @@ topology_template:
                       hosts:
                         - lifewatch.lab.uvalight.net
                       paths:
-                        - /argowf(/|$)(.*)
+                      - /argowf(/|$)(.*)
                       tls:
                         - hosts:
                             - lifewatch.lab.uvalight.net
@@ -808,6 +821,14 @@ topology_template:
                   prometheus:
                     enabled: true
                   grafana:
+                    adminPassword: prom-operator
+                    grafana.ini:
+                      server:
+                        domain: lifewatch.lab.uvalight.net
+                        #root_url: "%(protocol)s://%(domain)s/"
+                        root_url: https://lifewatch.lab.uvalight.net/grafana/
+                        serve_from_sub_path: true
+
                     enabled: true
 #                    service:
 #                      type: NodePort
@@ -825,7 +846,7 @@ topology_template:
                           sub_filter_once on;
                       hosts:
                         - lifewatch.lab.uvalight.net
-                      path: /monitor(/|$)(.*)
+                      path: /grafana(/|$)(.*)
                       tls:
                         - hosts:
                             - lifewatch.lab.uvalight.net

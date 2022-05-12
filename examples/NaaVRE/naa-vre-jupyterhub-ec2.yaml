@@ -620,9 +620,9 @@ topology_template:
                     extraConfig:
                       templates: |
                         c.JupyterHub.template_paths = ['/etc/jupyterhub/custom/templates']
-                    concurrentSpawnLimit: 10
-                    consecutiveFailureLimit: 3
-                    activeServerLimit: 5
+                    concurrentSpawnLimit: 20
+                    consecutiveFailureLimit: 20
+                    activeServerLimit: 20
                     namedServerLimitPerUser: 1
                     shutdownOnLogout: true
                     extraEnv:
@@ -630,12 +630,12 @@ topology_template:
                     baseUrl: /n-a-a-vre
                     config:
                       GenericOAuthenticator:
-                        client_id: xxxxxxxxxxxxx
-                        client_secret: xxxxxxxxxxxxx
-                        oauth_callback_url: https://jupyter_host:port/n-a-a-vre/hub/oauth_callback
-                        authorize_url: https://keycloak_host:port/auth/realms/n-a-a-vre/protocol/openid-connect/auth
-                        token_url: https://keycloak_host:port/auth/realms/n-a-a-vre/protocol/openid-connect/token
-                        userdata_url: https://keycloak_host:port/auth/realms/n-a-a-vre/protocol/openid-connect/userinfo
+                        client_id: naa-vre-lifewatch.dev
+                        client_secret: f714c456-925e-4ed4-b5a1-57a2b10fc840
+                        oauth_callback_url: https://lfw-ds001-i022.lifewatch.dev:32443/n-a-a-vre/hub/oauth_callback
+                        authorize_url: https://lifewatch.lab.uvalight.net:32443/auth/realms/n-a-a-vre/protocol/openid-connect/auth
+                        token_url: https://lifewatch.lab.uvalight.net:32443/auth/realms/n-a-a-vre/protocol/openid-connect/token
+                        userdata_url: https://lifewatch.lab.uvalight.net:32443/auth/realms/n-a-a-vre/protocol/openid-connect/userinfo
                         login_service: keycloak
                         username_key: preferred_username
                         userdata_params:
@@ -657,12 +657,20 @@ topology_template:
                       kubernetes.io/tls-acme: "true"
                     tls:
                       - hosts:
-                        - jupyter_host:port
-                        secretName: jupyter_host:port-tls
+                        - lfw-ds001-i022.lifewatch.dev
+                        secretName: lfw-ds001-i022.lifewatch.dev-tls
                   proxy:
                     service:
                       type: ClusterIP
                   singleuser:
+                    lifecycleHooks:
+                      postStart:
+                        exec:
+                          command:
+                            - "sh"
+                            - "-c"
+                            - >
+                              mkdir /home/jovyan/examples && cp -r /tmp/notebooks /home/jovyan/examples;
                     profileList:
                     - display_name: "Minimal VL environment"
                       description: "Python VL environment"
@@ -677,6 +685,14 @@ topology_template:
                       description: "Latest version of the Virtual lab. May not be stable"
                       kubespawner_override:
                         image: qcdis/n-a-a-vre-laserfarm:latest
+                    - display_name: "vol2 bird version of VL"
+                      description: "Virtual lab with vol2 dependencies installed"
+                      kubespawner_override:
+                        image: qcdis/n-a-a-vre-vol2bird:alpha-v0.1.1.4
+                    - display_name: "multiply version of VL"
+                      description: "Virtual lab with multiply dependencies installed"
+                      kubespawner_override:
+                        image: qcdis/n-a-a-vre-multiply:latest
                     defaultUrl: "/lab"
                     extraEnv:
                       JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
@@ -758,10 +774,10 @@ topology_template:
                         }
                     enabled: true
                     path: /auth/
-                    hostname: jupyter_host:port
+                    hostname: lfw-ds001-i022.lifewatch.dev
                     tls: true
                     secrets:
-                      - jupyter_host:port-tls
+                      - lfw-ds001-i022.lifewatch.dev-tls
                   postgresql:
                     enabled: false
                   externalDatabase:
@@ -895,7 +911,7 @@ topology_template:
                     serviceType: ClusterIP
                     #https://github.com/argoproj/argo-workflows/blob/master/docs/argo-server-sso.md
                     sso:
-                      issuer: https://keycloak_host:port/auth/realms/n-a-a-vre
+                      issuer: https://lifewatch.lab.uvalight.net:32443/auth/realms/n-a-a-vre
                       sessionExpiry: 240h
                       clientId:
                         name: argo-sso
@@ -903,15 +919,11 @@ topology_template:
                       clientSecret:
                         name: argo-sso
                         key: client-secret-key
-                      redirectUrl: https://keycloak_host:port/argowf/oauth2/callback
+                      redirectUrl: https://lfw-ds001-i022.lifewatch.dev:32443/argowf/oauth2/callback
                       rbac:
                         enabled: false
                       insecureSkipVerify: false
                     ingress:
-                      tls:
-                        - secretName: letsencrypt
-                          hosts:
-                            - lifewatch.lab.uvalight.net
                       enabled: true
                       ingressClassName: "nginx"
                       annotations:
@@ -923,8 +935,14 @@ topology_template:
                           proxy_set_header Accept-Encoding "";
                           sub_filter '<base href="/">' '<base href="/argowf/">';
                           sub_filter_once on;
+                      hosts:
+                        - lfw-ds001-i022.lifewatch.dev
                       paths:
                         - /argowf(/|$)(.*)
+                      tls:
+                        - hosts:
+                            - lfw-ds001-i022.lifewatch.dev
+                          secretName: lfw-ds001-i022.lifewatch.dev-tls
               inventory:
                 all:
                   hosts:
@@ -980,9 +998,15 @@ topology_template:
                 repo_name: minio
                 repo_url: https://charts.bitnami.com/bitnami
                 values:
-                  tls:
-                    existingSecret: jupyter_host:port-tls
+                  apiIngress:
                     enabled: true
+                    hostname: lfw-ds001-i022.lifewatch.dev
+                    tls: true
+                    selfSigned: true
+                  ingress:
+                    tls: true
+                    selfSigned: true
+                    hostname: lfw-ds001-i022.lifewatch.dev
                   persistence:
                     enabled: false
                   service:
