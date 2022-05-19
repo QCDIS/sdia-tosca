@@ -396,9 +396,9 @@ topology_template:
                 repo_url: https://helm.releases.hashicorp.com
                 values:
                   server:
-                    enabled: false
+                    enabled: true
                   dataStorage:
-                    enabled: false
+                    enabled: true
                   ui:
                     enabled: true
                     publishNotReadyAddresses: true
