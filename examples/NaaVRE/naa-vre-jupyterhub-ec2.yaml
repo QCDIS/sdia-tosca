@@ -631,7 +631,7 @@ topology_template:
                     config:
                       GenericOAuthenticator:
                         client_id: naa-vre-lifewatch.dev
-                        client_secret: f714c456-925e-4ed4-b5a1-57a2b10fc840
+                        client_secret: SECRET
                         oauth_callback_url: https://lfw-ds001-i022.lifewatch.dev:32443/n-a-a-vre/hub/oauth_callback
                         authorize_url: https://lifewatch.lab.uvalight.net:32443/auth/realms/n-a-a-vre/protocol/openid-connect/auth
                         token_url: https://lifewatch.lab.uvalight.net:32443/auth/realms/n-a-a-vre/protocol/openid-connect/token
@@ -670,7 +670,7 @@ topology_template:
                             - "sh"
                             - "-c"
                             - >
-                              mkdir /home/jovyan/examples && cp -r /tmp/notebooks /home/jovyan/examples;
+                              mkdir -p /home/jovyan/examples && cp -r /tmp/notebooks/ /home/jovyan/examples/ && mv /home/jovyan/examples/notebooks/conf_vl_repos.py /home/jovyan/examples/ && mv /home/jovyan/examples/notebooks/README.md /home/jovyan/examples/ && python /home/jovyan/examples/conf_vl_repos.py --force=False --github_url=https://github.com/QCDIS/NaaVRE-container-prestage --github_token=SECRET_TOKEN --registry_url=https://hub.docker.com/u/qcdis
                     profileList:
                     - display_name: "Minimal VL environment"
                       description: "Python VL environment"
