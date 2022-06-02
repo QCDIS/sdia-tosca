@@ -21,7 +21,7 @@ topology_template:
                 repo_name: argo
                 repo_url: https://argoproj.github.io/argo-helm
                 values:
-                  containerRuntimeExecutor: k8sapi
+                  containerRuntimeExecutor: emissary
                   server:
                     serviceType: NodePort
               inventory:
