@@ -51,14 +51,14 @@ topology_template:
                     localhost:
                       ansible_connection: local
                       instances:
-                      { % for vm in vms % }
+                      {% for vm in vms %}
                         {{ vm['name'] }}:
-                          disk_size: {{ vm[ 'disk_size' ] }}
-                          mem_size: {{ vm[ 'mem_size' ] }}
-                          num_cores: {{ vm[ 'num_cores' ] }}
+                          disk_size: {{ vm['disk_size'] }}
+                          mem_size: {{ vm['mem_size'] }}
+                          num_cores: {{ vm['num_cores'] }}
                           os_distro: { get_property: [ {{ vm['name'] }}, os_distro ] }
                           os_version: { get_property: [ {{ vm['name'] }}, os_version ] }
-                          user_name: {{ vm[ 'user_name' ] }}
+                          user_name: {{ vm['user_name'] }}
                           role: {{ vm['role'] }}
                           assign_public_ip: {{ vm['assign_public_ip'] }}
                       {% endfor %}
@@ -108,10 +108,10 @@ topology_template:
                       credentials: { get_attribute: [ topology, credentials ] }
                       instances:
                       {% for vm in vms %}
-                        {{ vm[ 'name' ] }}:
-                          disk_size: {{ vm[ 'disk_size' ] }}
-                          mem_size: {{ vm[ 'mem_size' ] }}
-                          num_cores: {{ vm[ 'num_cores' ] }}
+                        {{ vm['name'] }}:
+                          disk_size: {{ vm['disk_size'] }}
+                          mem_size: {{ vm['mem_size'] }}
+                          num_cores: {{ vm['num_cores'] }}
                       {% endfor %}
               repository: https://github.com/QCDIS/ec2_playbooks.git
           select_image:
@@ -126,10 +126,10 @@ topology_template:
                     localhost:
                       ansible_connection: local
                       instances:
-                      { % for vm in vms % }
-                        { { vm[ 'name' ] } }:
-                          os_distro: { get_property: [ { { vm[ 'name' ] } }, os_distro ] }
-                          os_version: { get_property: [ { { vm[ 'name' ] } }, os_version ] }
+                      {% for vm in vms %}
+                        {{ vm['name'] }}:
+                          os_distro: { get_property: [ {{ vm['name'] }}, os_distro ] }
+                          os_version: { get_property: [ {{ vm['name'] }}, os_version ] }
                       {% endfor %}
           create_ssh_key:
             implementation: key/create_keys.yaml
@@ -142,10 +142,10 @@ topology_template:
                     localhost:
                       ansible_connection: local
                       instances:
-                      { % for vm in vms % }
-                        { { vm[ 'name' ] } }:
-                          os_distro: { get_property: [ { { vm[ 'name' ] } }, os_distro ] }
-                          os_version: { get_property: [ { { vm[ 'name' ] } }, os_version ] }
+                      {% for vm in vms %}
+                        {{ vm['name'] }}:
+                          os_distro: { get_property: [ {{ vm['name'] }}, os_distro ] }
+                          os_version: { get_property: [ {{ vm['name'] }}, os_version ] }
                       {% endfor %}
               repository: https://github.com/QCDIS/ec2_playbooks.git
           delete_ssh_key:
@@ -153,9 +153,9 @@ topology_template:
             inputs:
               extra_variables:
                 region: {{ topology['domain'] }}
-                { % for vm in vms % }
-                { % if vm[ 'role' ] == 'master' % }
-                random_name: { get_attribute: [ vm[ 'name' ], random_name ] }
+                {% for vm in vms %}
+                {% if vm['role'] == 'master' %}
+                random_name: { get_attribute: [ vm['name'], random_name ] }
                 {% endif %}
                 {% endfor %}
               inventory:
@@ -169,21 +169,21 @@ topology_template:
             inputs:
               extra_variables:
                 region: {{ topology['domain'] }}
-                { % for vm in vms % }
-                { % if vm[ 'role' ] == 'master' % }
-                random_name: { get_attribute: [ vm[ 'name' ], random_name ] }
-                { % endif % }
-                { % endfor % }
+                {% for vm in vms %}
+                {% if vm['role'] == 'master' %}
+                random_name: { get_attribute: [ vm['name'], random_name ] }
+                {% endif %}
+                {% endfor %}
               inventory:
                 all:
                   hosts:
                     localhost:
                       ansible_connection: local
                       instances:
-                        { % for vm in vms % }
+                        {% for vm in vms %}
                           {{ vm['name'] }}:
                           id: { get_attribute: [ vm['name'], id ] }
-                        { % endfor % }
+                        {% endfor %}
               repository: https://github.com/QCDIS/ec2_playbooks.git
           install_requirements:
             implementation: install_requirements.yaml
@@ -215,9 +215,9 @@ topology_template:
                     localhost:
                       ansible_connection: local
                       instances:
-                      { % for vm in vms % }
+                      {% for vm in vms %}
                         {{ vm['name'] }}:
-                          user_name : {{ vm[ 'user_name' ] }}
+                          user_name : {{ vm['user_name'] }}
                       {% endfor %}
           set_attributes:
             implementation: set_attributes.yaml
@@ -230,11 +230,11 @@ topology_template:
               repository: https://github.com/QCDIS/ec2_playbooks.git
     nfs:
       properties:
-      { % for vm in vms % }
-        { % if vm[ 'role' ] == 'master' % }
+      {% for vm in vms %}
+        {% if vm['role'] == 'master' %}
         credential: { get_attribute: [ vm['name'],user_key_pair ] }
-        { % endif % }
-      { % endfor % }
+        {% endif %}
+      {% endfor %}
       requirements:
         - host:
             capability: "tosca.capabilities.QC.VM.topology"
@@ -252,14 +252,14 @@ topology_template:
                   children:
                     nfs-server:
                       hosts:
-                      { % for vm in vms % }
-                      { % if vm[ 'role' ] == 'master' % }
+                      {% for vm in vms %}
+                      {% if vm['role'] == 'master' %}
                         hlf0:
-                          ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                          ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_user:  {{ vm[ 'user_name' ] }}
-                      { % endif % }
-                      { % endfor % }
+                          ansible_ssh_user:  {{ vm['user_name'] }}
+                      {% endif %}
+                      {% endfor %}
               repository: "https://github.com/QCDIS/nfs_playbooks.git"
           requirements:
             implementation: "install_requirements.yaml"
@@ -278,14 +278,14 @@ topology_template:
                   children:
                     nfs-server:
                       hosts:
-                      { % for vm in vms % }
-                      { % if vm[ 'role' ] == 'master' % }
+                      {% for vm in vms %}
+                      {% if vm['role'] == 'master' %}
                         hlf0:
-                          ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                          ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                           ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_user:  {{ vm[ 'user_name' ] }}
-                      { % endif % }
-                      { % endfor % }
+                          ansible_ssh_user:  {{ vm['user_name'] }}
+                      {% endif %}
+                      {% endfor %}
               repository: "https://github.com/QCDIS/nfs_playbooks.git"
       type: "tosca.nodes.QC.Application.NFS"
     kubernetes:
@@ -296,11 +296,11 @@ topology_template:
             node: "topology"
             relationship: "tosca.relationships.HostedOn"
       properties:
-      { % for vm in vms % }
-        { % if vm[ 'role' ] == 'master' % }
+      {% for vm in vms %}
+        {% if vm['role'] == 'master' %}
             credential: { get_attribute: [ vm['name'],user_key_pair ] }
-        { % endif % }
-      { % endfor % }
+        {% endif %}
+      {% endfor %}
       interfaces:
         Kubernetes:
           install_requirements:
@@ -310,19 +310,19 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
+                      ansible_ssh_user:  {{ vm['user_name'] }}
                   {% else %}
                     worker:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user: {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
           install_k8s:
             implementation: install_k8s.yaml
             inputs:
@@ -330,19 +330,19 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
+                      ansible_ssh_user:  {{ vm['user_name'] }}
                   {% else %}
                     worker:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user: {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
           set_master:
             implementation: set_master_k8s_cluster.yaml
             inputs:
@@ -350,14 +350,14 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user:  {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
           join_k8s_cluster:
             implementation: join_k8s_cluster.yaml
             inputs:
@@ -365,19 +365,19 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
+                      ansible_ssh_user:  {{ vm['user_name'] }}
                   {% else %}
                     worker:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user: {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
           create_k8s_dashboard:
             implementation: create_k8s_dashboard.yaml
             inputs:
@@ -385,14 +385,14 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user:  {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
           create_k8s_metrics_server:
             implementation: create_k8s_metrics_server.yaml
             inputs:
@@ -400,14 +400,14 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user:  {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
           scale:
           autoscale:
           info:
@@ -418,14 +418,14 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user:  {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
           create_persistent_volume:
             implementation: create_persistent_volume.yaml
             inputs:
@@ -436,19 +436,19 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
+                      ansible_ssh_user:  {{ vm['user_name'] }}
                   {% else %}
                     worker:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user: {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
           reset_k8s_cluster:
             implementation: create_persistent_volume.yaml
             inputs:
@@ -459,19 +459,19 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
+                      ansible_ssh_user:  {{ vm['user_name'] }}
                   {% else %}
                     worker:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user: {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
     ingress:
       interfaces:
         Helm:
@@ -515,26 +515,26 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
+                      ansible_ssh_user:  {{ vm['user_name'] }}
                   {% else %}
                     worker:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user: {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user: {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
               repository: https://github.com/QCDIS/helm_playbooks.git
       properties:
-      { % for vm in vms % }
-        { % if vm[ 'role' ] == 'master' % }
+      {% for vm in vms %}
+        {% if vm['role'] == 'master' %}
         credential: { get_attribute: [ vm['name'],user_key_pair ] }
-        { % endif % }
-      { % endfor % }
+        {% endif %}
+      {% endfor %}
       requirements:
         - kubernetes:
             capability: tosca.capabilities.QC.Kubernetes
@@ -555,11 +555,11 @@ topology_template:
                 repo_url: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
                 values:
                   nfs:
-                    { % for vm in vms % }
-                      { % if vm[ 'role' ] == 'master' % }
-                    server:  { get_attribute: [ { { vm[ 'name' ] } },public_ip ] }
-                      { % endif % }
-                      { % endfor % }
+                    {% for vm in vms %}
+                      {% if vm['role'] == 'master' %}
+                    server:  { get_attribute: [ {{ vm['name'] }},public_ip ] }
+                      {% endif %}
+                      {% endfor %}
                     path: /data/nfs-data
                     storageClass:
                       name: nfs
@@ -567,14 +567,14 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user:  {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
               repository: https://github.com/QCDIS/helm_playbooks.git
           install_requirements:
             implementation: install_requirements.yaml
@@ -582,21 +582,21 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user:  {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
               repository: https://github.com/QCDIS/helm_playbooks.git
       properties:
-      { % for vm in vms % }
-        { % if vm[ 'role' ] == 'master' % }
+      {% for vm in vms %}
+        {% if vm['role'] == 'master' %}
         credential: { get_attribute: [ vm['name'],user_key_pair ] }
-        { % endif % }
-      { % endfor % }
+        {% endif %}
+      {% endfor %}
       requirements:
         - kubernetes:
             capability: tosca.capabilities.QC.Kubernetes
@@ -711,14 +711,14 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user:  {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
               repository: https://github.com/QCDIS/helm_playbooks.git
           install_requirements:
             implementation: install_requirements.yaml
@@ -726,21 +726,21 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user:  {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
               repository: https://github.com/QCDIS/helm_playbooks.git
       properties:
-      { % for vm in vms % }
-        { % if vm[ 'role' ] == 'master' % }
+      {% for vm in vms %}
+        {% if vm['role'] == 'master' %}
         credential: { get_attribute: [ vm['name'],user_key_pair ] }
-        { % endif % }
-      { % endfor % }
+        {% endif %}
+      {% endfor %}
       requirements:
         - kubernetes:
             capability: tosca.capabilities.QC.Kubernetes
@@ -822,21 +822,21 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user:  {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
               repository: https://github.com/QCDIS/helm_playbooks.git
       properties:
-      { % for vm in vms % }
-        { % if vm[ 'role' ] == 'master' % }
+      {% for vm in vms %}
+        {% if vm['role'] == 'master' %}
         credential: { get_attribute: [ vm['name'],user_key_pair ] }
-        { % endif % }
-      { % endfor % }
+        {% endif %}
+      {% endfor %}
       requirements:
         - kubernetes:
             capability: tosca.capabilities.QC.Kubernetes
@@ -892,21 +892,21 @@ topology_template:
               inventory:
                 all:
                   hosts:
-                  { % for vm in vms % }
-                  { % if vm[ 'role' ] == 'master' % }
+                  {% for vm in vms %}
+                  {% if vm['role'] == 'master' %}
                     master:
-                      ansible_host: { get_attribute: [ {{ vm[ 'name' ] }},public_ip ] }
+                      ansible_host: { get_attribute: [ {{ vm['name'] }},public_ip ] }
                       ansible_python_interpreter: /usr/bin/python3
-                      ansible_ssh_user:  {{ vm[ 'user_name' ] }}
-                  { % endif % }
-                  { % endfor % }
+                      ansible_ssh_user:  {{ vm['user_name'] }}
+                  {% endif %}
+                  {% endfor %}
               repository: https://github.com/QCDIS/helm_playbooks.git
       properties:
-      { % for vm in vms % }
-        { % if vm[ 'role' ] == 'master' % }
+      {% for vm in vms %}
+        {% if vm['role'] == 'master' %}
         credential: { get_attribute: [ vm['name'],user_key_pair ] }
-        { % endif % }
-      { % endfor % }
+        {% endif %}
+      {% endfor %}
       requirements:
         - kubernetes:
             capability: tosca.capabilities.QC.Kubernetes
