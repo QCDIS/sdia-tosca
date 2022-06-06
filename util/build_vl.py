@@ -1,10 +1,11 @@
+import glob
 import os
 from configparser import ConfigParser
 from pathlib import Path
 from jinja2 import Environment, PackageLoader, FileSystemLoader
 
 
-def build(config_dict=None,vl_file_path=None):
+def build(config_dict=None, vl_file_path=None):
     template_env = Environment(
         loader=FileSystemLoader('../templates'),
         trim_blocks=True,
@@ -25,9 +26,15 @@ def as_dict(conf=None):
 
 
 if __name__ == '__main__':
-    input_conf_file = os.path.join(str(Path.home()), 'Downloads', 'vl-conf.ini')
-    vl_file_path = os.path.join(str(Path.home()), 'Downloads', 'vl.yaml')
-    config = ConfigParser()
-    config.read(input_conf_file)
-    config_dict = as_dict(config)
-    build(config_dict,vl_file_path=vl_file_path)
+    vls_path = os.path.join(str(Path.home()), 'Downloads', 'envri-community-international-summer-school-2022', 'VLs')
+    vls_conf_path = os.path.join(vls_path, 'conf')
+    conf_files = glob.glob(vls_conf_path + '/*.ini')
+    for conf_file in conf_files:
+        vl_name = os.path.basename(conf_file).replace('ini','yaml').replace('-conf-','-')
+        vl_file_path = os.path.join(vls_path,'helm', vl_name)
+        # config = ConfigParser()
+        # config.read(conf_file)
+        # config_dict = as_dict(config)
+        # build(config_dict, vl_file_path=vl_file_path)
+        vl_name = vl_name.replace('.yaml', '')
+        print('kubectl create ns '+vl_name+' && helm install '+vl_name+' jupyterhub/jupyterhub -f '+vl_name+'.yaml -n '+vl_name)
