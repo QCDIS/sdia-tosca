@@ -12,7 +12,8 @@ def build(config_dict=None, vl_file_path=None):
         lstrip_blocks=True)
     template_vl = template_env.get_template('vl.jinja2')
     print(config_dict['vl']['base_url'])
-    template_vl.stream(vl=config_dict['vl'], auth=config_dict['auth']) \
+    template_vl.stream(vl=config_dict['vl'], auth=config_dict['auth'], minio=config_dict['minio'],
+                       github=config_dict['github'], registry=config_dict['registry']) \
         .dump(vl_file_path)
 
 
@@ -30,11 +31,12 @@ if __name__ == '__main__':
     vls_conf_path = os.path.join(vls_path, 'conf')
     conf_files = glob.glob(vls_conf_path + '/*.ini')
     for conf_file in conf_files:
-        vl_name = os.path.basename(conf_file).replace('ini','yaml').replace('-conf-','-')
-        vl_file_path = os.path.join(vls_path,'helm', vl_name)
-        # config = ConfigParser()
-        # config.read(conf_file)
-        # config_dict = as_dict(config)
-        # build(config_dict, vl_file_path=vl_file_path)
+        vl_name = os.path.basename(conf_file).replace('ini', 'yaml').replace('-conf-', '-')
+        vl_file_path = os.path.join(vls_path, 'helm', vl_name)
+        config = ConfigParser()
+        config.read(conf_file)
+        config_dict = as_dict(config)
+        build(config_dict, vl_file_path=vl_file_path)
         vl_name = vl_name.replace('.yaml', '')
-        print('kubectl create ns '+vl_name+' && helm install '+vl_name+' jupyterhub/jupyterhub -f '+vl_name+'.yaml -n '+vl_name)
+        print(
+            'kubectl create ns ' + vl_name + ' && helm install ' + vl_name + ' jupyterhub/jupyterhub -f ' + vl_name + '.yaml -n ' + vl_name)
