@@ -79,22 +79,22 @@
                   singleuser:
                     storage:
                         capacity: 0.5Gi
+                        extraVolumes:
+                          - name: jupyterhub-shared-{{vl['name']}}
+                            persistentVolumeClaim:
+                              claimName: shared-volume-{{vl['name']}}
+                        extraVolumeMounts:
+                          - name: jupyterhub-shared-{{vl['name']}}
+                            mountPath: /home/shared
                     lifecycleHooks:
                       postStart:
                         exec:
-                          command:
-                            - "sh"
-                            - "-c"
-                            - >
-                              mkdir -p /home/jovyan/examples && \
+                          command: ["sh", "-c", "mkdir -p /home/jovyan/examples && \
                               cp -r /tmp/notebooks/ /home/jovyan/examples/ && \
                               mv /home/jovyan/examples/notebooks/conf_vl_repos.py /home/jovyan/examples/ && \
                               mv /home/jovyan/examples/notebooks/README.md /home/jovyan/examples/ && \
                               python /home/jovyan/examples/conf_vl_repos.py --force=False --github_url={{github['url']}} --github_token={{github['token']}} --registry_url={{registry['url']}} && \
-                              echo "{{minio['key_id']}}:{{minio['key']}}" > /home/jovyan/.passwd-s3fs && \
-                              chmod 600 /home/jovyan/.passwd-s3fs && \
-                              mkdir /mnt/{{minio['key_id']}} && \
-                              s3fs {{minio['key_id']}} /mnt/{{minio['key_id']}} -o passwd_file=/home/jovyan/.passwd-s3fs,use_path_request_style,url=https://{{ vl['fqdn'] }}:{{vl['ingress_ssl_port']}},dbglevel='debug'
+                              ln -s /home/shared /home/jovyan/shared"]
                     defaultUrl: "/lab"
                     extraEnv:
                       JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
