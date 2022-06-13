@@ -100,7 +100,7 @@
                               mv /home/jovyan/examples/notebooks/conf_vl_repos.py /home/jovyan/examples/ && \
                               mv /home/jovyan/examples/notebooks/README.md /home/jovyan/examples/ && \
                               python /home/jovyan/examples/conf_vl_repos.py --force=False --github_url={{github['url']}} --github_token={{github['token']}} --registry_url={{registry['url']}} && \
-                              ( [ -e "/home/jovyan/shared" ] || ln -s /home/shared /home/jovyan/shared )
+                              ( [ -e /home/jovyan/shared ] || ln -s /home/shared /home/jovyan/shared )"]
                     defaultUrl: "/lab"
                     extraEnv:
                       JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
