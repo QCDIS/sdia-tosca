@@ -55,7 +55,7 @@ topology_template:
       interfaces:
         Openstack:
           create:
-            implementation: openstack/server/create_vm.yaml
+            implementation: server/create_vm.yaml
             inputs:
               inventory:
                 all:

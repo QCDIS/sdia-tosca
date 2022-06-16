@@ -127,7 +127,7 @@ topology_template:
       interfaces:
         Openstack:
           create:
-            implementation: openstack/server/create_vm.yaml
+            implementation: server/create_vm.yaml
             inputs:
               inventory:
                 all:
@@ -139,7 +139,7 @@ topology_template:
                       identity_provider: { get_property: [ topology, identity_provider ]}
               repository: https://github.com/QCDIS/openstack_playbooks.git
           create_access_token:
-            implementation: openstack/authentication/create_access_token.yaml
+            implementation: authentication/create_access_token.yaml
             inputs:
               inventory:
                 all:
@@ -149,7 +149,7 @@ topology_template:
                       credentials: { get_attribute: [ topology, credentials ] }
               repository: https://github.com/QCDIS/openstack_playbooks.git
           create_ssh_key:
-            implementation: openstack/key/create_keys.yaml
+            implementation: key/create_keys.yaml
             inputs:
               inventory:
                 all:
@@ -166,7 +166,7 @@ topology_template:
                           os_distro : { get_property: [ compute, os_distro ]}
               repository: https://github.com/QCDIS/openstack_playbooks.git
           delete_ssh_key:
-            implementation: openstack/key/delete_keys.yaml
+            implementation: key/delete_keys.yaml
             inputs:
               inventory:
                 all:
@@ -178,7 +178,7 @@ topology_template:
                       identity_provider: { get_property: [ topology, identity_provider ] }
               repository: https://github.com/QCDIS/openstack_playbooks.git
           install_requirements:
-            implementation: openstack/install_requirements.yaml
+            implementation: install_requirements.yaml
             inputs:
               inventory:
                 all:
@@ -187,7 +187,7 @@ topology_template:
                       ansible_connection: local
               repository: https://github.com/QCDIS/openstack_playbooks.git
           select_image:
-            implementation: openstack/info/get_images.yaml
+            implementation: info/get_images.yaml
             inputs:
               inventory:
                 all:
@@ -206,7 +206,7 @@ topology_template:
                           os_version: { get_property: [ compute_1, os_version ] }
               repository: https://github.com/QCDIS/openstack_playbooks.git
           select_instance_type:
-            implementation: openstack/info/get_inst_flavors.yaml
+            implementation: info/get_inst_flavors.yaml
             inputs:
               inventory:
                 all:
@@ -227,7 +227,7 @@ topology_template:
                           num_cores: { get_property: [ compute, num_cores ] }
               repository: https://github.com/QCDIS/openstack_playbooks.git
           select_network:
-            implementation: openstack/info/get_networks.yaml
+            implementation: info/get_networks.yaml
             inputs:
               inventory:
                 all:
@@ -244,7 +244,7 @@ topology_template:
                           os_distro : { get_property: [ compute, os_distro ]}
               repository: https://github.com/QCDIS/openstack_playbooks.git
           set_attributes:
-            implementation: openstack/concat_attributes.yaml
+            implementation: concat_attributes.yaml
             inputs:
               inventory:
                 all:
