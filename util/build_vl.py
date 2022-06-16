@@ -5,7 +5,7 @@ from pathlib import Path
 from jinja2 import Environment, PackageLoader, FileSystemLoader
 
 
-def build(config_dict=None, vl_file_path=None):
+def build_VL(config_dict=None, vl_file_path=None):
     template_env = Environment(
         loader=FileSystemLoader('../templates'),
         trim_blocks=True,
@@ -35,7 +35,7 @@ if __name__ == '__main__':
         config = ConfigParser()
         config.read(conf_file)
         config_dict = as_dict(config)
-        build(config_dict, vl_file_path=vl_file_path)
+        build_VL(config_dict, vl_file_path=vl_file_path)
         vl_name = vl_name.replace('.yaml', '')
         print(
             'kubectl create ns ' + vl_name + ' ; helm install shared-volume-'+vl_name.replace('vl-','')+' k8s-as-helm/pvc -n '+vl_name+' -f ../pvc/vl-pvc.yaml -n '+ vl_name + ' ; helm install ' + vl_name + ' jupyterhub/jupyterhub -f ' + vl_name + '.yaml -n ' + vl_name)
