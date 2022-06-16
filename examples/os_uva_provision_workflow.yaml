@@ -109,11 +109,10 @@ topology_template:
       type: tosca.nodes.QC.docker.Orchestrator.Kubernetes
     topology:
       properties:
-        domain: INFN
-        provider: EGI
-        auth_url: https://stack-server.ct.infn.it:35357/v3
-        project_id: 745695ccd17042fabf96d2410a4278d9
-        identity_provider: egi.eu
+        domain: RegionOne
+        provider: OpenStack
+        auth_url: https://controller.cloud3.uvalight.net:5000/v3/
+        project_id: 8ce53a6b695b4f8cb40b7183005c7801
       requirements:
       - vm:
           capability: tosca.capabilities.QC.VM
@@ -252,9 +251,17 @@ topology_template:
                     localhost:
                       ansible_connection: local
               repository: https://github.com/QCDIS/playbooks.git
+
+
   workflows:
     provision:
       description: Workflow to deploy the topology
+      preconditions:
+        - target: topology
+          condition:
+            - assert:
+              - desired_state: [{equal: RUNNING }]
+              - current_state: [{equal: UNDEFINED }]
       steps:
         create_access_token:
           activities:
