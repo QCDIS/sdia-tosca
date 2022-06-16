@@ -36,77 +36,6 @@ topology_template:
         os_version: 18.04
         user_name: vm_user
       type: tosca.nodes.QC.VM.Compute
-    kubernetes:
-      interfaces:
-        Standard:
-          configure:
-            implementation: k8s/create_k8s_dashboard.yaml
-            inputs:
-              inventory:
-                all:
-                  children:
-                    master:
-                      hosts:
-                        compute:
-                          ansible_host:  { get_attribute: [  compute,public_ip] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                          ansible_ssh_user: { get_property: [compute,user_name] }
-                    workers:
-                      hosts:
-                        compute_1:
-                          ansible_host: { get_attribute:[ compute_1, public_ip ] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                          ansible_ssh_user: { get_property: [compute_1, user_name] }
-              repository: https://github.com/QCDIS/playbooks.git
-          create:
-            implementation: k8s/install_k8s.yaml
-            inputs:
-              inventory:
-                all:
-                  children:
-                    master:
-                      hosts:
-                        compute:
-                          ansible_host:  { get_attribute: [  compute, public_ip] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                          ansible_ssh_user: { get_property: [compute, user_name] }
-                    workers:
-                      hosts:
-                        compute_1:
-                          ansible_host:  { get_attribute: [  compute_1, public_ip ] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                          ansible_ssh_user: { get_property: [ compute_1, user_name ] }
-              repository: https://github.com/QCDIS/playbooks.git
-          delete:
-            implementation: k8s/k8s_delete.yaml
-            inputs:
-              inventory:
-                all:
-                  children:
-                    master:
-                      hosts:
-                        compute:
-                          ansible_host:  { get_attribute: [  compute, public_ip ] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-                          ansible_ssh_user: { get_property: [ compute,user_name ] }
-                    workers:
-                      hosts:
-                        compute_1:
-                          ansible_ssh_user: { get_property: [ compute_1, user_name ] }
-                          ansible_python_interpreter: /usr/bin/python3
-                          ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-              repository: https://github.com/QCDIS/playbooks.git
-      requirements:
-      - host:
-          capability: tosca.capabilities.QC.VM.topology
-          node: topology
-          relationship: tosca.relationships.HostedOn
-      type: tosca.nodes.QC.docker.Orchestrator.Kubernetes
     topology:
       properties:
         domain: RegionOne
@@ -136,9 +65,9 @@ topology_template:
                       auth_url: { get_property: [ topology, auth_url ]}
                       project_id: { get_property: [ topology, project_id ]}
                       identity_provider: { get_property: [ topology, identity_provider ]}
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           create_access_token:
-            implementation: openstack/authentication/create_access_token.yaml
+            implementation: authentication/create_access_token.yaml
             inputs:
               inventory:
                 all:
@@ -146,9 +75,9 @@ topology_template:
                     localhost:
                       ansible_connection: local
                       credentials: { get_attribute: [ topology, credentials ] }
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           create_ssh_key:
-            implementation: openstack/key/create_keys.yaml
+            implementation: key/create_keys.yaml
             inputs:
               inventory:
                 all:
@@ -163,9 +92,9 @@ topology_template:
                           os_distro : { get_property: [ compute, os_distro ]}
                         compute_1:
                           os_distro : { get_property: [ compute, os_distro ]}
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           delete_ssh_key:
-            implementation: openstack/key/delete_keys.yaml
+            implementation: key/delete_keys.yaml
             inputs:
               inventory:
                 all:
@@ -175,18 +104,18 @@ topology_template:
                       auth_url: { get_property: [ topology, auth_url ] }
                       project_id: { get_property: [ topology, project_id ] }
                       identity_provider: { get_property: [ topology, identity_provider ] }
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           install_requirements:
-            implementation: openstack/install_requirements.yaml
+            implementation: install_requirements.yaml
             inputs:
               inventory:
                 all:
                   hosts:
                     localhost:
                       ansible_connection: local
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           select_image:
-            implementation: openstack/info/get_images.yaml
+            implementation: info/get_images.yaml
             inputs:
               inventory:
                 all:
@@ -203,9 +132,9 @@ topology_template:
                         compute_1:
                           os_distro: { get_property: [ compute_1, os_distro ] }
                           os_version: { get_property: [ compute_1, os_version ] }
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           select_instance_type:
-            implementation: openstack/info/get_inst_flavors.yaml
+            implementation: info/get_inst_flavors.yaml
             inputs:
               inventory:
                 all:
@@ -224,9 +153,9 @@ topology_template:
                           disk_size: { get_property: [ compute_1, disk_size ] }
                           mem_size: { get_property: [ compute_1, mem_size ] }
                           num_cores: { get_property: [ compute, num_cores ] }
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           select_network:
-            implementation: openstack/info/get_networks.yaml
+            implementation: info/get_networks.yaml
             inputs:
               inventory:
                 all:
@@ -241,16 +170,16 @@ topology_template:
                           os_distro : { get_property: [ compute, os_distro ]}
                         compute_1:
                           os_distro : { get_property: [ compute, os_distro ]}
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           set_attributes:
-            implementation: openstack/concat_attributes.yaml
+            implementation: concat_attributes.yaml
             inputs:
               inventory:
                 all:
                   hosts:
                     localhost:
                       ansible_connection: local
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
 
 
   workflows:

@@ -59,7 +59,7 @@ topology_template:
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [compute_1, user_name] }
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           create:
             implementation: k8s/install_k8s.yaml
             inputs:
@@ -80,7 +80,7 @@ topology_template:
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
                           ansible_ssh_user: { get_property: [ compute_1, user_name ] }
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           delete:
             implementation: k8s/k8s_delete.yaml
             inputs:
@@ -100,7 +100,7 @@ topology_template:
                           ansible_ssh_user: { get_property: [ compute_1, user_name ] }
                           ansible_python_interpreter: /usr/bin/python3
                           ansible_ssh_common_args: '"-o StrictHostKeyChecking=no"'
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
       requirements:
       - host:
           capability: tosca.capabilities.QC.VM.topology
@@ -137,7 +137,7 @@ topology_template:
                       auth_url: { get_property: [ topology, auth_url ]}
                       project_id: { get_property: [ topology, project_id ]}
                       identity_provider: { get_property: [ topology, identity_provider ]}
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           create_access_token:
             implementation: openstack/authentication/create_access_token.yaml
             inputs:
@@ -147,7 +147,7 @@ topology_template:
                     localhost:
                       ansible_connection: local
                       credentials: { get_attribute: [ topology, credentials ] }
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           create_ssh_key:
             implementation: openstack/key/create_keys.yaml
             inputs:
@@ -164,7 +164,7 @@ topology_template:
                           os_distro : { get_property: [ compute, os_distro ]}
                         compute_1:
                           os_distro : { get_property: [ compute, os_distro ]}
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           delete_ssh_key:
             implementation: openstack/key/delete_keys.yaml
             inputs:
@@ -176,7 +176,7 @@ topology_template:
                       auth_url: { get_property: [ topology, auth_url ] }
                       project_id: { get_property: [ topology, project_id ] }
                       identity_provider: { get_property: [ topology, identity_provider ] }
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           install_requirements:
             implementation: openstack/install_requirements.yaml
             inputs:
@@ -185,7 +185,7 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           select_image:
             implementation: openstack/info/get_images.yaml
             inputs:
@@ -204,7 +204,7 @@ topology_template:
                         compute_1:
                           os_distro: { get_property: [ compute_1, os_distro ] }
                           os_version: { get_property: [ compute_1, os_version ] }
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           select_instance_type:
             implementation: openstack/info/get_inst_flavors.yaml
             inputs:
@@ -225,7 +225,7 @@ topology_template:
                           disk_size: { get_property: [ compute_1, disk_size ] }
                           mem_size: { get_property: [ compute_1, mem_size ] }
                           num_cores: { get_property: [ compute, num_cores ] }
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           select_network:
             implementation: openstack/info/get_networks.yaml
             inputs:
@@ -242,7 +242,7 @@ topology_template:
                           os_distro : { get_property: [ compute, os_distro ]}
                         compute_1:
                           os_distro : { get_property: [ compute, os_distro ]}
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
           set_attributes:
             implementation: openstack/concat_attributes.yaml
             inputs:
@@ -251,9 +251,15 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-              repository: https://github.com/QCDIS/playbooks.git
+              repository: https://github.com/QCDIS/openstack_playbooks.git
   workflows:
     provision:
+      preconditions:
+        - target: topology
+          condition:
+            - assert:
+              - desired_state: [{equal: RUNNING }]
+              - current_state: [{equal: UNDEFINED }]
       description: Workflow to deploy the topology
       steps:
         create_access_token:
