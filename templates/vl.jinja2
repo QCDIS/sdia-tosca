@@ -5,7 +5,7 @@
                         args:
                           - clone
                           - --single-branch
-                          - --branch=ess-22
+                          - --branch={{vl['git_login_template']}}
                           - --depth=1
                           - --
                           - https://github.com/QCDIS/k8s-jhub.git
@@ -100,11 +100,12 @@
                               mv /home/jovyan/examples/notebooks/conf_vl_repos.py /home/jovyan/examples/ && \
                               mv /home/jovyan/examples/notebooks/README.md /home/jovyan/examples/ && \
                               python /home/jovyan/examples/conf_vl_repos.py --force=False --github_url={{github['url']}} --github_token={{github['token']}} --registry_url={{registry['url']}} && \
-                              ( [ -e /home/jovyan/shared ] || ln -s /home/shared /home/jovyan/shared )"]
+                              ( [ -e /home/jovyan/shared ] || ln -s /home/shared /home/jovyan/shared ) && \
+                              export WORKFLOW_ENG_ACCESS_TOKEN={{workflow_engine['access_token']}}"]
                     defaultUrl: "/lab"
                     extraEnv:
                       JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
                     image:
-                      name: qcdis/n-a-a-vre
-                      tag: v0.1.3-beta
+                      name: {{vl['image_name']}}
+                      tag: {{vl['image_tag']}}
                       pullPolicy: Always

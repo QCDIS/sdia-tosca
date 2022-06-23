@@ -162,9 +162,7 @@ topology_template:
                   hosts:
                     localhost:
                       ansible_connection: local
-                      auth_url: { get_property: [ topology, auth_url ] }
-                      project_id: { get_property: [ topology, project_id ] }
-                      identity_provider: { get_property: [ topology, identity_provider ] }
+                      credentials: { get_attribute: [ topology, credentials ] }
                       instances:
                         compute:
                           os_distro : { get_property: [ compute, os_distro ]}
