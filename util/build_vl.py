@@ -13,7 +13,8 @@ def build_VL(config_dict=None, vl_file_path=None):
     template_vl = template_env.get_template('vl.jinja2')
     template_vl.stream(vl=config_dict['vl'], auth=config_dict['auth'],
                        github=config_dict['github'], registry=config_dict['registry'],
-                       workflow_engine=config_dict['workflow_engine']) \
+                       workflow_engine=config_dict['workflow_engine'],
+                       vre=config_dict['vre']) \
         .dump(vl_file_path)
 
 
