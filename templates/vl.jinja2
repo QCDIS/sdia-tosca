@@ -103,7 +103,7 @@
                               ( [ -e /home/jovyan/shared ] || ln -s /home/shared /home/jovyan/shared ) && \
                               export WORKFLOW_ENG_ACCESS_TOKEN={{workflow_engine['access_token']}} && \
                               export VL_NAME={{vl['name']}} && \
-                              export VL_NAME={{vre['api_endpoint']}}"]
+                              export API_ENDPOINT={{vre['api_endpoint']}}"]
                     defaultUrl: "/lab"
                     extraEnv:
                       JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
