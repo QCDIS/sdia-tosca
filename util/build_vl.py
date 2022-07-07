@@ -39,8 +39,8 @@ if __name__ == '__main__':
         config_dict = as_dict(config)
         build_VL(config_dict, vl_file_path=vl_file_path)
         vl_name = vl_name.replace('.yaml', '')
-        print(
-            'kubectl create ns ' + vl_name + ' ; helm install shared-volume-' + vl_name.replace('vl-',
-                                                                                                '') + ' k8s-as-helm/pvc -n ' + vl_name + ' -f ../pvc/vl-pvc.yaml -n ' + vl_name + ' ; helm install ' + vl_name + ' jupyterhub/jupyterhub -f ' + vl_name + '.yaml -n ' + vl_name)
         # print(
-        #     'helm delete ' + vl_name+' -n ' + vl_name)
+        #     'kubectl create ns ' + vl_name + ' ; helm install shared-volume-' + vl_name.replace('vl-',
+        #                                                                                         '') + ' k8s-as-helm/pvc -n ' + vl_name + ' -f ../pvc/vl-pvc.yaml -n ' + vl_name + ' ; helm install ' + vl_name + ' jupyterhub/jupyterhub -f ' + vl_name + '.yaml -n ' + vl_name)
+        print(
+            'helm delete ' + vl_name+' -n ' + vl_name)
