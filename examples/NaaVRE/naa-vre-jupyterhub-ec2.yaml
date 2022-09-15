@@ -1007,18 +1007,22 @@ topology_template:
                     enabled: true
                     hostname: lfw-ds001-i022.lifewatch.dev
                     tls: true
-                    selfSigned: true
+                    selfSigned: false
+                    path: /minio-api
                   ingress:
+                    ingressClassName: nginx
+                    enabled: true
                     tls: true
-                    selfSigned: true
+                    selfSigned: true #this triggers the condition to load the secret from lfw-ds001-i022.lifewatch.dev-tls
                     hostname: lfw-ds001-i022.lifewatch.dev
+                    path: /minio
                   persistence:
-                    enabled: false
-                  service:
-                    type: NodePort
-                    nodePorts:
-                      api: 32445
-                      console: 32444
+                    enabled: true
+#                  service:
+#                    type: NodePort
+#                    nodePorts:
+#                      api: 32445
+#                      console: 32444
               inventory:
                 all:
                   hosts:

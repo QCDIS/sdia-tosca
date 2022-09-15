@@ -69,6 +69,8 @@
                       kubernetes.io/ingress.class: "nginx"
                       nginx.ingress.kubernetes.io/add-base-url: "true"
                       kubernetes.io/tls-acme: "true"
+                      nginx.ingress.kubernetes.io/proxy-body-size: "600m"
+                      nginx.org/client-max-body-size: "600m"
                     tls:
                       - hosts:
                         - {{ vl['fqdn'] }}
@@ -78,11 +80,8 @@
                       type: ClusterIP
                   singleuser:
                     memory:
-                        limit: 0.5G
-                        guarantee: 0.3G
-                    cpu:
-                        limit: .5
-                        guarantee: .2
+                        limit: 2G
+                        guarantee: 2G
                     storage:
                         capacity: 0.1Gi
                         extraVolumes:
@@ -91,16 +90,15 @@
                               claimName: shared-volume-{{vl['name']}}
                         extraVolumeMounts:
                           - name: jupyterhub-shared-{{vl['name']}}
-                            mountPath: /home/shared
+                            mountPath: /home/ENVRI-Summer-School
                     lifecycleHooks:
                       postStart:
                         exec:
-                          command: ["sh", "-c", "mkdir -p /home/jovyan/examples && \
-                              cp -r /tmp/notebooks/ /home/jovyan/examples/ && \
-                              mv /home/jovyan/examples/notebooks/conf_vl_repos.py /home/jovyan/examples/ && \
-                              mv /home/jovyan/examples/notebooks/README.md /home/jovyan/examples/ && \
-                              python /home/jovyan/examples/conf_vl_repos.py --force=False --github_url={{github['url']}} --github_token={{github['token']}} --registry_url={{registry['url']}} && \
-                              ( [ -e /home/jovyan/shared ] || ln -s /home/shared /home/jovyan/shared )"]
+                          command: ["sh", "-c", "mkdir -p /home/jovyan/NaaVRE && \
+                              cp -r /tmp/notebooks/conf_vl_repos.py /home/jovyan/NaaVRE/ && \
+                              python /home/jovyan/NaaVRE/conf_vl_repos.py --force=False --github_url={{github['url']}} --github_token={{github['token']}} --registry_url={{registry['url']}} && \
+                              ( [ -e /home/jovyan/ENVRI-Summer-School ] || ln -s /home/ENVRI-Summer-School /home/jovyan/ENVRI-Summer-School )
+                              "]
                     defaultUrl: "/lab"
                     extraEnv:
                       JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
