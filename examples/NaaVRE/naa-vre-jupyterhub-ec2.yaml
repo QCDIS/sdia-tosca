@@ -1008,16 +1008,25 @@ topology_template:
                     hostname: lfw-ds001-i022.lifewatch.dev
                     tls: true
                     selfSigned: false
-                    path: /minio-api
+                    path: /
                   ingress:
+                    annotations:
+                      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+                      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+                      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
                     ingressClassName: nginx
                     enabled: true
                     tls: true
-                    selfSigned: true #this triggers the condition to load the secret from lfw-ds001-i022.lifewatch.dev-tls
+                    selfSigned: false
+                    extraTls:
+                      - hosts:
+                        - lfw-ds001-i022.lifewatch.dev
+                        secretName: lfw-ds001-i022.lifewatch.dev-tls
                     hostname: lfw-ds001-i022.lifewatch.dev
-                    path: /minio
+                    path: /
                   persistence:
                     enabled: true
+                    size: 5Gi
 #                  service:
 #                    type: NodePort
 #                    nodePorts:
