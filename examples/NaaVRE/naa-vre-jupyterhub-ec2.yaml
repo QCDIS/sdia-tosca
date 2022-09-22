@@ -857,7 +857,7 @@ topology_template:
                   externalDatabase:
                     host: keycloak-postgresql
                     user: bn_keycloak
-                    password: "password"
+                    password: password
                     database: bitnami_keycloak
               inventory:
                 all:
@@ -914,15 +914,15 @@ topology_template:
                 repo_name: bitnami
                 repo_url: https://charts.bitnami.com/bitnami
                 values:
-                  primary:
-                    persistence:
-                      existingClaim:  data-keycloak-postgresql-postgresql-0
+                  image:
+                    tag: 14-debian-11
                   global:
                     storageClass: nfs
                     postgresql:
-                      postgresqlDatabase: bitnami_keycloak
-                      postgresqlUsername: bn_keycloak
-                      postgresqlPassword: xxxxxxxxxxxxx
+                      auth:
+                        username: bn_keycloak
+                        password: password
+                        database: bitnami_keycloak
               inventory:
                 all:
                   hosts:
@@ -996,7 +996,7 @@ topology_template:
                       clientSecret:
                         name: argo-sso
                         key: client-secret-key
-                      redirectUrl: https://lfw-ds001-i022.lifewatch.dev:32443/argowf/oauth2/callback
+                      redirectUrl: https://lifewatch.lab.uvalight.net:32443/argowf/oauth2/callback
                       rbac:
                         enabled: false
                       insecureSkipVerify: false
@@ -1013,13 +1013,13 @@ topology_template:
                           sub_filter '<base href="/">' '<base href="/argowf/">';
                           sub_filter_once on;
                       hosts:
-                        - lfw-ds001-i022.lifewatch.dev
+                        - lifewatch.lab.uvalight.net
                       paths:
                         - /argowf(/|$)(.*)
                       tls:
                         - hosts:
-                            - lfw-ds001-i022.lifewatch.dev
-                          secretName: lfw-ds001-i022.lifewatch.dev-tls
+                            - lifewatch.lab.uvalight.net
+                          secretName: lifewatch.lab.uvalight.net-tls
               inventory:
                 all:
                   hosts:
