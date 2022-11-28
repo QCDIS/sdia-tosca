@@ -508,20 +508,35 @@ topology_template:
                 repo_name: owkin
                 repo_url: https://owkin.github.io/charts
                 values:
-#                  service:
-#                    type: NodePort
-                  persistence:
-                    storageClass: nfs
-                  adminUsername: admin
-                  adminPassword: password
-                  caName: org1-ca
+                  caName: lifewatch-ca
                   config:
                     csr:
                       names:
                         c: NL
                         st: North Holland
-                        o: UvA
-                        ou: qcdis
+                        o: LifeWatch
+                        ou: VLIC
+                        l: Amsterdam
+                  ingress:
+                    enabled: true
+                    ingressClassName: "nginx"
+                    annotations:
+                      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+                      nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+                      nginx.ingress.kubernetes.io/rewrite-target: /$2
+                      nginx.ingress.kubernetes.io/add-base-url: "true"
+                      nginx.ingress.kubernetes.io/configuration-snippet: |
+                        proxy_set_header Accept-Encoding "";
+                        sub_filter '<base href="/">' '<base href="/hlf-ca/">';
+                        sub_filter_once on;
+                    hosts:
+                      - lifewatch.lab.uvalight.net
+                    paths:
+                      - /hlf-ca(/|$)(.*)
+                    tls:
+                      - hosts:
+                          - lifewatch.lab.uvalight.net
+                        secretName: lifewatch.lab.uvalight.net-tls
               inventory:
                 all:
                   hosts:
