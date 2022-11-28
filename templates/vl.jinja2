@@ -83,7 +83,7 @@
                         limit: 2G
                         guarantee: 2G
                     storage:
-                        capacity: 0.1Gi
+                        capacity: 0.5Gi
                         extraVolumes:
                           - name: jupyterhub-shared-{{vl['name']}}
                             persistentVolumeClaim:
@@ -97,7 +97,7 @@
                           command: ["sh", "-c", "mkdir -p /home/jovyan/NaaVRE && \
                               cp -r /tmp/notebooks/conf_vl_repos.py /home/jovyan/NaaVRE/ && \
                               python /home/jovyan/NaaVRE/conf_vl_repos.py --force=False --github_url={{github['url']}} --github_token={{github['token']}} --registry_url={{registry['url']}} && \
-                              ( [ -e /home/jovyan/ENVRI-Summer-School ] || ln -s /home/ENVRI-Summer-School /home/jovyan/ENVRI-Summer-School )
+                              gitpuller {{ examples_git['url'] }} {{ examples_git['branch'] }} notebooks
                               "]
                     defaultUrl: "/lab"
                     extraEnv:
