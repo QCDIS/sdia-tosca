@@ -1,11 +1,11 @@
 tosca_definitions_version: "tosca_simple_yaml_1_2"
 description: "TOSCA example"
 imports:
-- nodes: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/nodes.yaml"
-- data: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/data.yml"
-- capabilities: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/capabilities.yaml"
-- policies: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/policies.yaml"
-- interfaces: "https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/interfaces.yml"
+- nodes: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/nodes.yaml"
+- data: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/data.yml"
+- capabilities: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/capabilities.yaml"
+- policies: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/policies.yaml"
+- interfaces: "https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/interfaces.yml"
 topology_template:
 
   node_templates:
