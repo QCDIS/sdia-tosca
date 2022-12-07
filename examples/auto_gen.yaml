@@ -1,9 +1,9 @@
 imports:
-- capabilities: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/capabilities.yaml
-  data: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/data.yml
-  interfaces: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/interfaces.yml
-  nodes: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/nodes.yaml
-  policies: https://raw.githubusercontent.com/qcdis-sdia/sdia-tosca/master/types/policies.yaml
+- capabilities: https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/capabilities.yaml
+  data: https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/data.yml
+  interfaces: https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/interfaces.yml
+  nodes: https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/nodes.yaml
+  policies: https://raw.githubusercontent.com/QCDIS/sdia-tosca/master/types/policies.yaml
 repositories:
   docker_hub: https://hub.docker.com/
 topology_template:
