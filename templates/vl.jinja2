@@ -102,10 +102,9 @@
                       postStart:
                         exec:
                           command: ["sh", "-c", "mkdir -p /home/jovyan/NaaVRE && \
-                              cp -r /tmp/notebooks/conf_vl_repos.py /home/jovyan/NaaVRE/ && \
-                              python /home/jovyan/NaaVRE/conf_vl_repos.py --force=False --github_url={{github['url']}} --github_token={{github['token']}} --registry_url={{registry['url']}} && \
-                              gitpuller {{ examples_git['url'] }} {{ examples_git['branch'] }} notebooks
-                              "]
+                                cp -r /tmp/repo_utils/conf_vl_repos.py /home/jovyan/NaaVRE/ && \
+                                python /home/jovyan/NaaVRE/conf_vl_repos.py --force=True --github_url={{github['url']}} --github_token={{github['token']}} --registry_url={{registry['url']}} &&\
+                                gitpuller {{ examples_git['url'] }} {{ examples_git['branch'] }} example_notebooks"]
                     defaultUrl: "/lab"
                     extraEnv:
                       JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
