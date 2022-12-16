@@ -1,0 +1,48 @@
+                  singleNamespace: true
+                  controller:
+                    containerRuntimeExecutor: emissary
+                    parallelism: 40
+                    resourceRateLimit:
+                      limit: 40
+                      burst: 10
+                  server:
+                    extraArgs:
+                      - --auth-mode=sso
+                      - --auth-mode=client
+                    enabled: true
+                    baseHref: /ess-22-argowf/
+                    serviceType: ClusterIP
+                    #https://github.com/argoproj/argo-workflows/blob/master/docs/argo-server-sso.md
+                    sso:
+                      issuer: https://{{ auth['keycloak_host'] }}:{{auth['keycloak_port']}}/auth/realms/{{ auth['realm_name'] }}
+                      sessionExpiry: 240h
+                      clientId:
+                        name: argo-sso
+                        key: client-id-key
+                      clientSecret:
+                        name: argo-sso
+                        key: client-secret-key
+                      redirectUrl: https://vl['fqdn']:{{vl['ingress_ssl_port']}}/ess-22-argowf/oauth2/callback
+                      rbac:
+                        enabled: false
+                      insecureSkipVerify: false
+                    ingress:
+                      enabled: true
+                      ingressClassName: "nginx"
+                      annotations:
+                        nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+                        nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+                        nginx.ingress.kubernetes.io/rewrite-target: /$2
+                        nginx.ingress.kubernetes.io/add-base-url: "true"
+                        nginx.ingress.kubernetes.io/configuration-snippet: |
+                          proxy_set_header Accept-Encoding "";
+                          sub_filter '<base href="/">' '<base href="/ess-22-argowf/">';
+                          sub_filter_once on;
+                      hosts:
+                        - vl['fqdn']
+                      paths:
+                        - /ess-22-argowf(/|$)(.*)
+                      tls:
+                        - hosts:
+                            - vl['fqdn']
+                          secretName: vl['fqdn']-tls

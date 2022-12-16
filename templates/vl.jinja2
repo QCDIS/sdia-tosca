@@ -1,0 +1,119 @@
+                  hub:
+                    initContainers:
+                      - name: git-clone-templates
+                        image: alpine/git
+                        args:
+                          - clone
+                          - --single-branch
+                          - --branch={{vl['git_login_template']}}
+                          - --depth=1
+                          - --
+                          - https://github.com/QCDIS/k8s-jhub.git
+                          - /etc/jupyterhub/custom
+                        securityContext:
+                          runAsUser: 0
+                        volumeMounts:
+                          - name: hub-templates
+                            mountPath: /etc/jupyterhub/custom
+                      - name: replace-login-path
+                        image: busybox:1.28
+                        command: ["sh", "-c", "sed -i 's#/VRE_PATH/hub/oauth_login?next=#{{ vl['base_url'] }}/hub/oauth_login?next=#' /etc/jupyterhub/custom/templates/login.html"]
+                        securityContext:
+                          runAsUser: 0
+                        volumeMounts:
+                          - name: hub-templates
+                            mountPath: /etc/jupyterhub/custom
+                    extraVolumes:
+                      - name: hub-templates
+                        emptyDir: { }
+                    extraVolumeMounts:
+                      - name: hub-templates
+                        mountPath: /etc/jupyterhub/custom
+                    extraConfig:
+                      templates: |
+                        c.JupyterHub.template_paths = ['/etc/jupyterhub/custom/templates']
+                    concurrentSpawnLimit: 20
+                    consecutiveFailureLimit: 20
+                    activeServerLimit: 20
+                    namedServerLimitPerUser: 1
+                    shutdownOnLogout: true
+                    extraEnv:
+                      OAUTH2_TLS_VERIFY: 'false'
+                    baseUrl: {{ vl['base_url'] }}
+                    config:
+                      GenericOAuthenticator:
+                        client_id: {{ auth['client_id'] }}
+                        client_secret: {{ auth['client_secret'] }}
+                        oauth_callback_url: https://{{ vl['fqdn'] }}:{{vl['ingress_ssl_port']}}{{ vl['base_url'] }}/hub/oauth_callback
+                        authorize_url: https://{{ auth['keycloak_host'] }}:{{auth['keycloak_port']}}/auth/realms/{{ auth['realm_name'] }}/protocol/openid-connect/auth
+                        token_url: https://{{ auth['keycloak_host'] }}:{{ auth['keycloak_port'] }}/auth/realms/{{ auth['realm_name'] }}/protocol/openid-connect/token
+                        userdata_url: https://{{ auth['keycloak_host'] }}:{{ auth['keycloak_port'] }}/auth/realms/{{ auth['realm_name'] }}/protocol/openid-connect/userinfo
+                        login_service: keycloak
+                        username_key: preferred_username
+                        userdata_params:
+                          state: state
+                      JupyterHub:
+                        authenticator_class: generic-oauth
+                        tornado_settings:
+                          headers:
+                            Content-Security-Policy: "frame-ancestors 'self' *"
+                          cookie_options:
+                            SameSite: "None"
+                            Secure: "True"
+                        tls_verify: false
+                  ingress:
+                    enabled: true
+                    hosts:
+                      - {{ vl['fqdn'] }}
+                    annotations:
+                      kubernetes.io/ingress.class: "nginx"
+                      nginx.ingress.kubernetes.io/add-base-url: "true"
+                      kubernetes.io/tls-acme: "true"
+                      nginx.ingress.kubernetes.io/proxy-body-size: "600m"
+                      nginx.org/client-max-body-size: "600m"
+                    tls:
+                      - hosts:
+                        - {{ vl['fqdn'] }}
+                        secretName: {{ vl['fqdn'] }}-tls
+                  proxy:
+                    service:
+                      type: ClusterIP
+                  singleuser:
+                    extraFiles:
+                      jupyter_notebook_config.json:
+                        mountPath: /etc/jupyter/jupyter_notebook_config.json
+                        data:
+                          ServerApp:
+                            iopub_data_rate_limit: 1.0e10
+                            iopub_msg_rate_limitFloat: 3000
+                    memory:
+                        limit: 2G
+                        guarantee: 2G
+                    storage:
+                        capacity: 0.5Gi
+                        extraVolumes:
+                          - name: jupyterhub-shared-{{vl['name']}}
+                            persistentVolumeClaim:
+                              claimName: shared-volume-{{vl['name']}}
+                        extraVolumeMounts:
+                          - name: jupyterhub-shared-{{vl['name']}}
+                            mountPath: /home/ENVRI-Summer-School
+                    lifecycleHooks:
+                      postStart:
+                        exec:
+                          command: ["sh", "-c", "mkdir -p /home/jovyan/NaaVRE && \
+                              cp -r /tmp/notebooks/conf_vl_repos.py /home/jovyan/NaaVRE/ && \
+                              python /home/jovyan/NaaVRE/conf_vl_repos.py --force=False --github_url={{github['url']}} --github_token={{github['token']}} --registry_url={{registry['url']}} && \
+                              gitpuller {{ examples_git['url'] }} {{ examples_git['branch'] }} notebooks
+                              "]
+                    defaultUrl: "/lab"
+                    extraEnv:
+                      JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
+                      MODULE_MAPPING_URL: {{vl['module_mapping_url']}}
+                      NAAVRE_API_TOKEN: {{workflow_engine['access_token']}}
+                      VLAB_SLUG: {{vl['name']}}
+                      API_ENDPOINT: {{vre['api_endpoint']}}
+                    image:
+                      name: {{vl['image_name']}}
+                      tag: {{vl['image_tag']}}
+                      pullPolicy: Always
