@@ -11,11 +11,21 @@ def build_VL(config_dict=None, vl_file_path=None,examples_git=None):
         trim_blocks=True,
         lstrip_blocks=True)
     template_vl = template_env.get_template('vl.jinja2')
+    custom = {}
+    shared_volume = {}
+    if 'custom' in config_dict:
+        custom = config_dict['custom']
+    if 'shared_volume' in config_dict:
+        shared_volume = config_dict['shared_volume']
+
     template_vl.stream(vl=config_dict['vl'], auth=config_dict['auth'],
                        github=config_dict['github'], registry=config_dict['registry'],
-                       workflow_engine=config_dict['workflow_engine'],
+                       naavre_api_token=config_dict['naavre_api_token'],
                        vre=config_dict['vre'],
-                       examples_git=config_dict['examples_git']) \
+                       examples_git=config_dict['examples_git'],
+                       search=config_dict['search'],
+                       custom=custom,
+                       shared_volume=shared_volume) \
         .dump(vl_file_path)
 
 
@@ -42,7 +52,9 @@ if __name__ == '__main__':
         vl_name = vl_name.replace('.yaml', '')
         print(
             'kubectl create ns ' + vl_name + ' ; helm install shared-volume-' + vl_name.replace('vl-',
-                                                                                                '') + ' k8s-as-helm/pvc -n ' + vl_name + ' -f ../pvc/vl-pvc.yaml -n ' + vl_name + ' ; helm install ' + vl_name + ' jupyterhub/jupyterhub -f ' + vl_name + '.yaml -n ' + vl_name)
+                                                                                                '') +
+            ' k8s-as-helm/pvc -n ' + vl_name + ' -f ../pvc/vl-pvc.yaml -n ' + vl_name + ' ; helm upgrade --install ' +
+            vl_name + ' jupyterhub/jupyterhub -f ' + vl_name + '.yaml -n ' + vl_name+'; kubectl create secret tls lifewatch.lab.uvalight.net-tls --cert=/home/spiros/Lets_Encrypt/fullchain.pem --key=/home/spiros/Lets_Encrypt/privkey.pem -n '+vl_name)
         # print(
         #     'helm delete ' + vl_name+' -n ' + vl_name)
         # print(

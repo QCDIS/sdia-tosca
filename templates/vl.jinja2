@@ -8,7 +8,7 @@
                           - --branch={{vl['git_login_template']}}
                           - --depth=1
                           - --
-                          - https://github.com/QCDIS/k8s-jhub.git
+                          - {{vl['git_login_repository']}}
                           - /etc/jupyterhub/custom
                         securityContext:
                           runAsUser: 0
@@ -79,6 +79,7 @@
                     service:
                       type: ClusterIP
                   singleuser:
+                    cmd: ['/usr/local/bin/start-jupyter-venv.sh']
                     extraFiles:
                       jupyter_notebook_config.json:
                         mountPath: /etc/jupyter/jupyter_notebook_config.json
@@ -90,28 +91,37 @@
                         limit: 2G
                         guarantee: 2G
                     storage:
-                        capacity: 0.5Gi
+                        capacity: 0.1Gi
+                    {% if shared_volume is defined and shared_volume['name'] %}
                         extraVolumes:
-                          - name: jupyterhub-shared-{{vl['name']}}
+                          - name: {{shared_volume['name']}}
                             persistentVolumeClaim:
-                              claimName: shared-volume-{{vl['name']}}
+                              claimName: {{shared_volume['name']}}
                         extraVolumeMounts:
-                          - name: jupyterhub-shared-{{vl['name']}}
-                            mountPath: /home/ENVRI-Summer-School
+                          - name: {{shared_volume['name']}}
+                            mountPath: /home/{{shared_volume['name']}}
+                    {% endif %}
                     lifecycleHooks:
                       postStart:
                         exec:
-                          command: ["sh", "-c", "mkdir -p /home/jovyan/NaaVRE && \
-                                cp -r /tmp/repo_utils/conf_vl_repos.py /home/jovyan/NaaVRE/ && \
-                                python /home/jovyan/NaaVRE/conf_vl_repos.py --force=True --github_url={{github['url']}} --github_token={{github['token']}} --registry_url={{registry['url']}} &&\
-                                gitpuller {{ examples_git['url'] }} {{ examples_git['branch'] }} example_notebooks"]
+                          command: ["sh", "-c", "/tmp/init_script.sh"]
                     defaultUrl: "/lab"
                     extraEnv:
                       JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
                       MODULE_MAPPING_URL: {{vl['module_mapping_url']}}
-                      NAAVRE_API_TOKEN: {{workflow_engine['access_token']}}
+                      NAAVRE_API_TOKEN: {{naavre_api_token['access_token']}}
                       VLAB_SLUG: {{vl['name']}}
                       API_ENDPOINT: {{vre['api_endpoint']}}
+                      SEARCH_API_ENDPOINT: {{search['url']}}
+                      SEARCH_API_TOKEN: {{search['access_token']}}
+                      {% if custom is defined and custom['multiply_conf_url'] %}
+                      MULTIPLY_CONF_URL: {{custom['multiply_conf_url']}}
+                      PROJ_LIB: /venv/share/proj
+                      {% endif %}
+                      CELL_GITHUB: {{github['url']}}
+                      CELL_GITHUB_TOKEN: {{github['token']}}
+                      REGISTRY_URL: {{registry['url']}}
+
                     image:
                       name: {{vl['image_name']}}
                       tag: {{vl['image_tag']}}
