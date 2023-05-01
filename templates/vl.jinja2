@@ -54,12 +54,6 @@
                           state: state
                       JupyterHub:
                         authenticator_class: generic-oauth
-                        tornado_settings:
-                          headers:
-                            Content-Security-Policy: "frame-ancestors 'self' *"
-                          cookie_options:
-                            SameSite: "None"
-                            Secure: "True"
                         tls_verify: false
                   ingress:
                     enabled: true
