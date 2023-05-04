@@ -54,7 +54,7 @@ if __name__ == '__main__':
             'kubectl create ns ' + vl_name + ' ; helm install shared-volume-' + vl_name.replace('vl-',
                                                                                                 '') +
             ' k8s-as-helm/pvc -n ' + vl_name + ' -f ../pvc/vl-pvc.yaml -n ' + vl_name + ' ; helm upgrade --install ' +
-            vl_name + ' jupyterhub/jupyterhub -f ' + vl_name + '.yaml -n ' + vl_name+'; kubectl create secret tls lifewatch.lab.uvalight.net-tls --cert=Lets_Encrypt/fullchain.pem --key=Lets_Encrypt/privkey.pem -n '+vl_name)
+            vl_name + ' jupyterhub/jupyterhub -f ' + vl_name + '.yaml -n ' + vl_name+'; kubectl create secret tls HOST-tls --cert=Lets_Encrypt/fullchain.pem --key=Lets_Encrypt/privkey.pem -n '+vl_name)
         # print(
         #     'helm delete ' + vl_name+' -n ' + vl_name)
         # print(

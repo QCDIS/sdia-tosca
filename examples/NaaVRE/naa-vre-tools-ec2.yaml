@@ -623,15 +623,15 @@ topology_template:
                           sub_filter '<base href="/">' '<base href="/argowf/">';
                           sub_filter_once on;
                       hosts:
-                        - lifewatch.lab.uvalight.net
+                        - HOST
                       paths:
                       - /argowf(/|$)(.*)
                       tls:
                         - hosts:
-                            - lifewatch.lab.uvalight.net
-                          secretName: lifewatch.lab.uvalight.net-tls
+                            - HOST
+                          secretName: HOST-tls
                     sso:
-                      issuer: https://lifewatch.lab.uvalight.net:32443/auth/realms/n-a-a-vre
+                      issuer: https://HOST:PORT/auth/realms/n-a-a-vre
                       sessionExpiry: 240h
                       clientId:
                         name: argo-sso
@@ -639,7 +639,7 @@ topology_template:
                       clientSecret:
                         name: argo-sso
                         key: client-secret-key
-                      redirectUrl: https://lifewatch.lab.uvalight.net:32443/argowf/oauth2/callback
+                      redirectUrl: https://HOST:PORT/argowf/oauth2/callback
                       rbac:
                         enabled: false
                       insecureSkipVerify: false
@@ -824,9 +824,9 @@ topology_template:
                     adminPassword: prom-operator
                     grafana.ini:
                       server:
-                        domain: lifewatch.lab.uvalight.net
+                        domain: HOST
                         #root_url: "%(protocol)s://%(domain)s/"
-                        root_url: https://lifewatch.lab.uvalight.net/grafana/
+                        root_url: https://HOST/grafana/
                         serve_from_sub_path: true
 
                     enabled: true
@@ -845,12 +845,12 @@ topology_template:
                           sub_filter '<base href="/">' '<base href="/monitor/">';
                           sub_filter_once on;
                       hosts:
-                        - lifewatch.lab.uvalight.net
+                        - HOST
                       path: /grafana(/|$)(.*)
                       tls:
                         - hosts:
-                            - lifewatch.lab.uvalight.net
-                          secretName: lifewatch.lab.uvalight.net-tls
+                            - HOST
+                          secretName: HOST-tls
               inventory:
                 all:
                   hosts:
@@ -898,7 +898,7 @@ topology_template:
                   persistence:
                     enabled: false
                   ingress:
-                    host: lifewatch.lab.uvalight.net
+                    host: HOST
               inventory:
                 all:
                   hosts:
